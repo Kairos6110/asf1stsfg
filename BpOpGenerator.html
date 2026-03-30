@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Breakpoint OPORD Generator v2.2</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://js.puter.com/v2/"></script>
+    <style>
+        :root {
+            --accent: olivedrab;
+            --bg-panel: rgba(0, 0, 0, 0.85);
+            --border: #444;
+        }
+        body {
+            background-image: url('./images/bgndblurred.jpg');
+            background-repeat: repeat;
+            color: #ffffff;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+        img { max-width: 100%; }
+        
+        /* SLEEK SELECTOR STYLES */
+        .modern-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: var(--bg-panel);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .province-card {
+            border: 1px solid #333;
+            border-radius: 4px;
+            margin-bottom: 8px;
+            overflow: hidden;
+        }
+
+        .province-header {
+            background: #1a1a1a;
+            padding: 10px 15px;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .province-header:hover { background: #252525; }
+
+        .province-header input[type="checkbox"] {
+            margin-right: 15px;
+            transform: scale(1.2);
+        }
+
+        .location-grid {
+            display: none;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 10px;
+            padding: 15px;
+            background: #0d0d0d;
+            border-top: 1px solid #333;
+        }
+
+        .location-item {
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            color: #ccc;
+        }
+
+        .location-item input { margin-right: 8px; }
+
+        .controls-row {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            justify-content: center;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #333;
+        }
+
+        input[type="number"] {
+            background: #000;
+            border: 1px solid var(--accent);
+            color: white;
+            padding: 8px;
+            border-radius: 4px;
+            width: 60px;
+        }
+
+        .btn-generate {
+            background: var(--accent);
+            color: black;
+            font-weight: bold;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 4px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-generate:hover { filter: brightness(1.2); }
+
+        /* Existing Overlays */
+        #instructions-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.8); z-index: 100; justify-content: center; align-items: center;
+        }
+        #instructions-box { background: black; border: 2px solid #444; padding: 30px; max-width: 500px; text-align: left; border-radius: 8px; }
+        
+        #success-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.8); z-index: 101; justify-content: center; align-items: center;
+        }
+        #success-box { background: black; border: 2px solid #444; padding: 30px; max-width: 400px; text-align: center; border-radius: 8px; }
+        
+        #map-preview-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.9); z-index: 200; justify-content: center; align-items: center;
+            flex-direction: column;
+        }
+        #map-preview-box {
+            max-width: 90%; max-height: 90%; overflow: auto; text-align: center;
+        }
+        #map-preview-img {
+            max-width: 100%; max-height: 80vh; border: 2px solid #444;
+        }
+
+        .btn-instructions {
+            background: rgba(0, 0, 0, 0.6);
+            color: #ccc;
+            border: 1px solid #555;
+            padding: 8px 20px;
+            border-radius: 0;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+        .btn-instructions:hover {
+            border-color: var(--accent);
+            color: white;
+            background: rgba(0, 0, 0, 0.9);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+        }
+    </style>
+</head>
+
+<body>
+
+<center>
+    <img src='./images/title.png' alt="Logo" style="width:300px; border:1px solid gray">
+    <br><br>
+    <button type="button" class="btn-instructions" onclick="showInstructions()">ℹ️ View Instructions</button>
+
+    <h3 style="font-family:arial">Provinces Location Preview</h3>
+    <img id='provincesMap' src='./images/provincespreview.jpg' style="width:600px; border:5px solid black;">
+    <br><br>
+
+    <div class="modern-container">
+        <h2 style="margin-top:0; color:white">Select desired locations</h2>
+        <div id="selector-engine"></div>
+
+        <div id="selection-summary" style="margin-top:15px; padding:10px; background:#111; border:1px solid #333; border-radius:4px; font-size:0.85rem; color:#ccc; min-height:40px;">Selected: None</div>
+
+        <div class="controls-row">
+			            <button class="btn-generate" onclick="copyAiPrompt()">📋 Copy OPORD Prompt</button>
+
+        </div>
+    </div>
+    <br>
+
+    <div id="mapContainer">
+        <img hidden id='golemMap' src='./images/golemMap.png' style="width:500px;border:5px solid black; margin:10px;">
+        <img hidden id='capenorthMap' src='./images/capenorthMap.png' style="width:500px;border:5px solid black; margin:10px;">
+        <img hidden id='driftwoodisletsMap' src='./images/driftwoodisletsMap.png' style="width:500px;border:5px solid black; margin:10px;">
+        <img hidden id='wildcoastMap' src='./images/wildcoastMap.png' style="width:500px;border:5px solid black; margin:10px;">
+        <img hidden id='smugglerscovesMap' src='./images/smugglerscovesMap.png' style="width:500px;border:5px solid black; margin:10px;">
+        <img hidden id='mounthodgsonMap' src='./images/mounthodgsonMap.png' style="width:500px;border:5px solid black; margin:10px;">
+        <img hidden id='sinkingcountryMap' src='./images/sinkingcountryMap.png' style="width:500px;border:5px solid black; margin:10px;">
+        <img hidden id='whalersbayMap' src='./images/whalersbayMap.png' style="width:500px;border:5px solid black; margin:10px;">
+        <img hidden id='silentmountainMap' src='./images/silentmountainMap.png' style="width:500px;border:5px solid black; margin:10px;">
+        <img hidden id='fenbogMap' src='./images/fenbogMap.png' style="width:500px;border:5px solid black; margin:10px;">
+        <img hidden id='newargyllMap' src='./images/newargyllMap.png' style="width:500px;border:5px solid black; margin:10px;">
+        <img hidden id='channelsMap' src='./images/channelsMap.png' style="width:500px;border:5px solid black; margin:10px;">
+        <img hidden id='goodhopemountainMap' src='./images/goodhopemountainMap.png' style="width:500px;border:5px solid black; margin:10px;">
+        <img hidden id='lakecountryMap' src='./images/lakecountryMap.png' style="width:500px;border:5px solid black; margin:10px;">
+        <img hidden id='infinityMap' src='./images/infinityMap.png' style="width:500px;border:5px solid black; margin:10px;">
+        <img hidden id='sealislandsMap' src='./images/sealislandsMap.png' style="width:500px;border:5px solid black; margin:10px;">
+        <img hidden id='restrictedarea01Map' src='./images/restrictedarea01Map.png' style="width:500px;border:5px solid black; margin:10px;">
+        <img hidden id='newstirlingMap' src='./images/newstirlingMap.png' style="width:500px;border:5px solid black; margin:10px;">
+        <img hidden id='libertyMap' src='./images/libertyMap.png' style="width:500px;border:5px solid black; margin:10px;">
+		        <img hidden id='eggislandMap' src='./images/eggislandMap.png' style="width:500px;border:5px solid black; margin:10px;">
+
+        <img hidden id='windyislandsMap' src='./images/windyislandsMap.png' style="width:500px;border:5px solid black; margin:10px;">
+    </div>
+
+    <div id="instructions-overlay" onclick="hideInstructions()">
+    <div id="instructions-box">
+  <h3 style="border-bottom: 1px solid var(--accent); padding-bottom: 10px;">
+    How to Use the Operation Generator
+  </h3>
+
+  <p>
+    <strong>1. Scout the AO:</strong>
+    Use the province location preview images below to decide where you want to operate.
+    Click <span style="color:var(--accent)">“View Map 🗺️”</span> next to any province to inspect the layout as needed.
+  </p>
+
+  <p>
+    <strong>2. Select Objectives:</strong>
+    Click on a province name to expand it, then select the specific locations you want to include in your operation.
+  </p>
+
+  <p>
+    <strong>3. Generate Your OPORD:</strong>
+    Click the <strong>“Copy OPORD Prompt”</strong> button and follow the instructions.
+  </p>
+
+  <p style="margin-top: 15px; font-size: 0.9em;">
+    This tool was created by <strong>Kairos</strong> of <strong>Auroa Special Forces • 1st SFG</strong> (PlayStation Community).
+    Feel free to share it with the entire Ghost Recon community, it was made for everyone to enjoy!
+    <br><br>
+    Want to join our PlayStation Discord? Click here:<br>
+    <a href="https://discord.gg/BqQsGe59J2" target="_blank" style="color: var(--accent);">
+      ASF 1st SFG PSN Discord Server
+    </a>
+  </p>
+
+  <p style="text-align:center; color:var(--accent); margin-top:20px; font-size:0.9em;">
+    Click anywhere to close
+  </p>
+</div>
+
+    </div>
+
+    <div id="success-overlay" onclick="hideSuccess()">
+        <div id="success-box">
+            <h3 style="margin-top:0; color:white">Prompt Copied in your Clipboard!</h3>
+<p style="color:#ccc">
+  Go paste it into your AI tool of choice to generate the final OPORD. Try a few generations and use the one you prefer. You can also fine-tune it as needed. Enjoy running immersive operations with your teammates and good luck out there!
+</p>
+      <div style="display:flex; gap:15px; justify-content:center; margin:20px 0; flex-wrap: wrap;">
+    <a href="https://gemini.google.com" target="_blank" style="background:var(--accent); color:black; padding:10px 20px; text-decoration:none; border-radius:4px; font-weight:bold;">Gemini</a>
+    <a href="https://chatgpt.com/" target="_blank" style="background:var(--accent); color:black; padding:10px 20px; text-decoration:none; border-radius:4px; font-weight:bold;">ChatGPT</a>
+    <a href="https://claude.ai/new" target="_blank" style="background:var(--accent); color:black; padding:10px 20px; text-decoration:none; border-radius:4px; font-weight:bold;">Claude</a>
+    <a href="https://grok.com/" target="_blank" style="background:var(--accent); color:black; padding:10px 20px; text-decoration:none; border-radius:4px; font-weight:bold;">Grok</a>
+    <a href="https://www.perplexity.ai/" target="_blank" style="background:var(--accent); color:black; padding:10px 20px; text-decoration:none; border-radius:4px; font-weight:bold;">Perplexity</a>
+</div>
+            <p style="color:var(--accent); font-size:0.9em; margin-bottom:0;">Click anywhere to close</p>
+        </div>
+    </div>
+
+    <div id="map-preview-overlay" onclick="closeMapPreview()">
+        <div id="map-preview-box">
+            <h3 id="map-preview-title" style="color:white; margin-top:0;"></h3>
+            <img id="map-preview-img" src="">
+            <p style="color:var(--accent); margin-top:10px;">Click anywhere to close</p>
+        </div>
+    </div>
+</center>
+
+<script>
+    // COMPLETE DATABASE
+    const db = {
+        "Cape North": ["A.I Experimental Center", "Bat SAM Site", "Campus Data Farm", "Campus Relay Station", "Construction Site", "Darkwood Island Port", "Sentinel Corp. Location", "Skell Foundation Campus", "Underwater Cable Station"],
+        "Channels": ["Ancient Village", "Auroa Power Plant", "Channels Port", "Channels R&D Center", "Checkpoint Shark Charlie", "Cold War Ruins", "Eagle SAM Site", "Electric Grid Control", "Main Pumping Station", "Navy Fuelling Station", "Oceanic Power Plant", "Red Shark Outpost", "Sentinel Corp. Location", "Step Up Startup", "Vulture SAM Site"],
+        "Driftwood Islets": ["Ancient Cemetery", "Ancient Sanctuary", "Camp Kodiak", "Driftwood Islets Testing Zone"],
+        "Egg Island (Drones)": ["Aamon Assault Areas", "Murmur Patrol Areas"],
+        "Fen Bog": ["Airship Air Station", "Andersons Farm", "Ancient Village", "BlueCorp Startup", "Checkpoint Tiger Bravo", "Checkpoint Tiger Hotel", "Control Station Tiger 02", "Control Station Tiger 03", "Drone Station W051", "Drone Station W052", "Fen Bog Port", "Fen Bog Testing Zone", "Hogweed Station", "Longford Farm", "Photovoltaic Park W01", "Recycling Facility", "Shipping Center", "Whitestone Farm"],
+        "Golem Island": ["Ancient Harbor", "Camp Phoenix", "Camp Salamander", "Chemical Pipeline", "Chemical Refinery", "Forgotten Sanctuary", "Golem Island Heliport", "Golem Island Sattelite Dish", "Golem Island Testing Zone ", "Lava Shield", "Lavaduct", "Missile Site Ruins", "No Man's Land", "Prototype Workshop", "Red Phoenix Outpost", "Scandium Mine"],
+        "Good Hope Mountain": ["Auroa Survival Shelter", "Auroa Weather Station", "Bunker Edgehod South", "Camp Weasel", "Checkpoint Weasel Alpha", "Checkpoint Weasel Golf", "Checkpoint Weasel Hotel", "Checkpoint Weasel India", "Drone Station W111", "Natural Hazards Control", "Red Weasel Outpost"],
+        "Infinity": ["Adam Smith District", "Alpha Centauri Residences", "Antares District", "Auroa Airport", "Auroa Eco-Museum", "Canopus District", "Checkpoint Viper Charlie", "Checkpoint Viper Delta", "Checkpoint Viper Echo", "Checkpoint Viper Golf", "Control Station Viper 04", "Infinity Medical Center", "Infinity Transport Hub", "Jace Skell Conference Hall", "Outpost Green Viper", "Polaris Residences", "Rigel Residences", "Sirius Residences", "Skell Foundation Head Office", "Skell Security", "Skell Technology Head Office", "Vega Residences"],
+        "Lake Country": ["Ancient Fort", "Ancient Village", "Camp Viper", "Checkpoint Viper Alpha", "Drone Station W121", "Maintenance Area", "Prototype Workshop", "Red Viper Outpost", "Skell Security Assembly Hall", "Skell Security Operations", "Skell Security R&D Center", "Two Lakes Residences"],
+        "Liberty": ["Adam Smith District", "Ancient Fort", "Auroa Hospital", "Auroa Parliament", "Auroa Solar Power Plant", "Autumn Lake District", "Ayn Rand Residences", "Benjamin Franklin Residences", "Checkpoint Fox Bravo", "Checkpoint Fox Foxtrot", "Construction Site (Liberty capital)", "Construction Site (Liberty outskirts east)", "Control Station Fox 01", "Control Station Fox 02", "Cryohope", "Cryogenization Center", "Detention Center", "Drone Station W191", "Drone Station W192", "East Park", "Eternity", "Frederic Bastiat Residences", "Gate 05", "Gate 06", "Gate 07", "Island District", "Jace Skell Dam", "Jane Addams Residences", "John Dewey Residences", "Liberty Airport", "Liberty Port", "Liberty Transport Hub", "Maunga Nui Eco Park", "Parliament Shopping Street", "Richard Cobden Residences", "Thomas Jefferson Residences", "Winter Park"],
+        "Mount Hodgson": ["Bald Peak Mine", "Chem-Extraction Complex", "Checkpoint Tiger Echo", "Drone Station W041", "Mining Control Center", "Silent Valley Mine"],
+        "New Argyll": ["Ancient Fort", "Ancient Sacred Site", "Brewery", "Cold Storage Center", "Control Station Tiger 04", "Fish Processing Center", "Juice Processing Center", "Long Valley Residences", "Meal Packaging Center", "New Argyll Winery", "Outpost Black Tiger", "Skell Estate"],
+        "New Stirling": ["Agronomy Center", "Ancient Village", "Ardmore Farm", "Blue Viper Outpost", "Burnside Orchard", "Checkpoint Viper Bravo", "Checkpoint Viper Foxtrot", "Checkpoint Viper Hotel", "Checkpoint Viper India", "Control Station Viper 02", "Control Station Viper 03", "Drone Station W131", "Drone Station W132", "Dunback Farm", "Ettrick Residences", "Forsyth Farm", "Glenfield Farm", "Glenorchy Orchard", "Kelso Farm", "Kinloch Farm", "Mossburn Hopfield", "New Stirling Freight Yard", "Sutherland Vineyard", "World SeedVault"],
+        "Restricted Area 01": ["Arrow Testing Zone", "Assembly Hall Omega 01", "Assembly Hall Omega 02", "Camp Ferret", "Camp Fox", "Checkpoint Ferret Bravo", "Checkpoint Fox Alpha", "Checkpoint Fox Charlie", "Checkpoint Fox Delta", "Checkpoint Fox Echo", "Checkpoint Weasel Bravo", "Construction Site", "Control Station Fox 01", "Control Station Fox 02", "Control Station Viper 01", "Devil Forest Gold Mine", "Drone Station W161", "Freeman Residences", "Gate 01", "Gate 02", "Gate 03", "Gate 04", "Gate 05", "Gate 06", "Gate 07", "Gold Trail Testing Zone", "Grandview Mansion", "Maintenance Area", "Nugget Cliff", "Omega Operations", "Omega R&D Center", "Outpost Red Ferret", "Outpost Red Fox", "Prototype Workshop", "Russell Gold Mine", "Stony Creek Village", "Training Center"],
+        "Seal Islands": ["Abandoned Barracks", "Ammunition Storage", "Anti Aircraft Battery", "Buzzard SAM Site", "Camp Seal Cove", "Checkpoint Shark Alpha", "Checkpoint Shark Bravo", "Condor SAM site", "Control Station Shark 01", "Emelius Port", "Falcon SAM Site", "Fuel Storage", "Naval Base Auroa Airfield", "Owl SAM Site", "Sentinel Corp. Naval Base", "Shark Base", "West Radar Station"],
+        "Silent Mountain": ["Auroa Data Farm", "Auroa Intranet Control", "Battery Farm", "Camp Black Widow", "Drone Station W071", "Hemlock Station", "Mathilda's Palace", "O'Connors Mine", "Pumping Station", "Submarine Cable Control"],
+        "Sinking Country": ["Ammunition Depot", "Ancient Harbor", "Anti-Aircraft Ruins", "Bunker Edgehod North", "Bunker Edgehod South", "Camp Tiger", "Checkpoint Tiger Golf", "Checkpoint Tiger India", "Checkpoint Tiger Juliet", "Checkpoint Tiger Kilo", "Equipment Depot", "Harrier SAM Site", "Howard Airfield", "Howard Port", "Osprey SAM Site", "Radar Station North", "Sentinel Corp. Land Base", "Sparrowhawk SAM Site"],
+        "Smugglers Coves": ["Ancient Harbor", "Auroa Materials Deposit", "Checkpoint Tiger Bravo", "Checkpoint Tiger Charlie", "Checkpoint Tiger Delta", "Composite Factory", "Drone Station W011", "Emergency Center", "Foxglove Station", "Maunga Nui Port", "Oleander Station", "Outpost Red Tiger", "Polymorph Modeling", "Smuggler Coves Freight Yard", "Spanish Fortress", "Wind Farm W01"],
+        "Whalers Bay": ["Aconite Station", "Air Chassis Factory", "Ancient Harbor", "Blue Cove Station", "Checkpoint Weasel Charlie", "Checkpoint Weasel Delta", "Checkpoint Weasel Echo", "Construction Site", "Drone Station W061", "Fanny Bay Port", "Land Chassis Factory", "Mechanical R&D Center", "Storage Depot", "Whalers Bay Airfield", "Wind Farm W02"],
+        "Wild Coast": ["Anchor Point Station", "Ancient Harbor", "Checkpoint Tiger Foxtrot", "Control Station Tiger 01", "Drone Station W031", "Electric Engine Factory", "Engine R&D Center", "Hybrid Engine Factory", "Outpost Blue Tiger", "Shark Bank Station", "Storage Depot", "Toxic Storage Depot", "Wild Coast Freight Yard", "Wind Farm W03", "Youth Spring"],
+        "Windy Islands": ["Auroa Recycling Factory", "Drone Station S01", "Garbage Dump", "Incineration Plant", "Windy Islands Port"]
+    };
+
+   // Initialize Selector
+    const engine = document.getElementById('selector-engine');
+
+    // Define the desired order of provinces
+    const provinceOrder = [
+        "Golem Island",
+        "Cape North",
+        "Driftwood Islets",
+        "Smugglers Coves",
+        "Sinking Country",
+        "Wild Coast",
+        "Mount Hodgson",
+        "Fen Bog",
+        "Whalers Bay",
+        "Silent Mountain",
+        "New Argyll",
+        "Infinity",
+        "Channels",
+        "Good Hope Mountain",
+        "Lake Country",
+        "Seal Islands",
+        "Restricted Area 01",
+        "New Stirling",
+        "Liberty",
+        "Egg Island (Drones)", // Note: The key in db is "Egg Island (Drones)"
+        "Windy Islands"
+    ];
+
+    provinceOrder.forEach(prov => {
+    const card = document.createElement('div');
+    card.className = 'province-card';
+    // Updated header: Removed checkbox, entire header now toggles the grid
+    const header = document.createElement('div');
+    header.className = 'province-header';
+    header.style.cursor = "pointer";
+    header.onclick = () => toggleGrid(prov); // Clicking anywhere on header opens/closes
+    
+    header.innerHTML = `
+        <span style="flex-grow:1; font-weight:bold;">${prov}</span>
+        <span style="font-size:0.85em; color:var(--accent); margin-right:15px; z-index:10;" onclick="previewMap(event, '${prov}')">View map 🗺️</span>
+        <span style="font-size:0.8em; color:olivedrab">▼</span>
+    `;
+    
+    const grid = document.createElement('div');
+    grid.className = 'location-grid';
+    grid.id = `grid-${prov.replace(/\s+/g, '')}`;
+
+    db[prov].forEach(loc => {
+        const item = document.createElement('div');
+        item.className = 'location-item';
+        item.innerHTML = `<label><input type="checkbox" class="loc-check" data-prov="${prov}" value="${loc}" onchange="handleCheckboxChange(this)"> ${loc}</label>`;
+        grid.appendChild(item);
+    });
+
+    card.appendChild(header);
+    card.appendChild(grid);
+    engine.appendChild(card);
+});
+
+    function toggleGrid(prov) {
+        const g = document.getElementById(`grid-${prov.replace(/\s+/g, '')}`);
+        g.style.display = (g.style.display === 'grid') ? 'none' : 'grid';
+    }
+
+    // Global array to store selected locations in order of selection
+    let selectedLocationsInOrder = [];
+
+    // Function to handle checkbox changes
+    function handleCheckboxChange(checkbox) {
+        const province = checkbox.getAttribute('data-prov');
+        const location = checkbox.value;
+        const item = { province, location };
+
+        if (checkbox.checked) {
+            // Add to array if checked
+            selectedLocationsInOrder.push(item);
+        } else {
+            // Remove from array if unchecked
+            selectedLocationsInOrder = selectedLocationsInOrder.filter(
+                (loc) => !(loc.province === province && loc.location === location)
+            );
+        }
+        updateSummary(); // Update the displayed summary
+    }
+
+    // The toggleAllInProv function is not currently used in the HTML,
+    // but if it were, it would need to iterate and call handleCheckboxChange for each.
+    // function toggleAllInProv(prov, isChecked) {
+    //     const checks = document.querySelectorAll(`.loc-check[data-prov="${prov}"]`);
+    //     checks.forEach(c => {
+    //         if (c.checked !== isChecked) {
+    //             c.checked = isChecked;
+    //             handleCheckboxChange(c);
+    //         }
+    //     });
+    // }
+
+    function updateSummary() {
+        const display = document.getElementById('selection-summary');
+        
+        if(selectedLocationsInOrder.length === 0) {
+            display.innerHTML = "Selected: <span style='color:#777'>None</span>";
+            return;
+        }
+
+        const names = selectedLocationsInOrder.map(item => `${item.province} - ${item.location}`);
+        display.innerHTML = `Selected (${names.length}): <span style='color:var(--accent)'>${names.join(', ')}</span>`;
+    }
+
+    function showInstructions() { document.getElementById("instructions-overlay").style.display = "flex"; }
+    function hideInstructions() { document.getElementById("instructions-overlay").style.display = "none"; }
+    function hideSuccess() { document.getElementById("success-overlay").style.display = "none"; }
+
+    function previewMap(e, prov) {
+        e.stopPropagation();
+        let id = prov.toLowerCase().replace(/\s+/g, '') + "Map";
+        if(prov.includes("Golem")) id = "golemMap";
+        if(prov.includes("Egg Island")) id = "eggislandMap";
+        
+        const sourceImg = document.getElementById(id);
+        if (sourceImg) {
+            document.getElementById('map-preview-title').innerText = prov;
+            document.getElementById('map-preview-img').src = sourceImg.src;
+            document.getElementById('map-preview-overlay').style.display = 'flex';
+        } else {
+            alert("Map preview not available for " + prov);
+        }
+    }
+
+    function closeMapPreview() {
+        document.getElementById('map-preview-overlay').style.display = 'none';
+    }
+
+    function copyAiPrompt() {
+        if (selectedLocationsInOrder.length === 0) {
+            alert("Please select at least one province or location."); 
+            return; 
+        }
+
+        const selectedData = selectedLocationsInOrder.map(item => `${item.province} - ${item.location}`);
+
+        const prompt = `Act as a Military Operations Specialist. Your task is to generate a summarized (always below 1500 characters please to fit Discord maximum message lengtht) tactical Operation Order (OPORD) based on a brief scenario description you need to make up yourself based on the locations the user selected and which are listed at the end of this prompt (USER DATA: section). Just refer to the team as a choice between 'Alpha Team','Bravo Team','Charlie Team' or 'Delta Team'. Use the following structural logic for each section:
+
+Header: Create a unique Operation number (OPORD NO. *4 random digits*) and list the area of operations (in the user data, areas are the first part of the string before the - character)
+
+1. SITUATION AND MISSION Describe the incident, enemy activity, and the "hook" that justifies the mission, inspire yourself directly by the location names. Write a clear "Who, What, Where, and Why" statement (without making an actual Who What Where Why bullet list just a guideline) summarizing the primary objective and the units involved.
+
+3. EXECUTION: Break the mission into chronological Phases with objectives (Phase I, II, III). One phase per user data location.
+
+4. SERVICE & SUPPORT: Make up info about which Close Air support, Exfil helicopter, Air or Ground vehicle assets are available. Close air support can only be helicopters ('MH-6 Little Bird', 'MH-60 Black Hawk' or 'AH-64 Apache') though, never A-10 or never fighter jets. Ground vehicle can be 'Technical', 'Truck' or 'APC' and always only one.
+
+5. COMMAND & SIGNAL: Make up callsigns for command and the team, the radio frequency, and provide at least two unique codewords for mission milestones.
+
+Tone and Style: Use professional military jargon, be concise, and use bold headers with bullet points for readability.
+
+
+
+USER DATA: ${selectedData.join(', ')}`;
+        
+        navigator.clipboard.writeText(prompt).then(() => {
+            document.getElementById("success-overlay").style.display = "flex";
+        });
+    }
+</script>
+
+</body>
+</html>

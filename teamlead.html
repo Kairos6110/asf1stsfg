@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ghost Recon MILSIM - The '8-Phase Team Lead Framework'</title>
+    <style>
+        :root {
+            /* MILITARY GREEN / BLACK Theme */
+            --background-color: #0d1313; /* Deep, near-black background */
+            --text-color: #c0c0c0; /* Light gray for main text */
+            --header-color: #a3b18a; /* Soft, muted olive green for main titles */
+            --accent-color: #588157; /* Darker forest green for accents/borders */
+            --card-background: #1a1a1a; /* Very dark gray/black for cards and sections */
+            --border-color: #3a4a3a; /* Subtle dark green border color */
+            --highlight-text: #ffffff; /* Pure white for high contrast text */
+            --code-background: #101010; /* Extra dark for code blocks */
+            --code-text: #a3b18a; /* Olive green for code text */
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background-color: var(--card-background);
+            padding: 20px 0;
+            border-bottom: 3px solid var(--accent-color);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+        }
+
+        header h1 {
+            color: var(--header-color);
+            text-align: center;
+            margin: 0;
+            text-transform: uppercase;
+            letter-spacing: 2px; /* Increased letter-spacing for military/stencil feel */
+        }
+
+        h2, h3 {
+            color: var(--header-color);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 5px;
+            margin-top: 30px;
+        }
+
+        .section-intro, .card {
+            background-color: var(--card-background);
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 4px; /* Reduced border radius for a sharper look */
+            box-shadow: 0 1px 5px rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--border-color); /* Added subtle border */
+        }
+
+        .framework-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .framework-list li {
+            padding: 10px;
+            border-bottom: 1px dashed var(--border-color);
+            font-weight: 500;
+        }
+
+        .framework-list li:last-child {
+            border-bottom: none;
+        }
+
+        .framework-list strong {
+            color: var(--accent-color);
+            font-size: 1.1em;
+            margin-right: 10px;
+        }
+
+        .callout {
+            background-color: var(--accent-color);
+            color: var(--highlight-text);
+            padding: 15px;
+            border-radius: 4px;
+            margin: 20px 0;
+            font-style: italic;
+            font-weight: bold;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+        }
+
+        .example {
+            margin: 10px 0;
+            padding: 10px;
+            border-left: 5px solid var(--header-color);
+            background-color: #242424; /* Slightly lighter card background for contrast */
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+
+        .example code {
+            font-family: Consolas, monospace;
+            background-color: var(--code-background);
+            color: var(--code-text);
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+
+        .radio-call-example {
+            border: 1px dashed var(--border-color);
+            padding: 15px;
+            margin: 15px 0;
+            background-color: #242424;
+        }
+
+        .radio-call-example p {
+            margin: 5px 0;
+            font-weight: bold;
+            color: var(--highlight-text);
+        }
+
+        .video-section {
+            text-align: center;
+            margin-top: 40px;
+        }
+
+        .video-container {
+            position: relative;
+            padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
+            height: 0;
+            overflow: hidden;
+            max-width: 100%;
+            background: #000;
+            margin-top: 20px;
+            border-radius: 4px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.7);
+        }
+
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: 0;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Ghost Recon MILSIM - The '8-Phase Team Lead Framework'</h1>
+    </header>
+
+    <div class="container">
+
+        <section class="section-intro">
+            <p>This a concise and practical guide to leading missions effectively, confidently, and with minimal improvisation or unnecessary delays. It tackles common challenges observed during missions such as prolonged execution, unclear or unrealistic instructions, and excessive improvisation that often lead to time wasted and unrealistic scenarios.</p>
+
+            <p>The course’s objective is to present a clear, structured framework for leading a team from start to finish. Although the training example focuses on a single compound, the leadership principles demonstrated are adaptable to any mission environment. By adopting this framework, team leaders can deliver missions that are efficient, authentic, and—most importantly—enjoyable for everyone involved.</p>
+        </section>
+
+        <div class="callout">
+            📌 Universal Principle: Every team leader naturally develops their own style and personality; however, the concepts presented here are the foundation of effective team leadership. Also, at every step of the way, the team lead takes into account the team’s feedback when making decisions. Ultimately, the team lead “calls the shots” to maintain cohesion and uphold the chain of command, but it’s all about teamwork — every teammate’s input is valued and considered. After all, there’s no “I” in TEAM.
+        </div>
+
+        <section class="card">
+            <h2>The 8-Phase Leadership Framework 📋</h2>
+            <p>As team lead, you are responsible for supporting and executing this comprehensive 8-step framework:</p>
+            <ul class="framework-list">
+                <li><strong>1. Operation Briefing:</strong> Inform team of the mission intent and objectives and ensure everyone understands the mission they are about to execute.</li>
+                <li><strong>2. Role Assignment:</strong> Assign roles based on objectives and terrain, making full use of the operators and leaving nothing to chance. Assign 2IC (Second in Command).</li>
+                <li><strong>3. TACMAP/Base(s) Review:</strong> Quick review of the tactical map and target area layout.</li>
+                <li><strong>4. Infiltration:</strong> Approaching target area realistically, preserving stealth and plausibility.</li>
+                <li><strong>5. Recon:</strong> Getting eyes on Hostiles, Entries and Exits, Areas of Interest, Targets of Interest, etc.</li>
+                <li><strong>6. Planning (P.A.C.E):</strong> Primary, Alternate, Contingency, Emergency plans.</li>
+                <li><strong>7. Execution:</strong> Act out the plan, monitor progress, and make necessary adjustments or contingency adaptations as required.</li>
+                <li><strong>8. Exfiltration / RTB:</strong> Once complete, return to base realistically and conduct a debrief.</li>
+            </ul>
+        </section>
+
+        <section class="card">
+            <h2>Mission Application & Detail 🎯</h2>
+
+            <h3>Demonstration Mission Location</h3>
+            <p><strong>Sentinel Corp Naval Base</strong> (start from South Cape Station)</p>
+
+            <h3>1. Operation Briefing: Be Short, Concise, and Direct</h3>
+            <p>Leave no room for ambiguity. Everyone must clearly understand the overall mission intent.</p>
+            <div class="example">
+                <strong>Example Briefing: Operation Siren's Call</strong>
+                <p>Our team is to execute a raid on the Sentinel Corp Naval Base to neutralize hostile personnel, secure and extract any Prisoner of War (POW), and conduct Site Exploitation (SE). The primary goal is to gather intel regarding Sentinel's operational capabilities and future movement patterns and recapture the base so friendly forces can use it as a FOB.</p>
+                <p><strong>ROE:</strong> Any military personnel carrying a weapon is greenlit. Civilians may be in the area, watch your background.</p>
+            </div>
+
+            <h3>2. Role Assignment: Keep it Simple and declare a 2IC:</h3>
+            <div class="example">
+                <strong>Example Roles:</strong>
+                <p>- 1 will be point man</p>
+                <p>- 2 will be team lead - medic</p>
+                <p>- 3 will be spotter and 2IC</p>
+                <p>- 4 will be overwatch</p>
+            </div>
+
+    <h3>3. TACMAP review before departing :</h3> <p>Explain to your team how you’re planning to approach the base based on the map view, just to give them a preview of the general idea.</p>
+
+            <h3>4. Infiltration</h3>
+            <p>Inflitrate preserving stealth and plausibility (e.g., high-alt helicopter, HAHO HALO LAHO HELOCAST,distant landing, etc. ). Avoid obvious 'gaming' low-alt runs right in front of the base or rooftop drops that instantly break realism factor and may alert enemies.</p>
+            <p></p>
+
+<h3>5. RECON</h3>
+<p>Delegate or do the recon task to gather critical intelligence for planning the attack (hostile count, entries, exits, areas of interest, etc.)</p>
+
+            <h3>6. Planning: The P.A.C.E. Model</h3>
+            <p>P.A.C.E. planning is crucial to remain professional and realistic, ensuring you are not caught "with your pants down" and simply "winging it."</p>
+            <ul>
+                <li>Primary: The main plan.</li>
+                <li>Alternate: A possible alternative route or method.</li>
+                <li>Contingency: What happens if the plan is compromised? (e.g., If we get spotted what should happen?)</li>
+                <li>Emergency: Last resort. (e.g., Break contact, evade to a rally point, and reassess.)</li>
+            </ul>
+
+            <h3>7. Execution and Communication: Stay Liquid</h3>
+            <p>Avoid “stop-and-go” actions. Constantly pausing breaks the flow and makes the team feel amateurish. Stay Liquid.</p>
+            <ul>
+                <li>Choose a simple plan and commit to it fully. (e.g., two-person ground team clears clockwise, two-person overwatch provides cover).</li>
+                <li>Do not constantly change the plan or micro-manage every action. Trust your teammates to handle their roles.</li>
+                <li>Keep communication concise. Every message should convey necessary information using the fewest words possible.</li>
+            </ul>
+            <div class="example">
+                Good Example: <code>"Two mobile tangos northwest, got eyes? Ready to engage?"</code><br>
+                Bad Example: <code>"Hold up, we got a two man patrol walking over there. You guys see em? Overwatch do you have a shot?"</code>
+            </div>
+
+            <h3>8. Exfiltration: Add Flavor and Realism</h3>
+            <p>Enhance immersion by incorporating "realistic" radio calls. Have an operator roleplay the pilot.</p>
+            <div class="radio-call-example">
+                <p>MOTHER 3-2, THIS IS ALPHA 1 HOW COPY?</p>
+                <p>... (Roleplay wait for response in earpiece)</p>
+                <p>MOTHER 3-2, REQUESTING IMMEDIATE EXFIL. PERSONNEL FOUR, NO CASUALTIES. LOCATION IS GRID NOVEMBER CHARLIE EIGHT NINER ZERO ZERO ONE TWO, OVER.</p>
+                <p>... (Roleplay wait for response in earpiece)</p>
+                <p>ROGER THAT, BE ADVISED, ENEMY PATROLS IN VICINITY 1 KLICK NORTH OF LZ. REQUEST YOUR ETA. OVER.</p>
+                <p>... (Roleplay wait for response in earpiece)</p>
+                <p>MOTHER 3-2, SOLID COPY, WILCO, ALPHA 1 OUT</p>
+            </div>
+            <p>Then, a teammate brings in a helo, extracts the team, and returns to base for debrief.</p>
+
+<h3>*Demonstration is with one base only for brevity but with multiple bases you just do the same steps (3,4,5,6,7): 'TACMAP REVIEW, INFIL, RECON, P.A.C.E., EXECUTE' until mission complete, then RTB.</h3>
+
+        </section>
+
+        <section class="video-section">
+            <h2>Video Demonstration 🎬</h2>
+            <p>Watch this video to see the full framework applied from start to finish. Everything shown is examples only, to adapt as needed. The idea is to display how to lead a team professionally on any mission.</p>
+            <div class="video-container">
+               <iframe
+    src="https://www.youtube.com/embed/J1mLQWtJvxI?si=g8lXRnZVk52AtyKO"
+    title="Ghost Recon MILSIM - The '8-Phase Team Lead Framework' Demonstration"
+    frameborder="0"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowfullscreen>
+</iframe>
+
+            </div>
+        </section>
+        
+        <section class="card">
+            <h2>IMPORTANT FINAL POINTS</h2>
+            
+            <h3>Key Points to AVOID as a Team Lead (Examples of Poor Leadership) 🚫</h3>
+            <ul>
+                <li><strong>Blaming teammates</strong> for failures instead of taking responsibility and learning from mistakes; being arrogant and ruining morale.</li>
+                <li>Giving unclear, ambiguous, or impractical instructions that lack tactical viability and are difficult to execute.</li>
+                <li>Constantly reversing decisions and changing plans unpredictably, leading to unstable leadership.</li>
+                <li>Failing to leverage individual strengths and not delegating effectively, taking on too much instead of trusting the team.</li>
+                <li>Losing composure in high-pressure situations, such as compromises or unexpected encounters.</li>
+                <li>Making reckless decisions that endanger the team’s safety under stress.</li>
+                <li>Ignoring or dismissing teammate input when planning or reacting to situations.</li>
+                <li>Being inefficient—dragging out movement and planning phases, wasting valuable mission time and teammates’ real-life time commitment.</li>
+                <li>Overloading comms with unnecessary chatter, using long-winded explanations instead of concise, clear communication (aim for the smallest amount of words possible per concept).</li>
+                <li>Failing to respond quickly to teammates' questions, causing confusion and delays.</li>
+            </ul>
+
+            <h3>Final Thoughts</h3>
+            <p>No one is perfect, so just do your best when leading operations! Also, not everyone needs to be a team lead—some prefer to play as the 2nd, 3rd, or 4th operator, and that’s perfectly fine. Variety strengthens the team. However, we should all be ready to step up as a team lead when the situation calls for it and do so in an efficient manner that will bring an enjoyable mission for all.</p>
+        </section>
+
+    </div>
+</body>
+
+</html>

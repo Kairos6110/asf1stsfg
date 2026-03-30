@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MILSIM Soundboard for Roleplay </title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&family=Oswald:wght@700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --dark-bg: #1a1a1a;
+            --medium-dark-bg: #2a2a2a;
+            --light-text: #e0e0e0;
+            --accent-green: #4CAF50;
+            --border-color: #444;
+            --header-font: 'Oswald', sans-serif;
+            --body-font: 'Roboto Mono', monospace;
+        }
+
+        body {
+            font-family: var(--body-font);
+            background-color: var(--dark-bg);
+            color: var(--light-text);
+            margin: 0;
+            padding: 20px 0;
+            line-height: 1.6;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 95%;
+            max-width: 500px; /* Adjusted max-width for soundboard layout */
+            background-color: var(--medium-dark-bg);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+            box-sizing: border-box;
+            border: 1px solid var(--border-color);
+            text-align: center; /* Center content within container */
+        }
+
+        h1, h2, h3 {
+            font-family: var(--header-font);
+            color: var(--accent-green);
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 15px;
+        }
+
+        h1 {
+            font-size: 2.2em;
+            margin-top: 0;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--accent-green);
+        }
+
+        p {
+            font-size: 0.9em;
+            margin-bottom: 20px;
+            color: #ccc;
+        }
+
+        .sound-button {
+            width: 90%; /* Make buttons wider */
+            max-width: 300px; /* Limit button width for better appearance */
+            height: 50px; /* Slightly taller buttons */
+            font-family: var(--body-font);
+            font-size: 110%;
+            background: var(--dark-bg);
+            color: var(--accent-green); /* Button text color */
+            border: 1px solid var(--border-color);
+            margin: 10px auto; /* Center buttons with auto margins */
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.2s, border-color 0.2s;
+            display: block; /* Make buttons block level for centering */
+        }
+
+        .sound-button:hover {
+            background-color: #3a3a3a; /* Slightly lighter on hover */
+            border-color: var(--accent-green);
+        }
+
+        .sound-button:active {
+            background-color: var(--accent-green);
+            color: var(--dark-bg);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>MILSIM Soundboard</h1>
+        <p>*Click button to play, click again to stop (toggle)</p>
+
+        <input type="button" class="sound-button" onclick="keyradio()" value="Keying Radio">
+        <input type="button" class="sound-button" onclick="radio1()" value="Radio Reply 1 Short">
+        <input type="button" class="sound-button" onclick="radio2()" value="Radio Reply 2 Short">
+        <input type="button" class="sound-button" onclick="radio3()" value="Radio Reply 3 Long">
+        <input type="button" class="sound-button" onclick="ziptie()" value="Zip Tie HVT">
+        <input type="button" class="sound-button" onclick="hackcomputer()" value="Accessing Computer">
+        <input type="button" class="sound-button" onclick="searchingDocuments()" value="Grabbing Intel Documents">
+        <input type="button" class="sound-button" onclick="medic()" value="Medic TCCC (Sealing Wound)">
+        <input type="button" class="sound-button" onclick="panelWiretap()" value="Placing Wiretap in Panel">
+        <input type="button" class="sound-button" onclick="geiger()" value="Geiger (Radiation)">
+        <input type="button" class="sound-button" onclick="alarm()" value="Helicopter Alarm (Mayday)">
+        <input type="button" class="sound-button" onclick="samlaunch()" value="SAM Lock and Launch">
+
+        <input type="button" class="sound-button" onclick="wood()" value="Wood Creaking">
+
+        <audio id="medic">
+            <source src="./sounds/medic.mp3" type="audio/mpeg">
+            Your browser does not support the audio element.
+        </audio>
+        <audio id="keyradio">
+            <source src="./sounds/keyradio.mp3" type="audio/mpeg">
+            Your browser does not support the audio element.
+        </audio>
+        <audio id="hackcomputer">
+            <source src="./sounds/computer.mp3" type="audio/mpeg">
+            Your browser does not support the audio element.
+        </audio>
+        <audio id="searchingDocuments">
+            <source src="./sounds/searchingDocuments.mp3" type="audio/mpeg">
+            Your browser does not support the audio element.
+        </audio>
+        <audio id="panelWiretap">
+            <source src="./sounds/paneltools.mp3" type="audio/mpeg">
+            Your browser does not support the audio element.
+        </audio>
+        <audio id="ziptie">
+            <source src="./sounds/ziptie.mp3" type="audio/mpeg">
+            Your browser does not support the audio element.
+        </audio>
+        <audio id="radio1">
+            <source src="./sounds/radioreply1.mp3" type="audio/mpeg">
+            Your browser does not support the audio element.
+        </audio>
+        <audio id="radio2">
+            <source src="./sounds/radioreply2.mp3" type="audio/mpeg">
+            Your browser does not support the audio element.
+        </audio>
+        <audio id="radio3">
+            <source src="./sounds/radioreply3long.mp3" type="audio/mpeg">
+            Your browser does not support the audio element.
+        </audio>
+        <audio id="wood">
+            <source src="./sounds/woodcreak.mp3" type="audio/mpeg">
+            Your browser does not support the audio element.
+        </audio>
+        <audio id="geiger">
+            <source src="./sounds/geiger.mp3" type="audio/mpeg">
+            Your browser does not support the audio element.
+        </audio>
+        <audio id="alarm">
+            <source src="./sounds/helicopter_alarm.mp3" type="audio/mpeg">
+            Your browser does not support the audio element.
+        </audio>
+        <audio id="samlaunch">
+            <source src="./sounds/samLockandLaunch.mp3" type="audio/mpeg">
+            Your browser does not support the audio element.
+        </audio>
+
+        <script>
+            function toggleSound(id) {
+                var sound = document.getElementById(id);
+                if (sound.paused || sound.ended) {
+                    sound.currentTime = 0; // Reset playback position to the beginning
+                    sound.play();
+                } else {
+                    sound.pause();
+                }
+            }
+
+            function medic() { toggleSound('medic'); }
+            function keyradio() { toggleSound('keyradio'); }
+            function hackcomputer() { toggleSound('hackcomputer'); }
+            function searchingDocuments() { toggleSound('searchingDocuments'); }
+            function panelWiretap() { toggleSound('panelWiretap'); }
+            function ziptie() { toggleSound('ziptie'); }
+            function radio1() { toggleSound('radio1'); }
+            function radio2() { toggleSound('radio2'); }
+            function radio3() { toggleSound('radio3'); }
+            function wood() { toggleSound('wood'); }
+            function geiger() { toggleSound('geiger'); }
+            function alarm() { toggleSound('alarm'); }
+            function samlaunch() { toggleSound('samlaunch'); }
+        </script>
+    </div>
+</body>
+</html>

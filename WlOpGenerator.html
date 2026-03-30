@@ -1,0 +1,1653 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="https://js.puter.com/v2/"></script>
+<style>
+img {
+    max-width: 100%;
+}
+</style>
+<style>
+
+.locationsoverlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .locationsoverlay-content {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .locationsoverlay-content img {
+            max-width: 150px;
+            max-height: 150px;
+            border: 1px solid rgb(0, 0, 0);
+           
+            cursor: pointer;
+        }
+
+        .locationsoverlay-content img:hover {
+            transform: scale(1.1);
+            transition: transform 0.3s;
+        }
+        
+#overlay {
+  position: fixed;
+  display: none;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0,0,0,0.5);
+  z-index: 2;
+  cursor: pointer;
+}
+
+#instructions-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  justify-content: center;
+  align-items: center;
+}
+
+#instructions-box {
+ background:black;
+  border: 2px solid black;
+  border-radius: 5px;
+  padding: 20px;
+  max-width: 400px;
+  text-align: center;
+}
+
+#instructions-box span {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  cursor: pointer;
+}
+
+
+</style>
+</head>
+
+<title>Ghost Recon Wildlands Operation Generator </title>
+
+<body style="background-color: #3a2118;" text="ffffff" link="ffffff" vlink="ffffff" alink="ffffff">
+
+<center> 
+
+
+
+<img src='./images/titlewl.png' alt="Ghost Recon Wildlands Operation Generator" style="width:300px;border:1px solid rgb(63, 63, 63)">
+<br><br>
+<button type="button" style="width:300px;height:30px;font-family: arial; font-size: 100%; background-color: black; color: white; border: 1px solid rgb(90, 90, 90); border-radius: 1px;" onclick="showInstructions()">📝 Instructions</button>
+<br><br>
+<img src='./images/wlprovs.png' alt="fullmapover" style="width:300px;border:1px solid rgb(63, 63, 63)">
+<br><br>
+
+<div id="instructions-overlay" onclick="hideInstructions()">
+  <div id="instructions-box">
+    
+<p style="font-family:arial;color:white"><u>Instructions (click again to close):</u></p>
+<p style="font-family:arial;color:white">
+
+1. Use the map images to locate provinces. Click <b>Preview all locations</b> to view full maps and zoom in/out as needed.
+<br><br>
+2. Select one or more provinces, choose how many locations/objectives to randomize, then click <b>Generate Random Operation</b>.
+<br><br>
+3. A random operation and maps will appear below to help you find objectives and nearby locations.
+<br><br>
+4. Click <b>Copy AI Prompt 📋</b> to paste the prompt into your preferred AI tool (ChatGPT, Gemini, Claude, etc.) and refine it if needed.
+<br><br>
+5. Or click <b>Generate Op (AI) ✨</b> to generate the operation directly using Gemini and Puter.
+<br><br>
+The result is a unique, custom operation you can roleplay and play in-game. Enjoy!
+<br><br>
+Feel free to share this tool—it was made for the Ghost Recon Wildlands community.
+<br><br>
+– Kairos
+
+</p>
+
+  </div>
+</div>
+
+
+<button type="button" style="width:300px;height:30px;font-family: arial; font-size: 100%; background-color: black; color: white; border: 1px solid rgb(63, 63, 63); border-radius: 1px;" onclick="previewlocs()">🔎 Preview all locations</button>
+
+<h3 style="font-family:arial">Select one or more provinces</h3> 
+
+
+
+<div id="overlay" onclick="off()">
+<br><br><br>
+<img hidden id='provincesMap' src='./images/wlprovs.png' alt="provincesMap" style="width:600px;border:5px solid black">
+</div>
+
+<div id="locationsoverlay" class="locationsoverlay" onclick="closeLocationsoverlay()">
+  <div class="locationsoverlay-content">
+      <div>
+          <img src="./images/BARVECHOS.png" alt="Barvechos">
+          <br>
+          <span style="font-family: Arial;">BARVECHOS</span>
+      </div>
+      <div>
+          <img src="./images/CAIMANES.png" alt="Caimanes">
+          <br>
+          <span style="font-family: Arial;">CAIMANES</span>
+      </div>
+      <div>
+          <img src="./images/ESPIRITUSANTO.png" alt="Espiritu Santo">
+          <br>
+          <span style="font-family: Arial;">ESPIRITU SANTO</span>
+      </div>
+      <div>
+          <img src="./images/FLORDELORO.png" alt="Flor del Oro">
+          <br>
+          <span style="font-family: Arial;">FLOR DEL ORO</span>
+      </div>
+      <div>
+          <img src="./images/INCACAMINA.png" alt="Inca Camina">
+          <br>
+          <span style="font-family: Arial;">INCA CAMINA</span>
+      </div>
+      <div>
+          <img src="./images/ITACUA.png" alt="Itacua">
+          <br>
+          <span style="font-family: Arial;">ITACUA</span>
+      </div>
+      <div>
+          <img src="./images/KOANI.png" alt="KOANI">
+          <br>
+          <span style="font-family: Arial;">KOANI</span>
+      </div>
+      <div>
+          <img src="./images/LACRUZ.png" alt="La Cruz">
+          <br>
+          <span style="font-family: Arial;">LA CRUZ</span>
+      </div>
+      <div>
+          <img src="./images/LIBERTAD.png" alt="Libertad">
+          <br>
+          <span style="font-family: Arial;">LIBERTAD</span>
+      </div>
+      <div>
+          <img src="./images/MALCA.png" alt="Malca">
+          <br>
+          <span style="font-family: Arial;">MALCA</span>
+      </div>
+      <div>
+          <img src="./images/MEDIALUNA.png" alt="Media Luna">
+          <br>
+          <span style="font-family: Arial;">MEDIA LUNA</span>
+      </div>
+      <div>
+          <img src="./images/MOJOCOYO.png" alt="Mojocoyo">
+          <br>
+          <span style="font-family: Arial;">MOJOCOYO</span>
+      </div>
+      <div>
+          <img src="./images/MONTEPUNCU.png" alt="Monte Puncu">
+          <br>
+          <span style="font-family: Arial;">MONTE PUNCU</span>
+      </div>
+      <div>
+          <img src="./images/MONTUYOC.png" alt="Montuyoc">
+          <br>
+          <span style="font-family: Arial;">MONTUYOC</span>
+      </div>
+      <div>
+          <img src="./images/OCORO.png" alt="Ocor">
+          <br>
+          <span style="font-family: Arial;">OCORO</span>
+      </div>
+      <div>
+          <img src="./images/PNAGUA.png" alt="PNA Gua">
+          <br>
+          <span style="font-family: Arial;">PN AGUA VERDE</span>
+      </div>
+      <div>
+          <img src="./images/PUCARA.png" alt="Pucara">
+          <br>
+          <span style="font-family: Arial;">PUCARA</span>
+      </div>
+      <div>
+          <img src="./images/REMANZO.png" alt="Remanzo">
+          <br>
+          <span style="font-family: Arial;">REMANZO</span>
+      </div>
+      <div>
+          <img src="./images/SANMATEO.png" alt="San Mateo">
+          <br>
+          <span style="font-family: Arial;">SAN MATEO</span>
+      </div>
+      <div>
+          <img src="./images/TABACAL.png" alt="Tabacal">
+          <br>
+          <span style="font-family: Arial;">TABACAL</span>
+      </div>
+      <div>
+          <img src="./images/VILLAVERDE.png" alt="Villa Verde">
+          <br>
+          <span style="font-family: Arial;">VILLA VERDE</span>
+      </div>
+  </div>
+</div>
+
+
+
+
+
+
+<script>
+
+function previewlocs() {
+        const locationsoverlay = document.getElementById('locationsoverlay');
+        locationsoverlay.style.display = 'flex';
+    }
+
+    function closeLocationsoverlay() {
+        const locationsoverlay = document.getElementById('locationsoverlay');
+        locationsoverlay.style.display = 'none';
+    }
+
+function on() {
+  document.getElementById("overlay").style.display = "block";
+  document.getElementById("provincesMap").style.display = "block";
+}
+
+function off() {
+  document.getElementById("overlay").style.display = "none";
+}
+
+ function showInstructions() {
+        document.getElementById("instructions-overlay").style.display = "flex";
+    }
+
+    function hideInstructions() {
+        document.getElementById("instructions-overlay").style.display = "none";
+    }
+</script>
+
+
+<select name="provinces" size='22' style="width: 300px;font-family:arial;background:black;color:white;border:1px solid rgb(63, 63, 63)" id="provinces" multiple>
+    <option value="BARVECHOS">BARVECHOS</option>
+    <option value="CAIMANES">CAIMANES</option>
+    <option value="ESPIRITU SANTO">ESPIRITU SANTO</option>
+    <option value="FLOR DEL ORO">FLOR DEL ORO</option>
+    <option value="INCA CAMINA">INCA CAMINA</option>
+    <option value="ITACUA">ITACUA</option>
+    <option value="KOANI">KOANI</option>
+    <option value="LA CRUZ">LA CRUZ</option>
+    <option value="LIBERTAD">LIBERTAD</option>
+    <option value="MALCA">MALCA</option>
+    <option value="MEDIA LUNA">MEDIA LUNA</option>
+    <option value="MOJOCOYO">MOJOCOYO</option>
+    <option value="MONTE PUNCU">MONTE PUNCU</option>
+    <option value="MONTUYOC">MONTUYOC</option>
+    <option value="OCORO">OCORO</option>
+    <option value="PN AGUA VERDE">PN AGUA VERDE</option>
+    <option value="PUCARA">PUCARA</option>
+    <option value="REMANZO">REMANZO</option>
+    <option value="SAN MATEO">SAN MATEO</option>
+    <option value="TABACAL">TABACAL</option>
+    <option value="VILLA VERDE">VILLA VERDE</option>
+</select>
+
+<br>
+<h3 style="color: white; font-family: arial;">Number of locations desired</h3>
+
+
+
+<form id="formNbrLocs" action="">
+  <input type="text" style="width: 300px;height:20px;font-family:arial;background:black;color:white;border:1px solid rgb(63, 63, 63)" id="inputNumberOfLoc"><br><br>
+  <input type="button" id='generateButton' style="width: 300px;height:40px;font-family:arial;font-size:100%;background:black;color:white;border:1px solid rgb(63, 63, 63)" onclick="generateOp()" value="🔀 Generate random operation">
+</form>
+
+
+
+<script>
+var input = document.getElementById("inputNumberOfLoc");
+input.addEventListener("keypress", function(event) {
+  if (event.key === "Enter") {
+    event.preventDefault();
+    document.getElementById("generateButton").click();
+  }
+});
+</script>
+
+
+<script>
+	function generateOp() {
+ 
+
+		//Clean OPORD values
+		const opordBoxClear = document.getElementById('opordBox');
+		opordBoxClear.innerHTML = '' + '<br>';
+		
+
+		
+		
+		//Grab which provinces are selected
+		var provincesSelected = [];
+		for (var option of document.getElementById('provinces').options) {
+		if (option.selected) {
+		provincesSelected.push(option.value);
+		}
+		}
+		
+		//Stop if no provinces selected
+		if (provincesSelected.length < 1) {
+		alert('No provinces selected. Select one or more provinces.');
+		return;
+		}
+	
+		//Grab the 'Number of locations desired'
+		let numberOfLoc = document.getElementById("formNbrLocs").elements["inputNumberOfLoc"].value;
+
+		//Stop if no number provided
+		if (numberOfLoc.length < 1) {
+		alert('No number of locations desired provided. Provide a number.');
+		return;
+		}
+		
+		//Stop if number provided is not a number
+		if (isNaN(numberOfLoc)) {
+		alert(numberOfLoc + ' is not a valid number, provide a number.');
+		return;
+		}
+		
+		//Create arrays for provinces locations
+		const barvechos = [
+  "Bartolome Farm",
+  "Checkpoint",
+  "Matico",
+  "La Leproserna",
+  "Barvechos Mine Quarry",
+  "Gas Station Via-B Gas",
+  "Outpost",
+  "Outpost",
+  "Outpost",
+  "Nidia Flores' Hacienda",
+  "Outpost",
+  "Checkpoint",
+  "Barvechos Base",
+  "Makeshift Runway",
+  "Outpost",
+  "Barvechos",
+  "Macoya Cooperative",
+  "Barvechos Mine",
+  "Outpost",
+  "Lieutenant House",
+  "Pucamayu",
+  "Los Fisgones",
+  "Santa Maria Farm",
+  "Carretera 3",
+  "Nueva Plata Site"
+];
+
+const caimanes = [
+  "Malpaso Farm",
+  "Gas Station",
+  "La Frontera",
+  "Riverine Checkpoint",
+  "Makeshift Hospital",
+  "Rebel Campsite",
+  "Outpost",
+  "Ingani",
+  "Camargo Campsite",
+  "Caimanes Base",
+  "San Miguel Ruins",
+  "Puerto Chico",
+  "Combat Outpost",
+  "River Market",
+  "Los Hombres Jaguares",
+  "Outpost",
+  "Gas Station Via-B Gas",
+  "Rebel Campsite",
+  "Frontera",
+  "Buchon House",
+  "Las Anguila Wreck",
+  "Child Hunt"
+];
+
+		const espiritusanto = [
+  'Buchone Chapel',
+  'Outpost',
+  'Outpost',
+  'Alta Garcia Mine',
+  'Alta Gracia',
+  'Pilgrim House',
+  'Shrine of Truth',
+  'Santa Muerte Sanctuary',
+  'Espiritu Santo Base',
+  'Observation Post',
+  'Pilgrim House',
+  'Experimental Farm 03',
+  'Lajosa Farm',
+  'Guari',
+  'Guari Mine',
+  'Los Humildes Peregrinos',
+  'Outpost',
+  'Huanca Farm',
+  'Observation Post',
+  'Miski Secure Barn',
+  'Miski Farm',
+  'Outpost',
+  'Shrine of Purity',
+  'Coca Warehouse',
+  'Bahia Floresta',
+  'Huayani Farm',
+  'Buchon House',
+  'Shrine of Loyalty'
+];
+
+		
+	const flordeloro = [
+  'Hoalaca Ruins',
+  'Nupucu',
+  'Combat Outpost',
+  'Combat Outpost',
+  'Los Tramperos',
+  'Train Freight Yard',
+  'Combat Outpost',
+  'Rocha',
+  'Rocha Sawmill',
+  'Checkpoint',
+  'Halcone House',
+  'Armadillo Hunting Lodge',
+  'Gas Station Via-B Gas',
+  'M.O.B. Jaguar',
+  'Unidad Train Freight Yard',
+  'Checkpoint',
+  'Unidad Military Hospital',
+  'Huma Chua Sawmill',
+  'La Fortaleza',
+  'Huma Chua',
+  'Observation Post',
+  'Makeshift Runway',
+  'Chorrilos Wood Storage',
+  'Checkpoint',
+  'Checkpoint',
+  'Chorrillos',
+  'F.O.B. Serpiente',
+  'Checkpoint'
+];
+
+const incacamina = [
+  'Outpost',
+  'Inca Camina Base',
+  'Inca Chaca',
+  'Refugio de Pastores',
+  'Crash Site',
+  'Inca Ruins',
+  'Inca Road',
+  'Nevado Llamiru',
+  'San Martin Mountain Hut',
+  'Crash Site',
+  'Trecking Campsite',
+  'Nuevo Mondo',
+  'Cable Car Station',
+  'Lookout',
+  'Train Wrecks',
+  'La Cabaña de Pesca',
+  'Gas Station Via-B Gas',
+  'Inca Camina Freight Yard',
+  'Checkpoint',
+  'Julpe Alto',
+  'Improvised Runway',
+  'Archaeological Site',
+  'Checkpoint',
+  'Santa Catalina Chapel',
+  'Nevado Llamiru Garage',
+  'Ancient Cemetery of Miners',
+  'Sicario House',
+  'Refugio de Pastores'
+];
+
+const itacua = [
+  'Buena Vida',
+  'Cotani',
+  'Checkpoint',
+  'Yopil',
+  'Santa Maria',
+  'Culta',
+  'Hunt Lodge',
+  'Santa Catalina Chapel',
+  'Outpost',
+  'Vieja Granja',
+  'F.O.B. Armadillo',
+  'Baurecito Ruins',
+  'Campo de Futbol el Yayo',
+  'Colque Ranch',
+  'Atollo Farm',
+  'Mendez Farm',
+  'Sicario House',
+  'Pantoja',
+  'Observation Post',
+  'Outpost',
+  'Bocca Farm',
+  'Checkpoint',
+  'La Casa Del Mexicano',
+  'Itacua Base',
+  'Khochi'
+];
+
+const koani = [
+  'Narco-Slaughter',
+  'Huertas Mine',
+  'Koani Railway Camp',
+  'Santa Blanca Living District',
+  'Huertas',
+  'Truck Depot',
+  'Crashed Plane',
+  'Checkpoint',
+  'Combat Outpost',
+  'Outpost',
+  'Locotal Mine',
+  'Outpost',
+  'A Prehistoric Site',
+  'Koani Lithium Mine',
+  'Truck Stop Mamani',
+  'Gas Station Via-B Gas',
+  'Salt Hotel',
+  'Combat Outpost',
+  'El Arbol de Piedra',
+  'Outpost',
+  'Improvised Runway',
+  'Salt Miner\'s House',
+  'Sacani Salt Mines',
+  'Mina de Sal',
+  'Outpost',
+  'El Albergue',
+  'Sacani',
+  'Unidad Campsite',
+  'Shamanic Site',
+  'Train Cemetery',
+  'El Buen Sal',
+  'Makeshift Runway',
+  'Salt Mine Condori',
+  'Koani Air Base',
+  'Crashed Plane'
+];
+
+const lacruz = [
+  'Hoyito',
+  'F.O.B. Vibora',
+  'Rioja Ranch',
+  'Combat Outpost',
+  'San Rodrigo Monastery',
+  'Outpost',
+  'Buchon House',
+  'Makeshift Runway',
+  'Santa Elena',
+  'La Cruz Freight Yard',
+  'Outpost',
+  'Outpost',
+  'La Hacha Buena',
+  'Rebel Campsite',
+  'Outpost',
+  'Cemetery El Bosque Quemado',
+  'Isque',
+  'La Cruz Base',
+  'Burned Forest',
+  'Luluni Ruins',
+  'Carrasco Farm',
+  'El Pequeño Lago',
+  'Outpost'
+];
+
+
+const libertad = [
+  'Forestry Site',
+  'Checkpoint',
+  'Observation Post',
+  'Pa Kollu',
+  'La Guarida de Tres Brujas',
+  'Outpost',
+  'Shrine of Wealth',
+  'Bolivar Square',
+  'Libertad',
+  'Checkpoint',
+  'F.O.B. Oso Hormiguero',
+  'Los Cuatros Hermanos',
+  'Los Viejos Pinos',
+  'Viloma Tres Gas Field',
+  'Outpost',
+  'Oso',
+  'Viloma Dos Oil Field',
+  'Viloma Uno Oil Field',
+  'Viloma Refinery',
+  'Chem Precursors Storage',
+  'Viloma',
+  'Libertad Airport',
+  'Road Market',
+  'Narco-Slaughter',
+  'Chemical Institute Via-B Gas',
+  'Libertad Base',
+  'Gas Station Via-B Gas',
+  'Outpost',
+  'Viloma Cuatro Gas Field',
+  'Combat Outpost',
+  'El Escondite del Cazador'
+];
+
+const malca = [
+  'Outpost',
+  'Banado',
+  'Santa Muerte Idol',
+  'Chacori Farm',
+  'Uma Marca',
+  'Uma Marca Mine',
+  'El Establo',
+  'Combat Outpost',
+  'Outpost',
+  'Icoya',
+  'Sicario House',
+  'El Pais de la Felicidad',
+  'Holy Malca Base',
+  'Los Crios de la Muerte',
+  'La Buena Muerte'
+];
+
+const medialuna = [
+  'Combat Outpost',
+  'Rebel Campsite',
+  'Makeshift Runway',
+  'El Cañon',
+  'Combat Outpost',
+  'La Loma',
+  'F.O.B. Buitre',
+  'El Acantilado',
+  'Chipaya Farm',
+  'Checkpoint',
+  'El Puente del Diablo',
+  'Shooting Range',
+  'Combat Outpost',
+  'Checkpoint',
+  'Acevedo',
+  'Rebel Campsite',
+  'Checkpoint',
+  'Archaeology Site',
+  'Observation Post',
+  'Cardoza',
+  'M.O.B. Condor',
+  'Junin'
+];
+
+const mojocoyo = [
+  "Makeshift Runway",
+  "Cocaine Hideout",
+  "Gas Station Via-B Gas",
+  "Capachunco",
+  "Checkpoint",
+  "Prison Camp",
+  "Mojocoyo Base",
+  "Quispe Farm",
+  "La Vieja Granja",
+  "Panua Village",
+  "Private Helipad",
+  "Cocaine Hideout",
+  "Sacrificial Site",
+  "Chullpas",
+  "Rancho Sabala",
+  "Lieutenant House",
+  "Almacén de Quinua",
+  "Barrera Farm",
+  "Cocaine Hideout",
+  "Abandoned Prospecting Site",
+  "Cocaine Hideout",
+  "Outpost",
+  "Chacatal",
+  "Sicario House",
+  "La Curva de la Muerte"
+];
+
+const montepuncu = [
+  "Secure Barn 01",
+  "Experimental Farm 01",
+  "Outpost",
+  "Chaca Barraca",
+  "Rebel Campsite",
+  "Outpost",
+  "Rebel Campsite",
+  "A Car Wreck",
+  "Agronomic Center",
+  "La Cumbre",
+  "Rojas Farm",
+  "El Yayo Cooperative",
+  "Las Tumbas del Camino",
+  "Las Tumbas del Camino",
+  "Santa Blanca Campsite",
+  "Klaus Barbie House"
+];
+
+const montuyoc = [
+  "San Francisco Monastery",
+  "Montuyoc Training Base",
+  "Pre Columbian Necropolis",
+  "Gas Station Via-B Gas",
+  "Sicarios Boot Camp",
+  "Supply Depot",
+  "Laguna Colorada Baths",
+  "Makeshift Runway",
+  "Checkpoint",
+  "Mapooca Farm",
+  "Tupac Katari Tomb",
+  "Outpost",
+  "Vieja Granja",
+  "Araca Village",
+  "Choza Padre Mine",
+  "Hunter Shelter",
+  "Laguna Colorada",
+  "Lafuente Farm",
+  "Choza Padre",
+  "Inca Corral Farm",
+  "Condor Cairn"
+];
+
+const ocoro = [
+  "Outpost",
+  "Buchon House",
+  "Coca Paste Factory",
+  "Outpost",
+  "A Fisherman's House",
+  "Puerto Grande",
+  "Zona Narco Prohibida",
+  "Outpost",
+  "Combat Outpost",
+  "Zona Narco Prohibida",
+  "Zona Narco Prohibida",
+  "Puerto Nuevo",
+  "Nenma Freight Yard",
+  "Moko",
+  "Zona Narco Prohibida",
+  "Zona Narco Prohibida",
+  "Campo Ana",
+  "Outpost",
+  "Pachamama Scars",
+  "Ocoro Dispensary",
+  "Checkpoint",
+  "Gas Station Via-B Gas",
+  "Santa Rosa",
+  "El Altiplano Verde",
+  "Outpost",
+  "Gas Station Via-B Gas",
+  "Checkpoint",
+  "Outpost",
+  "Outpost",
+  "Checkpoint",
+  "Pujio",
+  "Outpost",
+  "Ocoro Base",
+  "Los Mosquitos"
+];
+
+const pnaguaverde = [
+  "Outpost",
+  "La Torre de Arroyo Baya",
+  "Arroyo Baya",
+  "La Nube Blanca",
+  "Playa Sirena",
+  "Outpost",
+  "Secret Cocaine Hideout",
+  "Patuja Mansion",
+  "Ajuga Mansion",
+  "Kantuta Mansion",
+  "Tajibo Mansion",
+  "Playa Tajibo",
+  "Rio Del Jaguar",
+  "Siren Island",
+  "Buchon House",
+  "Riverine Checkpoint",
+  "Goyo",
+  "Agua Verde Base",
+  "Paraiso Casino",
+  "Halcone House",
+  "Outpost",
+  "Paraiso Agua Verde",
+  "Checkpoint",
+  "Alicia Town"
+];
+
+const pucara = [
+  "Horco Farm",
+  "Charamokho Village",
+  "Makeshift Runway",
+  "Riverine Docks",
+  "Outpost",
+  "Olico Super Dam",
+  "Todos Santos Town",
+  "Santa Muerte Tomb",
+  "Todos Santos Rock Quarry",
+  "Old Silver Mine",
+  "Santa Muerte Tomb",
+  "Sueño Mausoleum",
+  "Pucara Base",
+  "El Nido de Cóndores",
+  "Outpost",
+  "Santa Muerte Tomb",
+  "Pilca Village",
+  "Pilca Mine",
+  "Pucara",
+  "Outpost"
+];
+
+const remanzo = [
+  "Las Mulas",
+  "Poco Irrigation Tank",
+  "Poco",
+  "F.O.B. Puma",
+  "Outpost",
+  "Remanzo Base",
+  "Test Center",
+  "Ovejas Real Slaughterhouse",
+  "Buying Office",
+  "Marcavi",
+  "Outpost",
+  "Observation Post",
+  "San Vicente",
+  "Factory Electro Energy Drink",
+  "Liquid Cocaine Lab",
+  "Gas Station"
+];
+
+const sanmateo = [
+  "Checkpoint",
+  "La Casa Abandonada",
+  "Train Station",
+  "La Carcel Del Pueblo",
+  "Abandoned House",
+  "San Mateo Base",
+  "Makeshift Runway",
+  "Flores Farm",
+  "Prison Rosario",
+  "Rebel Campsite",
+  "Gas Station Via-B Gas",
+  "Outpost",
+  "Narco-Muro",
+  "Outpost",
+  "Outpost",
+  "Sicario House",
+  "Boot Camp",
+  "Valle Verde",
+  "El Vaquero",
+  "Restaurante Humacha",
+  "Makeshift Runway",
+  "Checkpoint"
+];
+
+const tabacal = [
+  "Rebel Campsite",
+  "Killasisa Farm",
+  "Makeshift Runway",
+  "Secure Barn West",
+  "La Cote Molinos",
+  "Outpost",
+  "Tabacal Base",
+  "Outpost",
+  "Buchone House",
+  "SNPC Freight Yard",
+  "El Sicario Invencible",
+  "Crashed Plane",
+  "Barrientos Coop",
+  "Gas Station Via-B Gas",
+  "Bella Selva",
+  "El Cocalero Fallecido",
+  "Secure Barn East",
+  "Jaruma Cooperative",
+  "Pilpintu Farm",
+  "Observation Post"
+];
+
+const villaverde = [
+  "Outpost",
+  "Lafuente Farm",
+  "Pinaicobo Farm",
+  "La Buena Pesca",
+  "Villa Verde",
+  "El Yayo Cooperative",
+  "Camacho Farm",
+  "Coca Drying Site",
+  "Outpost",
+  "Gas Station Via-B Gas",
+  "Makeshift Runway",
+  "La Gran Colina",
+  "La Marqueza",
+  "Precursor's Storage",
+  "Outpost",
+  "Pyrolusite Laboratory Dos",
+  "Outpost",
+  "Lookout",
+  "Puerto de la Coca",
+  "Villa Verde Base",
+  "Maco",
+  "Pyrolusite Laboratory Uno",
+  "Forest Parking",
+  "Palmeras",
+  "Mama Coca Shrine",
+  "Leipez Cooperative",
+  "Prospecting Black Site",
+  "Ore Storage",
+  "F.O.B. Tucan",
+  "Illegal Pyrolusite Mine",
+  "Road Market",
+  "Observation Post",
+  "Boicobu Farm",
+  "Imaybe Glade",
+  "Quya Farm",
+  "Quya Secure Barn"
+];
+
+		//For each provinces selected, build total array of possible locations to choose from
+		randomObjectives = null
+		randomObjectives = []; 
+		
+		provincesSelected.forEach(function callback(province) {
+		
+			if (province == 'BARVECHOS') {
+			randomObjectives = randomObjectives.concat(barvechos)
+			}
+			
+			if (province == 'CAIMANES') {
+			randomObjectives = randomObjectives.concat(caimanes)
+			}
+			
+			if (province == 'ESPIRITU SANTO') {
+			randomObjectives = randomObjectives.concat(espiritusanto)
+			}
+			
+			if (province == 'FLOR DEL ORO') {
+			randomObjectives = randomObjectives.concat(flordeloro)
+			}
+						
+			if (province == 'INCA CAMINA') {
+			randomObjectives = randomObjectives.concat(incacamina)
+			}
+						
+			if (province == 'ITACUA') {
+			randomObjectives = randomObjectives.concat(itacua)
+			}
+						
+			if (province == 'KOANI') {
+			randomObjectives = randomObjectives.concat(koani)
+			}
+						
+			if (province == 'LA CRUZ') {
+			randomObjectives = randomObjectives.concat(lacruz)
+			}
+						
+			if (province == 'LIBERTAD') {
+			randomObjectives = randomObjectives.concat(libertad)
+			}
+						
+			if (province == 'MALCA') {
+			randomObjectives = randomObjectives.concat(malca)
+			}
+						
+			if (province == 'MEDIA LUNA') {
+			randomObjectives = randomObjectives.concat(medialuna)
+			}
+						
+			if (province == 'MOJOCOYO') {
+			randomObjectives = randomObjectives.concat(mojocoyo)
+			}
+						
+			if (province == 'MONTE PUNCU') {
+			randomObjectives = randomObjectives.concat(montepuncu)
+			}
+						
+			if (province == 'MONTUYOC') {
+			randomObjectives = randomObjectives.concat(montuyoc)
+			}
+						
+			if (province == 'OCORO') {
+			randomObjectives = randomObjectives.concat(ocoro)
+			}
+						
+			if (province == 'PN AGUA VERDE') {
+			randomObjectives = randomObjectives.concat(pnaguaverde)
+			}
+						
+			if (province == 'PUCARA') {
+			randomObjectives = randomObjectives.concat(pucara)
+			}
+						
+			if (province == 'REMANZO') {
+			randomObjectives = randomObjectives.concat(remanzo)
+			}
+						
+			if (province == 'SAN MATEO') {
+			randomObjectives = randomObjectives.concat(sanmateo)
+			}
+						
+			if (province == 'TABACAL') {
+			randomObjectives = randomObjectives.concat(tabacal)
+			}
+						
+			if (province == 'VILLA VERDE') {
+			randomObjectives = randomObjectives.concat(villaverde)
+			}
+						
+
+			
+		});
+		
+		
+// Shuffle the total array
+const shuffled = randomObjectives.sort(() => 0.5 - Math.random());
+// Get sub-array of first numberOfLoc elements after shuffled
+const randomSelection = shuffled.slice(0, numberOfLoc);
+
+		
+		
+		//Build OPORD text from data and selections
+		
+		//HORIZONTAL DIVIDER LINE
+		const hrT = document.createElement('hr');
+		const opordBoxT = document.getElementById('opordBox');
+		opordBoxT.appendChild(hrT);
+		
+		//BLANK LINE
+		var br = document.createElement("br")
+		 opordBoxT.appendChild(br);
+		
+		//Generate random number of OPORD
+		function randomIntFromInterval(min, max) {
+		return Math.floor(Math.random() * (max - min + 1) + min)
+		}
+		const rndInt = randomIntFromInterval(1, 9999)
+		
+		//Pick a random codename
+const codenames = ['WIDOW','SPIDER','MAMBA','ADDER','APOLLO','AVALANCHE','BADGER','BANSHEE','GRIZZLY','BISHOP','BOOMER','BOAR','BERSERKER','BLACK KNIGHT','BREAKER','BUFFALO','CANARY','CORAL','COPPER','CRIMSON','CROW','DANGER','DAGGER','DINGO','DIAMOND','DRAGON','EAGLE','FIRESTICK','FOX','FIREFLY','GRIFFIN','GHOST','GOPHER','HARVESTER','HIGHLANDER','HUNTER','HOUND','HAWK','JACKSON','JESTER','KAHUNA','KEEPER','LANTERN','LYNX','LEOPARD','MAGE','MONARCH','MOTHER','OBELISK','OCELOT','ORACLE','OVERLORD','PAWN','PEQUOD','POLARIS','RAZOR','RED DRAGON','RED QUEEN','REAVER','RORK','RIPLEY','SABRE','SEAL','SHADOW','SHAMAN','SPARROW','SPECTRE','SPEARFISH','SPEAR','STONE','SWEEPER','TOMAHAWK','TIGER','HATCHET','UMBRA','UMBRELLA','VANDAL','VIPER','SNAKE','WARDEN','WANDERER','WARLOCK','WHITE WIZARD','WHITE RABBIT','X-RAY','ZEBRA','ZIPPER','TORCH','BLADE','TOXIC','MIST','SMOKE','AVALANCHE','AVATAR','ARCHER','ANIMA','BARRACUDA','BANSHEE','BLACKOUT','BLITZ','BLIZZARD','BOLT','BULLDOG','BUTCHER','CARNIVAL','CASTLE','CHARGER','COBRA','COMET','CRIMSON','CROW','CRUSADER','DAGGER','DARKSTAR','DISCIPLE','DRAGON','EAGLE','ECLIPSE','ENIGMA','EREBUS','EXCALIBUR','FALCON','FIRESTORM','FOX','FROST','FURY','GAMMA','GOLIATH','GLADIATOR','GHOST','GRIFFIN','GRINCH','GUARDIAN','HARRIER','HAVOC','HAZARD','HELLHOUND','HELIOS','HORUS','HYDRA','HUNTER','HURRICANE','HAMMER','INFERNO','IRONHIDE','IRONCLAD','IVORY','JAGUAR','JACKAL','JUGGERNAUT','KODIAK','KESTREL','KNIGHT','KUMA','LANCER','LIGHTNING','LYNX','MAGICIAN','MAMBA','MAVERICK','MARAUDER','MIRAGE','MONGOOSE','MUSTANG','NEBULA','NEMESIS','NIGHTHAWK','NIGHTSHADE','NEPTUNE','NOVA','OBSIDIAN','OMEGA','ONYX','ORACLE','ORION','OXIDE','OUTLAW','PANTHER','PALADIN','PHANTOM','PHOENIX','PUMA','PYRO','POSEIDON','QUAKER','RAPTOR','RAZOR','RAZORBACK','REAPER','RENEGADE','RIPTIDE','RONIN','RUBEDO','SABER','SAPPHIRE','SANDMAN','SANDSTORM','SCALER','SCORPION','SHADOW','SOLO','SPECTRE','SPITFIRE','STALKER','STORMRIDER','STRIKER','TALON','TEMPEST','THUNDER','TITAN','TYPHOON','UNDERTAKER','UNDERTOW','URSA','VALKYRIE','VENGEANCE','VENOM','VIGILANTE','VIPER','VORTEX','WARBRINGER','WARCRY','WARHAWK','WARLOCK','WARLORD','WARDEN','WHISPER','WIDOWMAKER','WOLVERINE','WRAITH','WYVERN','X-RAY','XERXES','YANKEE','YELLOWJACKET','YUKON','ZEUS','ZERO','ZEPHYR','ZODIAC'];
+		// Shuffle codenames array
+		const shuffledCodenames = codenames.sort(() => 0.5 - Math.random());
+		// Get first element from shuffled codenamesarray
+		codename = shuffledCodenames.slice(0, 1);
+		
+		// ... existing code ...
+codename = shuffledCodenames.slice(0, 1);
+
+// --- MOVED PROMPT GENERATION HERE ---
+var promptText = `You are now a MILSIM gaming operation writer. Enemy faction is 'Santa Blanca Cartel'. All locations named 'FOB' or similar are enemy, not friendly. I will give you a template and instructions below framed by * *, please generate a realistic military operation with military lingo throughout and respect all instructions, especially the order (SITUATION AND MISSION first, CONCEPT OF OPERATION second, OBJECTIVES third). Throughout all the text refer to the team in the first person ('we') and don't split the team.
+OPERATION: opCodename
+
+SITUATION AND MISSION:
+*The section below framed by [] contains the locations the team needs to go to (each separated by a comma). Generate a storyline describing the situation the team needs to handle based on the objectives you will generate for each locations, be creative but use realistic military objectives. Ensure objectives are varied and richely detailed. Don't write separate paragraphs for each locations. Keep it short. Make sure the section framed by [] is NOT included in your output.
+[randomSelection]
+*
+
+CONCEPT OF OPERATION :
+*Generate a short paragraph describing how the team will leave the 'nearest safehouse' to infiltrate the AO then move to our objectives.*
+
+OBJECTIVES :
+*Generate a list of objectives based on the SITUATION AND MISSION paragraph you generated above. Each objective should be marked with letter like Alpha,Bravo,Charlie,etc. and be one very brief sentence. There should be the same number of objectives listed as there were items in the section framed by []*
+
+*Generate a list at the bottom of the operation named "---HVT profiles (integrate in the op as needed)---" containing a few HVT profiles to act as secondary objectives. Dont use a russian name for the HVT, only spanish male names.
+`;
+
+// Replace placeholders immediately
+promptText = promptText.replace("opCodename", codename);
+promptText = promptText.replace("randomSelection", randomSelection);
+// ------------------------------------
+					
+		 // Create a CHATGPT button element
+  var ChatGPTButton = document.createElement("button");
+    ChatGPTButton.style.width = "300px";
+	    ChatGPTButton.style.height = "40px";
+  ChatGPTButton.style.fontSize = "110%"; 
+  ChatGPTButton.style.background = "black"; 
+  ChatGPTButton.style.color = "white"; 
+  ChatGPTButton.style.border = "1px solid gray"; 
+
+  // Set the text content of the ChatGPTButton
+  ChatGPTButton.textContent = "Copy AI prompt 📋";
+
+  // Add an event listener to the ChatGPTButton
+ // Add an event listener to the ChatGPTButton
+  ChatGPTButton.addEventListener("click", function() {
+    // Just use the promptText variable defined above
+    navigator.clipboard.writeText(promptText)
+      .then(() => {
+        alert('Custom prompt has been copied to the clipboard. Now go to your ChatGPT, paste the prompt, fine tune as needed and enjoy the magic! It is recommended you regenerate in ChatGPT a few times until you get a good result.');
+      })
+      .catch(err => {
+        console.error('Error copying prompt:', err);
+      });
+  });
+  
+opordBoxT.appendChild(ChatGPTButton);
+// --- START OF NEW AI SECTION ---
+
+    // 1. CREATE "GENERATE OP (AI)" BUTTON
+    var GenAIButton = document.createElement("button");
+    GenAIButton.style.width = "300px";
+    GenAIButton.style.height = "40px";
+    GenAIButton.style.fontSize = "110%";
+    GenAIButton.style.background = "black";
+    GenAIButton.style.color = "white";
+    GenAIButton.style.border = "1px solid gray";
+    GenAIButton.style.marginTop = "10px"; 
+    GenAIButton.textContent = "Generate Op (AI) ✨";
+
+    // 2. CREATE OUTPUT BOX (Hidden by default)
+    var AIOutputBox = document.createElement("div");
+    AIOutputBox.setAttribute('style', 'font-family: courier new, monospace; white-space: pre-wrap; text-align: left; background: rgba(0,0,0,0.8); color: #cccccc; padding: 15px; border: 1px solid gray; margin-top: 15px; width: 90%; display: none;');
+
+    // 3. CREATE "COPY OUTPUT" BUTTON (Hidden by default)
+    var CopyOutputButton = document.createElement("button");
+    CopyOutputButton.style.width = "300px";
+    CopyOutputButton.style.height = "30px";
+    CopyOutputButton.style.fontSize = "100%";
+    CopyOutputButton.style.background = "#222"; 
+    CopyOutputButton.style.color = "white";
+    CopyOutputButton.style.border = "1px solid gray";
+    CopyOutputButton.style.marginTop = "5px";
+    CopyOutputButton.style.cursor = "pointer";
+    CopyOutputButton.style.display = "none"; 
+    CopyOutputButton.textContent = "Copy Generated Op 📄";
+
+    // Listener for Copy Output
+    CopyOutputButton.addEventListener("click", function() {
+        navigator.clipboard.writeText(AIOutputBox.textContent)
+            .then(() => {
+                alert('Full Operation copied to clipboard!');
+            })
+            .catch(err => {
+                console.error('Error copying text:', err);
+            });
+    });
+    
+    // Listener for Generate
+    GenAIButton.addEventListener("click", async function() {
+        // Show the box, hide copy button while loading
+        AIOutputBox.style.display = "block";
+        CopyOutputButton.style.display = "none";
+        AIOutputBox.innerHTML = "<i>Establishing Uplink... Interpreting Mission Data...<br>Please Wait...</i>";
+
+        try {
+            // Send to Puter.js using the 'promptText' variable defined in your existing code
+            const response = await puter.ai.chat(promptText, {
+                model: "google/gemini-2.5-flash" 
+            });
+
+            // Display Result
+            AIOutputBox.textContent = response.message.content;
+            
+            // Show the Copy Output button now that text exists
+            CopyOutputButton.style.display = "block";
+
+        } catch (err) {
+            AIOutputBox.innerHTML = "<span style='color:red'>Uplink Failed. Error: " + err.message + "</span>";
+        }
+    });
+
+    // 4. APPEND EVERYTHING TO THE BOX
+    opordBoxT.appendChild(document.createElement("br")); 
+    opordBoxT.appendChild(GenAIButton);
+    opordBoxT.appendChild(AIOutputBox);
+    opordBoxT.appendChild(CopyOutputButton);
+
+    // --- END OF NEW AI SECTION ---
+ var br = document.createElement("br")
+opordBoxT.appendChild(br);
+ var br = document.createElement("br")
+opordBoxT.appendChild(br);
+
+// Create the "Open ChatGPT" button element
+var openChatGPTButton = document.createElement("button");
+openChatGPTButton.style.width = "300px";
+openChatGPTButton.style.height = "40px";
+openChatGPTButton.style.fontSize = "110%"; 
+openChatGPTButton.style.background = "black"; 
+openChatGPTButton.style.color = "white"; 
+openChatGPTButton.style.border = "1px solid gray"; 
+
+// Set the text content of the OpenChatGPTButton
+openChatGPTButton.textContent = "Open ChatGPT 🌐";
+
+<!-- Add an event listener to the OpenChatGPTButton -->
+openChatGPTButton.addEventListener("click", function() {
+    // Create an anchor element
+    const a = document.createElement('a');
+    a.href = 'https://chatgpt.com/';
+    a.target = '_blank'; // Opens in a new tab
+    a.click(); // Simulates a click on the anchor element
+});
+
+
+
+
+// Add line breaks to match the spacing of your original code
+var br1 = document.createElement("br");
+opordBoxT.appendChild(br1);
+var br2 = document.createElement("br");
+opordBoxT.appendChild(br2);
+
+
+  
+		//OPORD NO.X
+		const opord = document.createElement('div');
+		opord.setAttribute(
+		'style',
+		'font-family:arial',
+		);
+		opord.textContent = 'OPORD '+rndInt;
+		const opordBox = document.getElementById('opordBox');
+		opordBox.appendChild(opord);
+		
+		//BLANK LINE
+		 var br = document.createElement("br")
+		 opordBox.appendChild(br);
+		
+		//CODENAME: X
+		const codenameLabel = document.createElement('div');
+		codenameLabel.setAttribute(
+		'style',
+		'font-family:arial',
+		);
+		codenameLabel.textContent = 'CODENAME: '+codename;
+		
+		opordBox.appendChild(codenameLabel);
+		
+		//BLANK LINE
+		 var br = document.createElement("br")
+		 opordBox.appendChild(br);
+		 
+		 //AREA OF OPERATIONS:
+		const ao = document.createElement('div');
+		ao.setAttribute(
+		'style',
+		'font-family:arial',
+		);
+		ao.textContent = 'AREA OF OPERATIONS:';
+		opordBox.appendChild(ao);
+		
+		//BLANK LINE
+		var br = document.createElement("br")
+		 opordBox.appendChild(br);
+		
+		//LIST PROVINCES SELECTED
+		provincesSelected.forEach(CreateTextAO);
+
+		function CreateTextAO(item) {
+		 const aoProvinces = document.createElement('div');
+		aoProvinces.setAttribute(
+		'style',
+		'font-family:arial',
+		);
+		aoProvinces.textContent = item;
+		opordBox.appendChild(aoProvinces);
+		}
+		
+		//BLANK LINE
+		var br = document.createElement("br")
+		opordBox.appendChild(br);
+				
+		//OBJECTIVES:
+		const objectives = document.createElement('div');
+		objectives.setAttribute(
+		'style',
+		'font-family:arial',
+		);
+		objectives.textContent = 'OBJECTIVES:';
+		opordBox.appendChild(objectives);						
+		
+		//BLANK LINE
+		var br = document.createElement("br")
+		opordBox.appendChild(br);		
+	
+		//LIST OBJECTIVES FROM THE RANDOM ROLL
+		randomSelection.forEach(CreateTextObjectives)
+		function CreateTextObjectives(item) {
+		 const objectiveslist = document.createElement('div');
+		objectiveslist.setAttribute(
+		'style',
+		'font-family:arial',
+		);
+		objectiveslist.textContent = item;
+		opordBox.appendChild(objectiveslist);
+		}
+		
+		//BLANK LINE
+		var br = document.createElement("br")
+		opordBox.appendChild(br);
+
+   
+		
+		
+  
+    provincesSelected.forEach(function callback(province) {
+
+//SHOW CORRENSPONDING MAPS
+
+  if (province == 'BARVECHOS') {
+    var text = document.createElement("p");
+  text.textContent = "🗺️BARVECHOS";
+  text.style.fontWeight = "bold"; // Optional: Make the text bold
+  text.style.fontFamily = "arial";
+  opordBox.appendChild(text);
+    var img = document.createElement("img");
+img.src = "images/BARVECHOS.png"; // Correct relative path
+img.style.width = "600px"; // Optional: Set the width
+img.style.border = "5px solid black"
+opordBox.appendChild(img);
+}
+
+if (province == 'CAIMANES') {
+  var text = document.createElement("p");
+  text.textContent = "🗺️CAIMANES";
+  text.style.fontWeight = "bold"; // Optional: Make the text bold
+  text.style.fontFamily = "arial";
+  opordBox.appendChild(text);
+  var img = document.createElement("img");
+img.src = "images/CAIMANES.png"; // Correct relative path
+img.style.width = "600px"; // Optional: Set the width
+img.style.border = "5px solid black"
+opordBox.appendChild(img);
+}
+
+if (province == 'ESPIRITU SANTO') {
+  var text = document.createElement("p");
+  text.textContent = "🗺️ESPIRITU SANTO";
+  text.style.fontWeight = "bold"; // Optional: Make the text bold
+  text.style.fontFamily = "arial";
+  opordBox.appendChild(text);
+  var img = document.createElement("img");
+img.src = "images/ESPIRITUSANTO.png"; // Correct relative path
+img.style.width = "600px"; // Optional: Set the width
+img.style.border = "5px solid black"
+opordBox.appendChild(img);
+
+}
+
+if (province == 'FLOR DEL ORO') {
+  var text = document.createElement("p");
+  text.textContent = "🗺️FLOR DEL ORO";
+  text.style.fontWeight = "bold"; // Optional: Make the text bold
+  text.style.fontFamily = "arial";
+  opordBox.appendChild(text);
+  var img = document.createElement("img");
+  img.src = "images/FLORDELORO.png"; // Correct relative path
+  img.style.width = "600px"; // Optional: Set the width
+  img.style.border = "5px solid black";
+  opordBox.appendChild(img);
+}
+
+
+if (province == 'INCA CAMINA') {
+  var text = document.createElement("p");
+  text.textContent = "🗺️INCA CAMINA";
+  text.style.fontWeight = "bold"; // Optional: Make the text bold
+  text.style.fontFamily = "arial";
+  opordBox.appendChild(text);
+  var img = document.createElement("img");
+  img.src = "images/INCACAMINA.png"; // Correct relative path
+  img.style.width = "600px"; // Optional: Set the width
+  img.style.border = "5px solid black";
+  opordBox.appendChild(img);
+}
+
+if (province == 'ITACUA') {
+
+var text = document.createElement("p");
+text.textContent = "🗺️ITACUA";
+text.style.fontWeight = "bold"; // Optional: Make the text bold
+text.style.fontFamily = "arial";
+opordBox.appendChild(text);
+var img = document.createElement("img");
+img.src = "images/ITACUA.png"; // Correct relative path
+img.style.width = "600px"; // Optional: Set the width
+img.style.border = "5px solid black"
+opordBox.appendChild(img);
+
+}
+
+if (province == 'KOANI') {
+  var text = document.createElement("p");
+  text.textContent = "🗺️KOANI";
+  text.style.fontWeight = "bold"; // Optional: Make the text bold
+  text.style.fontFamily = "arial";
+  opordBox.appendChild(text);
+var img = document.createElement("img");
+img.src = "images/KOANI.png"; // Correct relative path
+img.style.width = "600px"; // Optional: Set the width
+img.style.border = "5px solid black"
+opordBox.appendChild(img);
+
+}
+
+if (province == 'LA CRUZ') {
+  var text = document.createElement("p");
+  text.textContent = "🗺️LA CRUZ";
+  text.style.fontWeight = "bold"; // Optional: Make the text bold
+  text.style.fontFamily = "arial";
+  opordBox.appendChild(text);
+var img = document.createElement("img");
+img.src = "images/LACRUZ.png"; // Correct relative path
+img.style.width = "600px"; // Optional: Set the width
+img.style.border = "5px solid black"
+opordBox.appendChild(img);
+}
+
+if (province == 'LIBERTAD') {
+  var text = document.createElement("p");
+  text.textContent = "🗺️LIBERTAD";
+  text.style.fontWeight = "bold"; // Optional: Make the text bold
+  text.style.fontFamily = "arial";
+  opordBox.appendChild(text);
+var img = document.createElement("img");
+img.src = "images/LIBERTAD.png"; // Correct relative path
+img.style.width = "600px"; // Optional: Set the width
+img.style.border = "5px solid black"
+opordBox.appendChild(img);
+}
+
+if (province == 'MALCA') {
+var text = document.createElement("p");
+text.textContent = "🗺️MALCA";
+text.style.fontWeight = "bold"; // Optional: Make the text bold
+text.style.fontFamily = "arial";
+opordBox.appendChild(text);
+var img = document.createElement("img");
+img.src = "images/MALCA.png"; // Correct relative path
+img.style.width = "600px"; // Optional: Set the width
+img.style.border = "5px solid black"
+opordBox.appendChild(img);
+}
+
+if (province == 'MEDIA LUNA') {
+  var text = document.createElement("p");
+text.textContent = "🗺️MEDIA LUNA";
+text.style.fontWeight = "bold"; // Optional: Make the text bold
+text.style.fontFamily = "arial";
+opordBox.appendChild(text);
+var img = document.createElement("img");
+img.src = "images/MEDIALUNA.png"; // Correct relative path
+img.style.width = "600px"; // Optional: Set the width
+img.style.border = "5px solid black"
+opordBox.appendChild(img);
+}
+
+if (province == 'MOJOCOYO') {
+  var text = document.createElement("p");
+text.textContent = "🗺️MOJOCOYO";
+text.style.fontWeight = "bold"; // Optional: Make the text bold
+text.style.fontFamily = "arial";
+opordBox.appendChild(text);
+var img = document.createElement("img");
+img.src = "images/MOJOCOYO.png"; // Correct relative path
+img.style.width = "600px"; // Optional: Set the width
+img.style.border = "5px solid black"
+opordBox.appendChild(img);
+}
+
+if (province == 'MONTE PUNCU') {
+  var text = document.createElement("p");
+text.textContent = "🗺️MONTE PUNCU";
+text.style.fontWeight = "bold"; // Optional: Make the text bold
+text.style.fontFamily = "arial";
+opordBox.appendChild(text);
+var img = document.createElement("img");
+img.src = "images/MONTEPUNCU.png"; // Correct relative path
+img.style.width = "600px"; // Optional: Set the width
+img.style.border = "5px solid black"
+opordBox.appendChild(img);
+}
+
+if (province == 'MONTUYOC') {
+  var text = document.createElement("p");
+text.textContent = "🗺️MONTUYOC";
+text.style.fontWeight = "bold"; // Optional: Make the text bold
+text.style.fontFamily = "arial";
+opordBox.appendChild(text);
+var img = document.createElement("img");
+img.src = "images/MONTUYOC.png"; // Correct relative path
+img.style.width = "600px"; // Optional: Set the width
+img.style.border = "5px solid black"
+opordBox.appendChild(img);
+}
+
+if (province == 'OCORO') {
+  var text = document.createElement("p");
+text.textContent = "🗺️OCORO";
+text.style.fontWeight = "bold"; // Optional: Make the text bold
+text.style.fontFamily = "arial";
+opordBox.appendChild(text);
+var img = document.createElement("img");
+img.src = "images/OCORO.png"; // Correct relative path
+img.style.width = "600px"; // Optional: Set the width
+img.style.border = "5px solid black"
+opordBox.appendChild(img);
+}
+
+if (province == 'PN AGUA VERDE') {
+  var text = document.createElement("p");
+text.textContent = "🗺️PN AGUA VERDE";
+text.style.fontWeight = "bold"; // Optional: Make the text bold
+text.style.fontFamily = "arial";
+opordBox.appendChild(text);
+var img = document.createElement("img");
+img.src = "images/PNAGUA.png"; // Correct relative path
+img.style.width = "600px"; // Optional: Set the width
+img.style.border = "5px solid black"
+opordBox.appendChild(img);
+}
+
+if (province == 'PUCARA') {
+  var text = document.createElement("p");
+text.textContent = "🗺️PUCARA";
+text.style.fontWeight = "bold"; // Optional: Make the text bold
+text.style.fontFamily = "arial";
+opordBox.appendChild(text);
+var img = document.createElement("img");
+img.src = "images/PUCARA.png"; // Correct relative path
+img.style.width = "600px"; // Optional: Set the width
+img.style.border = "5px solid black"
+opordBox.appendChild(img);
+}
+
+if (province == 'REMANZO') {
+  var text = document.createElement("p");
+text.textContent = "🗺️REMANZO";
+text.style.fontWeight = "bold"; // Optional: Make the text bold
+text.style.fontFamily = "arial";
+opordBox.appendChild(text);
+var img = document.createElement("img");
+img.src = "images/REMANZO.png"; // Correct relative path
+img.style.width = "600px"; // Optional: Set the width
+img.style.border = "5px solid black"
+opordBox.appendChild(img); 
+}
+
+if (province == 'SAN MATEO') {
+  var text = document.createElement("p");
+text.textContent = "🗺️SAN MATEO";
+text.style.fontWeight = "bold"; // Optional: Make the text bold
+text.style.fontFamily = "arial";
+opordBox.appendChild(text);
+var img = document.createElement("img");
+img.src = "images/SANMATEO.png"; // Correct relative path
+img.style.width = "600px"; // Optional: Set the width
+img.style.border = "5px solid black"
+opordBox.appendChild(img); 
+}
+
+if (province == 'TABACAL') {
+  var text = document.createElement("p");
+text.textContent = "🗺️TABACAL";
+text.style.fontWeight = "bold"; // Optional: Make the text bold
+text.style.fontFamily = "arial";
+opordBox.appendChild(text);
+var img = document.createElement("img");
+img.src = "images/TABACAL.png"; // Correct relative path
+img.style.width = "600px"; // Optional: Set the width
+img.style.border = "5px solid black"
+opordBox.appendChild(img); 
+}
+
+if (province == 'VILLA VERDE') {
+  var text = document.createElement("p");
+text.textContent = "🗺️VILLA VERDE";
+text.style.fontWeight = "bold"; // Optional: Make the text bold
+text.style.fontFamily = "arial";
+opordBox.appendChild(text);
+var img = document.createElement("img");
+img.src = "images/VILLAVERDE.png"; // Correct relative path
+img.style.width = "600px"; // Optional: Set the width
+img.style.border = "5px solid black"
+opordBox.appendChild(img); 
+}
+
+
+
+});
+
+
+    //SHOW MAP LINK
+   // var link = document.getElementById('interactivemap');
+  //  link.style.display = 'block';
+		
+	}
+</script>
+
+<div id="opordBox"></div>
+<br>
+<hr>
+
+<br>
+<a href="https://www.swissgameguides.com/maps/ghost_recon_wildlands/world/interactive_map.html" id="interactivemap" style="font-family:arial; display:none; text-decoration:none;" target="_blank" rel="noopener noreferrer"> 👉 INTERACTIVE MAP 👈</a>
+
+
+
+
+
+<br>
+</center> 
+
+</body>
+
+</html>
+

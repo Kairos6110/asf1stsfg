@@ -1,0 +1,1315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>READY OR NOT - Game Guide</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" sizes="32x32" href="favico.png">
+
+    <style>
+        /* Custom CSS for dark blue military vibes and modern enhancements */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0F172A; /* Very dark muted blue (slate-950 equivalent) */
+            color: #E2E8F0; /* Light text (slate-200 equivalent) */
+            overflow-x: hidden; /* Prevent horizontal scroll */
+        }
+
+        .container {
+            position: relative;
+            z-index: 1; /* Keep content above background */
+        }
+
+        /* Mission card styling */
+        .mission-card {
+            background-color: #1E293B; /* Slightly lighter dark blue for cards (slate-900 equivalent) */
+            border: 1px solid #334155; /* Subtle border (slate-700 equivalent) */
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4); /* Deeper shadow */
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+            display: flex;
+            flex-direction: column;
+            width: 100%; /* Ensure cards take full available width within their grid column */
+            max-width: 500px; /* Limit max width of card for better appearance on very large screens */
+            margin-left: auto; /* Center cards in the single column */
+            margin-right: auto; /* Center cards in the single column */
+            box-sizing: border-box; /* Include padding and border in the element's total width and height */
+        }
+
+        .mission-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.6);
+        }
+
+        /* Heading styling */
+        h1, h2 {
+            color: #F8FAFC; /* Lighter heading text (slate-50 equivalent) */
+        }
+
+        /* Image container for aspect ratio and overlay */
+        .image-container {
+            position: relative;
+            width: 100%;
+            /* Original padding-bottom for 4:3 aspect ratio */
+            padding-bottom: 75%;
+            height: 0;
+            overflow: hidden;
+            border-radius: 0.75rem; /* More rounded corners */
+            cursor: pointer;
+            margin-bottom: 1.5rem;
+            background-color: #3e4d63; /* Set background color to 3e4d63 for map images */
+            display: flex; /* Flexbox for centering content within */
+            align-items: center;
+            justify-content: center;
+        }
+
+        .image-container img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: contain; /* Ensures the entire image is visible without cropping, maintaining aspect ratio */
+            border-radius: 0.75rem;
+            background-color: #3e4d63; /* Also ensure the image itself has this background to fill transparent areas */
+        }
+
+        .image-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(15, 23, 42, 0.6); /* Semi-transparent dark blue overlay */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            border-radius: 0.75rem;
+        }
+
+        .image-container:hover .image-overlay {
+            opacity: 1;
+        }
+
+        .image-overlay-text {
+            color: white;
+            font-weight: bold;
+            font-size: 1.15rem; /* Slightly smaller for better fit */
+            text-align: center;
+            padding: 0.5rem; /* Add some padding */
+        }
+
+        /* Text styling for tips */
+        .tips-text {
+            flex-grow: 1; /* Allows the text content to grow and fill available space */
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start; /* Align content to the start */
+        }
+
+        .tips-text ul {
+            list-style-type: disc;
+            margin-left: 1.5rem;
+        }
+
+        .tips-text li {
+            margin-bottom: 0.5rem;
+        }
+
+        .tips-text ul ul { /* Nested list styling */
+            list-style-type: circle;
+            margin-left: 1.25rem;
+            margin-top: 0.25rem;
+        }
+
+        /* Full-size image modal */
+        .modal {
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(15, 23, 42, 0.95); /* Darker, more opaque modal background */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(8px); /* Increased blur */
+            -webkit-backdrop-filter: blur(8px);
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .modal.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            margin: auto;
+            display: block;
+            max-width: 95%; /* Increased max-width */
+            max-height: 85%; /* Adjusted max-height to make space for caption */
+            object-fit: contain;
+            border-radius: 0.75rem;
+            background-color: #3e4d63; /* Ensure modal image background is a8a8a8 */
+        }
+
+        .modal-caption {
+            color: #F8FAFC; /* Lighter caption text */
+            font-weight: bold;
+            font-size: 1.6rem; /* Slightly larger caption */
+            text-align: center;
+            margin-top: 15px; /* Space between image and text */
+            padding-bottom: 20px;
+        }
+
+        .close {
+            position: absolute;
+            top: 20px; /* Adjusted position */
+            right: 25px; /* Adjusted position */
+            color: #F8FAFC; /* Lighter close button color */
+            font-size: 48px; /* Larger close button */
+            font-weight: lighter; /* Lighter font weight for 'x' */
+            transition: 0.3s;
+            cursor: pointer;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: #94A3B8; /* Muted blue on hover (slate-400 equivalent) */
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        /* Mission Selector */
+        .mission-selector-container {
+            position: sticky; /* Makes the element stick */
+            top: 0; /* Sticks to the top of the viewport */
+            z-index: 50; /* Ensure it stays above other content when scrolling */
+            background-color: #0F172A; /* Match body background to avoid transparency issues when sticking */
+            padding-top: 1rem; /* Add some padding at the top */
+            padding-bottom: 1rem; /* Add some padding at the bottom */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Add subtle shadow when sticky */
+        }
+
+        .mission-selector {
+            background-color: #1E293B; /* Same as card background */
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            padding: 1rem;
+        }
+
+        .mission-selector select {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            background-color: #334155; /* Slate-700 for input */
+            color: #E2E8F0; /* Light text */
+            border: 1px solid #475569; /* Slate-600 border */
+            appearance: none; /* Remove default arrow */
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            cursor: pointer;
+            font-size: 1rem;
+            line-height: 1.5;
+            background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%204%205%22%3E%3Cpath%20fill%3D%23E2E8F0%22%20d%3D%22M2%200L0%202h4zm0%205L0%203h4z%22%2F%3E%3C%2Fsvg%3E'); /* Custom arrow */
+            background-repeat: no-repeat;
+            background-position: right 0.75rem center;
+            background-size: 0.8em;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .mission-selector select:focus {
+            outline: none;
+            border-color: #6366F1; /* Indigo-500 on focus */
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.5); /* Focus ring */
+        }
+
+        /* Add this to adjust the scroll position */
+        html {
+            scroll-padding-top: 140px; /* Adjust this value based on the height of your sticky header + desired offset */
+        }
+
+        /* Responsive adjustments for overall layout */
+        @media (max-width: 768px) {
+            .container {
+                padding-left: 1rem;
+                padding-right: 1rem;
+            }
+
+
+            .mission-card {
+                padding: 1.25rem;
+            }
+
+            .image-overlay-text {
+                font-size: 1rem;
+            }
+            html {
+                scroll-padding-top: 120px; /* Adjust for smaller screens if header height changes */
+            }
+        }
+
+        /* Desktop adjustments for image size */
+        @media (min-width: 769px) {
+            .image-container {
+                /* Limit the width of the image container itself to prevent images from becoming too wide */
+                max-width: 500px; /* Adjust this value as needed */
+                margin-left: auto; /* Center the image container within the card */
+                margin-right: auto; /* Center the image container within the card */
+            }
+        }
+
+        /* New styles for the logo */
+        .header-logo-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 1rem; /* Adjust as needed */
+        }
+
+        .header-logo {
+            width: 100%;
+            height: auto;
+            object-fit: contain;
+            max-width: 400px;
+
+        }
+
+
+        @media (min-width: 768px) {
+            .header-logo {
+                max-width: 600px; /* On desktop and larger */
+            }
+        }
+
+        /* Optics Preview Button */
+        .optics-button {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            margin-top: 1rem;
+            background-color: #334155; /* Slate-700 */
+            color: #E2E8F0; /* Light text */
+            border: 1px solid #475569; /* Slate-600 border */
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            text-align: center;
+            cursor: pointer;
+            transition: background-color 0.2s ease, border-color 0.2s ease;
+        }
+
+        .optics-button:hover {
+            background-color: #475569; /* Slate-600 on hover */
+            border-color: #6366F1; /* Indigo-500 on hover */
+        }
+    </style>
+</head>
+<body class="antialiased">
+    <div class="container mx-auto px-4 py-8 md:py-12">
+        <header class="text-center mb-10 md:mb-16">
+            <div class="header-logo-container">
+                <img src="toplogo.png" alt="Ready Or Not Logo" class="header-logo">
+            </div>
+            <p class="text-slate-400 text-lg md:text-xl max-w-2xl mx-auto">
+                Game Guide by Kairos_6110<br><br>
+            </p>
+            <button id="opticsPreviewBtn" class="optics-button">🎯 All Optics Preview</button>
+        </header>
+
+        <div class="mission-selector-container">
+            <div class="mission-selector max-w-xl mx-auto">
+                <label for="mission-select" class="block text-slate-300 text-lg font-semibold mb-2 text-center"></label>
+                <select id="mission-select">
+                    <option value="">-- Select a Mission --</option>
+                    <option value="thank-you-come-again">1. Thank You, Come Again</option>
+                    <option value="megabytes-a-second">2. 23 Megabytes a Second</option>
+                    <option value="twisted-nerve">3. Twisted Nerve</option>
+                    <option value="the-spider">4. The Spider</option>
+                    <option value="a-lethal-obsession">5. A Lethal Obsession</option>
+                    <option value="ides-of-march">6. Ides of March</option>
+                    <option value="sinuous-trail">7. Sinuous Trail</option>
+                    <option value="ends-of-the-earth">8. Ends of the Earth</option>
+                    <option value="greased-palms">9. Greased Palms</option>
+                    <option value="valley-of-the-dolls">10. Valley of the Dolls</option>
+                    <option value="elephant">11. Elephant</option>
+                    <option value="rust-belt">12. Rust Belt</option>
+                    <option value="sins-of-the-father">13. Sins of The Father</option>
+                    <option value="neon-tomb">14. Neon Tomb</option>
+                    <option value="buy-cheap-buy-twice">15. Buy Cheap Buy Twice</option>
+                    <option value="carriers-of-the-vine">16. Carriers of the Vine</option>
+                    <option value="relapse">17. Relapse</option>
+                    <option value="hide-and-seek">18. Hide and Seek</option>
+                    <option value="dlc-dorms">19. H.I. DLC - Dorms</option>
+                    <option value="dlc-narcos">20. H.I. DLC - Narcos</option>
+                    <option value="dlc-lawmaker">21. H.I. DLC - Lawmaker</option>
+                    <option value="dlc-mirage-at-sea">22. D.W. DLC - Mirage at Sea</option>
+                    <option value="dlc-leviathan">23. D.W. DLC - Leviathan</option>
+                    <option value="dlc-3-letter-triad">24. D.W. DLC - 3 Letter Triad</option>
+                    <option value="dlc-hunger-strike">25. L.S.S. DLC - Hunger Strike</option>
+                    <option value="dlc-stolen-valor">26. L.S.S. DLC - Stolen Valor</option>
+                </select>
+            </div>
+        </div>
+
+        <main class="grid grid-cols-1 gap-8 mt-8 items-stretch">
+
+            <section id="thank-you-come-again" class="mission-card p-6 rounded-xl shadow-lg">
+                <h2 class="text-2xl font-semibold mb-4 text-slate-200">1. Thank You, Come Again</h2>
+                <div class="image-container rounded-lg" data-image-src="m1.jpg" data-caption="Thank You, Come Again Map">
+                    <img src="m1.jpg" alt="Map for Thank You, Come Again" class="rounded-lg" onerror="this.onerror=null;this.src='https://placehold.co/600x450/334155/E2E8F0?text=Map+Missing'">
+                    <div class="image-overlay">
+                        <span class="image-overlay-text">Click to view full size</span>
+                    </div>
+                </div>
+                    <div class="image-container rounded-lg" data-image-src="m1i.jpg" data-caption="Intel/OBJs">
+                    <img src="m1i.jpg" alt="Intel/OBJs" class="rounded-lg" onerror="this.onerror=null;this.src='https://placehold.co/600x450/334155/E2E8F0?text=Map+Missing'">
+                    <div class="image-overlay">
+                        <span class="image-overlay-text">Intel/OBJs</span>
+                    </div>
+                </div>
+                <div class="tips-text text-slate-300 leading-relaxed">
+                    <p class="mb-3">All hostiles and objectives are located on a single floor.</p>
+                    <ul class="list-disc ml-5 space-y-2">
+                        <li><strong>Crystal Leighton:</strong> Found in the small room marked “STAFF ONLY,” located to the left of the starting area.</li>
+                        <li><strong>Store Manager:</strong> Located near the center, close to the cash register booth.</li>
+                        <li><strong>Downed Veteran:</strong> Found in the diner area to the right of the start, lying near the dining booths.</li>
+                    </ul>
+                </div>
+            </section>
+
+            <section id="megabytes-a-second" class="mission-card p-6 rounded-xl shadow-lg">
+                <h2 class="text-2xl font-semibold mb-4 text-slate-200">2. 23 Megabytes a Second</h2>
+                <div class="image-container rounded-lg" data-image-src="m20.jpg" data-caption="23 Megabytes a Second - Ground Floor">
+                    <img src="m20.jpg" alt="Ground Floor Map for 23 Megabytes a Second" class="rounded-lg" onerror="this.onerror=null;this.src='https://placehold.co/600x450/334155/E2E8F0?text=Ground+Floor+Map+Missing'">
+                    <div class="image-overlay">
+                        <span class="image-overlay-text">Ground Floor</span>
+                    </div>
+                </div>
+                <div class="image-container rounded-lg" data-image-src="m21.jpg" data-caption="23 Megabytes a Second - First Floor">
+                    <img src="m21.jpg" alt="First Floor Map for 23 Megabytes a Second" class="rounded-lg" onerror="this.onerror=null;this.src='https://placehold.co/600x450/334155/E2E8F0?text=First+Floor+Map+Missing'">
+                    <div class="image-overlay">
+                        <span class="image-overlay-text">First Floor</span>
+                    </div>
+                </div>
+                <div class="image-container rounded-lg" data-image-src="m22.jpg" data-caption="23 Megabytes a Second - Top Floor">
+                    <img src="m22.jpg" alt="Top Floor Map for 23 Megabytes a Second" class="rounded-lg" onerror="this.onerror=null;this.src='https://placehold.co/600x450/334155/E2E8F0?text=Top+Floor+Map+Missing'">
+                    <div class="image-overlay">
+                        <span class="image-overlay-text">Top Floor</span>
+                    </div>
+                </div>
+                    <div class="image-container rounded-lg" data-image-src="m2i.jpg" data-caption="Intel/OBJs">
+                    <img src="m2i.jpg" alt="Intel/OBJs" class="rounded-lg" onerror="this.onerror=null;this.src='https://placehold.co/600x450/334155/E2E8F0?text=Map+Missing'">
+                    <div class="image-overlay">
+                        <span class="image-overlay-text">Intel/OBJs</span>
+                    </div>
+                </div>
+                <div class="tips-text text-slate-300 leading-relaxed">
+                    <ul class="list-disc ml-5 space-y-2">
+                        <li><strong>Ground Floor:</strong> Simply clear it.</li>
+                        <li><strong>First Floor:</strong> Only one apartment (Apartment 13), which contains the server farm evidence.</li>
+                        <li><strong>Top Floor:</strong>
+                            <ul class="list-circle ml-5 mt-1">
+                                <li>Apartment 14: Contains the HVT and multiple pieces of evidence.</li>
+                                <li>Apartment 15: Simply clear it.</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </section>
+
+            <section id="twisted-nerve" class="mission-card p-6 rounded-xl shadow-lg">
+                <h2 class="text-2xl font-semibold mb-4 text-slate-200">3. Twisted Nerve</h2>
+                <div class="image-container rounded-lg" data-image-src="m30.jpg" data-caption="Twisted Nerve - Ground Floor">
+                    <img src="m30.jpg" alt="Ground Floor Map for Twisted Nerve" class="rounded-lg" onerror="this.onerror=null;this.src='https://placehold.co/600x450/334155/E2E8F0?text=Ground+Floor+Map+Missing'">
+                    <div class="image-overlay">
+                        <span class="image-overlay-text">Ground Floor</span>
+                    </div>
+                </div>
+                <div class="image-container rounded-lg" data-image-src="m31.jpg" data-caption="Twisted Nerve - First Floor">
+                    <img src="m31.jpg" alt="First Floor Map for Twisted Nerve" class="rounded-lg" onerror="this.onerror=null;this.src='https://placehold.co/600x450/334155/E2E8F0?text=First+Floor+Map+Missing'">
+                    <div class="image-overlay">
+                        <span class="image-overlay-text">First Floor</span>
+                    </div>
+                </div>
+                <div class="image-container rounded-lg" data-image-src="m32.jpg" data-caption="Twisted Nerve - Second Floor">
+                    <img src="m32.jpg" alt="Second Floor Map for Twisted Nerve" class="rounded-lg" onerror="this.onerror=null;this.src='https://placehold.co/600x450/334155/E2E8F0?text=Second+Floor+Map+Missing'">
+                    <div class="image-overlay">
+                        <span class="image-overlay-text">Second Floor</span>
+                    </div>
+                </div>
+                <div class="image-container rounded-lg" data-image-src="m33.jpg" data-caption="Twisted Nerve - Underground Tunnel">
+                    <img src="m33.jpg" alt="Underground Tunnel Map for Twisted Nerve" class="rounded-lg" onerror="this.onerror=null;this.src='https://placehold.co/600x450/334155/E2E8F0?text=Underground+Tunnel+Map+Missing'">
+                    <div class="image-overlay">
+                        <span class="image-overlay-text">Underground Tunnel</span>
+                    </div>
+                </div>
+                    <div class="image-container rounded-lg" data-image-src="m3i.jpg" data-caption="Intel/OBJs">
+                    <img src="m3i.jpg" alt="Intel/OBJs" class="rounded-lg" onerror="this.onerror=null;this.src='https://placehold.co/600x450/334155/E2E8F0?text=Map+Missing'">
+                    <div class="image-overlay">
+                        <span class="image-overlay-text">Intel/OBJs</span>
+                    </div>
+                </div>
+                <div class="tips-text text-slate-300 leading-relaxed">
+                    <ul class="list-disc ml-5 space-y-2">
+                        <li><strong>Left House (not fumigated):</strong>
+                            <ul class="list-circle ml-5 mt-1">
+                                <li>Ground Floor: Simply clear it.</li>
+                                <li>Top Floor: Contains meth evidence, cash, and a child.</li>
+                            </ul>
+                        </li>
+                        <li><strong>Right House (fumigated 🎪):</strong>
+                            <ul class="list-circle ml-5 mt-1">
+                                <li>Ground Floor: Meth evidence in a small room to the right of the main entrance.</li>
+                                <li>Kitchen: Active meth lab.</li>
+                                <li>Second Floor: Another meth lab down the hall.</li>
+                                <li>Attic and Tunnel at the rear of map: Simply clear it.</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </section>
+
+            <section id="the-spider" class="mission-card p-6 rounded-xl shadow-lg">
+                <h2 class="text-2xl font-semibold mb-4 text-slate-200">4. The Spider</h2>
+                <div class="image-container rounded-lg" data-image-src="m40.jpg" data-caption="The Spider - Ground Floor">
+                    <img src="m40.jpg" alt="Ground Floor Map for The Spider" class="rounded-lg" onerror="this.onerror=null;this.src='https://placehold.co/600x450/334155/E2E8F0?text=Ground+Floor+Map+Missing'">
+                    <div class="image-overlay">
+                        <span class="image-overlay-text">Ground Floor</span>
+                    </div>
+                </div>
+                <div class="image-container rounded-lg" data-image-src="m41.jpg" data-caption="The Spider - Top Floor / Roof">
+                    <img src="m41.jpg" alt="Top Floor Map for The Spider" class="rounded-lg" onerror="this.onerror=null;this.src='https://placehold.co/600x450/334155/E2E8F0?text=Top+Floor+Map+Missing'">
+                    <div class="image-overlay">
+                        <span class="image-overlay-text">Top Floor / Roof</span>
+                    </div>
+                </div>
+                    <div class="image-container rounded-lg" data-image-src="m4i.png" data-caption="Intel/OBJs">
+                    <img src="m4i.png" alt="Intel/OBJs" class="rounded-lg" onerror="this.onerror=null;this.src='https://placehold.co/600x450/334155/E2E8F0?text=Map+Missing'">
+                    <div class="image-overlay">
+                        <span class="image-overlay-text">Intel/OBJs</span>
+                    </div>
+                </div>
+                <div class="tips-text text-slate-300 leading-relaxed">
+                    <p class="mb-3">No soft objective to complete or special evidence to report.</p>
+                    <ul class="list-disc ml-5 space-y-2">
+                        <li><strong>Market (start area):</strong> Simply clear it.</li>
+                        <li><strong>Ground Floor:</strong> Clear the area. Note: Brixley is often around the dressing room in the center.</li>
+                        <li><strong>Roof:</strong> Simply clear it.</li>
+                    </ul>
+                    <p class="mt-3 italic text-slate-400">*If civilians are hard to locate, check the homeless tent areas.</p>
+                </div>
+            </section>
+
+            <section id="a-lethal-obsession" class="mission-card p-6 rounded-xl shadow-lg">
+                <h2 class="text-2xl font-semibold mb-4 text-slate-200">5. A Lethal Obsession</h2>
+                <div class="image-container rounded-lg" data-image-src="m50.jpg" data-caption="A Lethal Obsession - Ground Floor">
+                    <img src="m50.jpg" alt="Ground Floor Map for A Lethal Obsession" class="rounded-lg" onerror="this.onerror=null;this.src='https://placehold.co/600x450/334155/E2E8F0?text=Ground+Floor+Map+Missing'">
+                    <div class="image-overlay">
+                        <span class="image-overlay-text">Ground Floor</span>
+                    </div>
+                </div>
+                <div class="image-container rounded-lg" data-image-src="m51.jpg" data-caption="A Lethal Obsession - First Floor">
+                    <img src="m51.jpg" alt="First Floor Map for A Lethal Obsession" class="rounded-lg" onerror="this.onerror=null;this.src='https://placehold.co/600x450/334155/E2E8F0?text=First+Floor+Map+Missing'">
+                    <div class="image-overlay">
+                        <span class="image-overlay-text">First Floor</span>
+                    </div>
+                </div>
+                <div class="image-container rounded-lg" data-image-src="m52.jpg" data-caption="A Lethal Obsession - Second Floor">
+                    <img src="m52.jpg" alt="Second Floor Map for A Lethal Obsession" class="rounded-lg" onerror="this.onerror=null;this.src='https://placehold.co/600x450/334155/E2E8F0?text=Second+Floor+Map+Missing'">
+                    <div class="image-overlay">
+                        <span class="image-overlay-text">Second Floor</span>
+                    </div>
+                </div>
+                    <div class="image-container rounded-lg" data-image-src="m5i.jpg" data-caption="Intel/OBJs">
+                    <img src="m5i.jpg" alt="Intel/OBJs" class="rounded-lg" onerror="this.onerror=null;this.src='https://placehold.co/600x450/334155/E2E8F0?text=Map+Missing'">
+                    <div class="image-overlay">
+                        <span class="image-overlay-text">Intel/OBJs</span>
+                    </div>
+                </div>
+                <div class="tips-text text-slate-300 leading-relaxed">
+                    <p class="mb-3">Peek or Mirror every single door and cut tripwires.</p>
+                    <ul class="list-disc ml-5 space-y-2">
+                        <li><strong>Ground Floor Lab:</strong> Simply clear it.</li>
+                        <li><strong>First floor:</strong> Federal documents evidence.</li>
+
+                        <li><strong>Top floor:</strong> Simply clear it.</li>
+                    </ul>
+                </div>
+            </section>
+
+            <section id="ides-of-march" class="mission-card p-6 rounded-xl shadow-lg">
+                <h2 class="text-2xl font-semibold mb-4 text-slate-200">6. Ides of March</h2>
+                <div class="image-container rounded-lg" data-image-src="m60.jpg" data-caption="Ides of March Map">
+                    <img src="m60.jpg" alt="Map for Ides of March" class="rounded-lg" onerror="this.onerror=null;this.src='https://placehold.co/600x450/334155/E2E8F0?text=Map+Missing'">
+                    <div class="image-overlay">
+                        <span class="image-overlay-text">Click to view full size</span>
+                    </div>
+                </div>
+                <div class="image-container rounded-lg" style="visibility: hidden; padding-bottom: 0; margin-bottom: 0;">
+                    </div>
+                    <div class="image-container rounded-lg" data-image-src="m6i.jpg" data-caption="Intel/OBJs">
+                    <img src="m6i.jpg" alt="Intel/OBJs" class="rounded-lg" onerror="this.onerror=null;this.src='https://placehold.co/600x450/334155/E2E8F0?text=Map+Missing'">
+                    <div class="image-overlay">
+                        <span class="image-overlay-text">Intel/OBJs</span>
+                    </div>
+                </div>
+                <div class="tips-text text-slate-300 leading-relaxed">
+                    <p class="mb-3">Peek or mirror every single door and cut tripwires.</p>
+                    <p class="mb-3">Check map for locations.</p>
+                </div>
+            </section>
+
+            <section id="sinuous-trail" class="mission-card p-6 rounded-xl shadow-lg">
+                <h2 class="text-2xl font-semibold mb-4 text-slate-200">7. Sinuous Trail</h2>
+                <div class="image-container rounded-lg" data-image-src="m70.jpg" data-caption="Sinuous Trail - Ground Floor">
+                    <img src="m70.jpg" alt="Ground Floor Map for Sinuous Trail" class="rounded-lg" onerror="this.onerror=null;this.src='https://placehold.co/600x450/334155/E2E8F0?text=Ground+Floor+Map+Missing'">
+                    <div class="image-overlay">
+                        <span class="image-overlay-text">Ground Floor</span>
+                    </div>
+                </div>
+                <div class="image-container rounded-lg" data-image-src="m71.jpg" data-caption="Sinuous Trail - First Floor">
+                    <img src="m71.jpg" alt="First Floor Map for Sinuous Trail" class="rounded-lg" onerror="this.onerror=null;this.src='https://placehold.co/600x450/334155/E2E8F0?text=First+Floor+Map+Missing'">
+                    <div class="image-overlay">
+                        <span class="image-overlay-text">First Floor</span>
+                    </div>
+                </div>
+                <div class="image-container rounded-lg" data-image-src="m72.jpg" data-caption="Sinuous Trail - Second Floor">
+                    <img src="m72.jpg" alt="Second Floor Map for Sinuous Trail" class="rounded-lg" onerror="this.onerror=null;this.src='https://placehold.co/600x450/334155/E2E8F0?text=Second+Floor+Map+Missing'">
+                    <div class="image-overlay">
+                        <span class="image-overlay-text">Second Floor</span>
+                    </div>
+                </div>
+                <div class="tips-text text-slate-300 leading-relaxed">
+                    <ul class="list-disc ml-5 space-y-2">
+                        <li>No special evidence to collect.</li>
+                        <li>Secure all suspects and civilians.</li>
+                    </ul>
+                </div>
+            </section>
+
+            <section id="ends-of-the-earth" class="mission-card p-6 rounded-xl shadow-lg">
+                <h2 class="text-2xl font-semibold mb-4 text-slate-200">8. Ends of the Earth</h2>
+                <div class="image-container rounded-lg" data-image-src="m80.jpg" data-caption="Ends of the Earth - Ground Floor">
+                    <img src="m80.jpg" alt="Ground Floor Map for Ends of the Earth" class="rounded-lg" onerror="this.onerror=null;this.src='https://placehold.co/600x450/334155/E2E8F0?text=Ground+Floor+Map+Missing'">
+                    <div class="image-overlay">
+                        <span class="image-overlay-text">Ground Floor</span>
+                    </div>
+                </div>
+                <div class="image-container rounded-lg" data-image-src="m81.jpg" data-caption="Ends of the Earth - First Floor">
+                    <img src="m81.jpg" alt="First Floor Map for Ends of the Earth" class="rounded-lg" onerror="this.onerror=null;this.src='https://placehold.co/600x450/334155/E2E8F0?text=First+Floor+Map+Missing'">
+                    <div class="image-overlay">
+                        <span class="image-overlay-text">First Floor</span>
+                    </div>
+                </div>
+                <div class="image-container rounded-lg" data-image-src="m82.jpg" data-caption="Ends of the Earth - Second Floor">
+                    <img src="m82.jpg" alt="Second Floor Map for Ends of the Earth" class="rounded-lg" onerror="this.onerror=null;this.src='https://placehold.co/600x450/334155/E2E8F0?text=Second+Floor+Map+Missing'">
+                    <div class="image-overlay">
+                        <span class="image-overlay-text">Second Floor</span>
+                    </div>
+                </div>
+                    <div class="image-container rounded-lg" data-image-src="m8i.jpg" data-caption="Intel/OBJs">
+                    <img src="m8i.jpg" alt="Intel/OBJs" class="rounded-lg" onerror="this.onerror=null;this.src='https://placehold.co/600x450/334155/E2E8F0?text=Map+Missing'">
+                    <div class="image-overlay">
+                        <span class="image-overlay-text">Intel/OBJs</span>
+                    </div>
+                </div>
+                <div class="tips-text text-slate-300 leading-relaxed">
+                    <ul class="list-disc ml-5 space-y-2">
+                        <li><strong>Special evidence:</strong> 'bag of cash' on the couch in the bedroom (First Floor).</li>
+                        <li><strong>3D Printers Weapon Lab:</strong> Located on the Second Floor.</li>
+                    </ul>
+                </div>
+            </section>
+
+            <section id="greased-palms" class="mission-card p-6 rounded-xl shadow-lg">
+                <h2 class="text-2xl font-semibold mb-4 text-slate-200">9. Greased Palms</h2>
+                <div class="image-container rounded-lg" data-image-src="m90.jpg" data-caption="Greased Palms - Ground Floor">
+                    <img src="m90.jpg" alt="Ground Floor Map for Greased Palms" class="rounded-lg" onerror="this.onerror=null;this.src='https://placehold.co/600x450/334155/E2E8F0?text=Ground+Floor+Map+Missing'">
+                    <div class="image-overlay">
+                        <span class="image-overlay-text">Ground Floor</span>
+                    </div>
+                </div>
+                <div class="image-container rounded-lg" data-image-src="m91.jpg" data-caption="Greased Palms - First Floor">
+                    <img src="m91.jpg" alt="First Floor Map for Greased Palms" class="rounded-lg" onerror="this.onerror=null;this.src='https://placehold.co/600x450/334155/E2E8F0?text=First+Floor+Map+Missing'">
+                    <div class="image-overlay">
+                        <span class="image-overlay-text">First Floor</span>
+                    </div>
+                </div>
+                    <div class="image-container rounded-lg" data-image-src="m9i.jpg" data-caption="Intel/OBJs">
+                    <img src="m9i.jpg" alt="Intel/OBJs" class="rounded-lg" onerror="this.onerror=null;this.src='https://placehold.co/600x450/334155/E2E8F0?text=Map+Missing'">
+                    <div class="image-overlay">
+                        <span class="image-overlay-text">Intel/OBJs</span>
+                    </div>
+                </div>
+                <div class="tips-text text-slate-300 leading-relaxed">
+                    <ul class="list-disc ml-5 space-y-2">
+                        <li><strong>Soft Objectives:</strong>
+                            <ul class="list-circle ml-5 mt-1">
+                                <li>Suspected shooter body (follow the blood trail to him).</li>
+                                <li>Illegal weapon delivery in the truck outside back.</li>
+                            </ul>
+                        </li>
+                        <li><strong>Key Persons:</strong>
+                            <ul class="list-circle ml-5 mt-1">
+                                <li>Maria Lopez is often in one of the two bottom LSPS buildings.</li>
+                                <li>Eugene Gomez is often on the floor around the conveyor belts areas.</li>
+                                <li>Fisa Agent Adams is often at the Fisa Office or very close.</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </section>
+
+            <section id="valley-of-the-dolls" class="mission-card p-6 rounded-xl shadow-lg">
+                <h2 class="text-2xl font-semibold mb-4 text-slate-200">10. Valley of the Dolls</h2>
+                <div class="image-container rounded-lg" data-image-src="m102.jpg" data-caption="Valley of the Dolls - Floor 2">
+                    <img src="m102.jpg" alt="Floor 2 Map for Valley of the Dolls" class="rounded-lg" onerror="this.onerror=null;this.src='https://placehold.co/600x450/334155/E2E8F0?text=Floor+2+Map+Missing'">
+                    <div class="image-overlay">
+                        <span class="image-overlay-text">Floor 2</span>
+                    </div>
+                </div>
+                <div class="image-container rounded-lg" data-image-src="m101.jpg" data-caption="Valley of the Dolls - Floor 1">
+                    <img src="m101.jpg" alt="Floor 1 Map for Valley of the Dolls" class="rounded-lg" onerror="this.onerror=null;this.src='https://placehold.co/600x450/334155/E2E8F0?text=Floor+1+Map+Missing'">
+                    <div class="image-overlay">
+                        <span class="image-overlay-text">Floor 1</span>
+                    </div>
+                </div>
+                <div class="image-container rounded-lg" data-image-src="m10g.jpg" data-caption="Valley of the Dolls - Ground Floor">
+                    <img src="m10g.jpg" alt="Ground Floor Map for Valley of the Dolls" class="rounded-lg" onerror="this.onerror=null;this.src='https://placehold.co/600x450/334155/E2E8F0?text=Ground+Floor+Map+Missing'">
+                    <div class="image-overlay">
+                        <span class="image-overlay-text">Ground Floor</span>
+                    </div>
+                </div>
+                <div class="image-container rounded-lg" data-image-src="m10ug.jpg" data-caption="Valley of the Dolls - Underground">
+                    <img src="m10ug.jpg" alt="Underground Map for Valley of the Dolls" class="rounded-lg" onerror="this.onerror=null;this.src='https://placehold.co/600x450/334155/E2E8F0?text=Underground+Map+Missing'">
+                    <div class="image-overlay">
+                        <span class="image-overlay-text">Underground</span>
+                    </div>
+                </div>
+                    <div class="image-container rounded-lg" data-image-src="m10i.jpg" data-caption="Intel/OBJs">
+                    <img src="m10i.jpg" alt="Intel/OBJs" class="rounded-lg" onerror="this.onerror=null;this.src='https://placehold.co/600x450/334155/E2E8F0?text=Map+Missing'">
+                    <div class="image-overlay">
+                        <span class="image-overlay-text">Intel/OBJs</span>
+                    </div>
+                </div>
+                <div class="tips-text text-slate-300 leading-relaxed">
+                    <ul class="list-disc ml-5 space-y-2">
+                        <li><strong>Photo Evidence:</strong> On the start top floor.</li>
+                        <li><strong>Office:</strong> On the floor below start, with damaged hard drives on the balcony.</li>
+                        <li><strong>2 Photo Evidence:</strong> In the underground horror show.</li>
+                    </ul>
+                </div>
+            </section>
+
+            <section id="elephant" class="mission-card p-6 rounded-xl shadow-lg">
+                <h2 class="text-2xl font-semibold mb-4 text-slate-200">11. Elephant</h2>
+                <div class="image-container rounded-lg" data-image-src="m11.jpg" data-caption="Elephant - Ground Floor">
+                    <img src="m11.jpg" alt="Ground Floor Map for Elephant" class="rounded-lg" onerror="this.onerror=null;this.src='https://placehold.co/600x450/334155/E2E8F0?text=Ground+Floor+Map+Missing'">
+                    <div class="image-overlay">
+                        <span class="image-overlay-text">Ground Floor</span>
+                    </div>
+                </div>
+                <div class="image-container rounded-lg" data-image-src="m11f1.jpg" data-caption="Elephant - Floor 1">
+                    <img src="m11f1.jpg" alt="Floor 1 Map for Elephant" class="rounded-lg" onerror="this.onerror=null;this.src='https://placehold.co/600x450/334155/E2E8F0?text=Floor+1+Map+Missing'">
+                    <div class="image-overlay">
+                        <span class="image-overlay-text">Floor 1</span>
+                    </div>
+                </div>
+                    <div class="image-container rounded-lg" data-image-src="m11i.png" data-caption="Intel/OBJs">
+                    <img src="m11i.png" alt="Intel/OBJs" class="rounded-lg" onerror="this.onerror=null;this.src='https://placehold.co/600x450/334155/E2E8F0?text=Map+Missing'">
+                    <div class="image-overlay">
+                        <span class="image-overlay-text">Intel/OBJs</span>
+                    </div>
+                </div>
+                <div class="tips-text text-slate-300 leading-relaxed">
+                    <p class="mb-3">This mission requires extreme speed — you HAVE to run and gun and listen for beeps, you have only about 10 minutes before the school blows up. Any delay could result in hostages dying or bombs detonating. There are always two bombs, randomly placed, and each takes 15 seconds to defuse. Keep moving and plan quickly.<br><br>Known Bomb Locations (Prioritize These):</p>
+                    <ul class="list-disc ml-5 space-y-2">
+                        <li><strong>Ground Floor:</strong>
+                            <ul class="list-circle ml-5 mt-1">
+                                <li>Cafe (on a table)</li>
+                                <li>Computer Room (near the lecture hall)</li>
+                                <li>Lecture Hall</li>
+                                <li>Down the hall East from the cafe, on a table by the couches</li>
+                            </ul>
+                        </li>
+                        <li><strong>Second Floor:</strong>
+                            <ul class="list-circle ml-5 mt-1">
+                                <li>Science Lab (through green double doors)</li>
+                                <li>Top of Stairway (by green doors)</li>
+                                <li>Chemistry Room (on a table)</li>
+                                <li>Classroom on the east wing.</li>
+                            </ul>
+                        </li>
+                        <li>They are never outside.</li>
+                    </ul>
+                    <p class="mt-3">Splitting up saves time. There are only around 4-5 active shooters. Don't worry about securing civilians until the 2 bombs have been defused so you don't waste time.</p>
+                </div>
+            </section>
+
+            <section id="rust-belt" class="mission-card p-6 rounded-xl shadow-lg">
+                <h2 class="text-2xl font-semibold mb-4 text-slate-200">12. Rust Belt</h2>
+                <div class="image-container rounded-lg" data-image-src="m12g.jpg" data-caption="Rust Belt - Ground">
+                    <img src="m12g.jpg" alt="Ground Map for Rust Belt" class="rounded-lg" onerror="this.onerror=null;this.src='https://placehold.co/600x450/334155/E2E8F0?text=Ground+Map+Missing'">
+                    <div class="image-overlay">
+                        <span class="image-overlay-text">Ground</span>
+                    </div>
+                </div>
+                <div class="image-container rounded-lg" data-image-src="m12ug.jpg" data-caption="Rust Belt - Underground">
+                    <img src="m12ug.jpg" alt="Underground Map for Rust Belt" class="rounded-lg" onerror="this.onerror=null;this.src='https://placehold.co/600x450/334155/E2E8F0?text=Underground+Map+Missing'">
+                    <div class="image-overlay">
+                        <span class="image-overlay-text">Underground</span>
+                    </div>
+                </div>
+                <div class="image-container rounded-lg" style="visibility: hidden; padding-bottom: 0; margin-bottom: 0;">
+                    </div>
+                    <div class="image-container rounded-lg" data-image-src="m12i.jpg" data-caption="Intel/OBJs">
+                    <img src="m12i.jpg" alt="Intel/OBJs" class="rounded-lg" onerror="this.onerror=null;this.src='https://placehold.co/600x450/334155/E2E8F0?text=Map+Missing'">
+                    <div class="image-overlay">
+                        <span class="image-overlay-text">Intel/OBJs</span>
+                    </div>
+                </div>
+                <div class="tips-text text-slate-300 leading-relaxed">
+                    <ul class="list-disc ml-5 space-y-2">
+                        <li><strong>Soft Objectives:</strong>
+                            <ul class="list-circle ml-5 mt-1">
+                                <li>Report confiscated Mexico passports.</li>
+                                <li>Report the barge deep in the tunnels.</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </section>
+
+            <section id="sins-of-the-father" class="mission-card p-6 rounded-xl shadow-lg">
+                <h2 class="text-2xl font-semibold mb-4 text-slate-200">13. Sins of The Father</h2>
+                <div class="image-container rounded-lg" data-image-src="m13r.jpg" data-caption="Sins of The Father - Roof">
+                    <img src="m13r.jpg" alt="Roof Map for Sins of The Father" class="rounded-lg" onerror="this.onerror=null;this.src='https://placehold.co/600x450/334155/E2E8F0?text=Roof+Map+Missing'">
+                    <div class="image-overlay">
+                        <span class="image-overlay-text">Roof</span>
+                    </div>
+                </div>
+                <div class="image-container rounded-lg" data-image-src="m13f2.jpg" data-caption="Sins of The Father - Floor 2">
+                    <img src="m13f2.jpg" alt="Floor 2 Map for Sins of The Father" class="rounded-lg" onerror="this.onerror=null;this.src='https://placehold.co/600x450/334155/E2E8F0?text=Floor+2+Map+Missing'">
+                    <div class="image-overlay">
+                        <span class="image-overlay-text">Floor 2</span>
+                    </div>
+                </div>
+                <div class="image-container rounded-lg" data-image-src="m13f1.jpg" data-caption="Sins of The Father - Floor 1">
+                    <img src="m13f1.jpg" alt="Floor 1 Map for Sins of The Father" class="rounded-lg" onerror="this.onerror=null;this.src='https://placehold.co/600x450/334155/E2E8F0?text=Floor+1+Map+Missing'">
+                    <div class="image-overlay">
+                        <span class="image-overlay-text">Floor 1</span>
+                    </div>
+                </div>
+
+                <div class="tips-text text-slate-300 leading-relaxed">
+                    <ul class="list-disc ml-5 space-y-2">
+                        <li>Peek or Mirror every single door and cut tripwires. No soft objectives just secure everything.</li>
+                    </ul>
+                </div>
+            </section>
+
+            <section id="neon-tomb" class="mission-card p-6 rounded-xl shadow-lg">
+                <h2 class="text-2xl font-semibold mb-4 text-slate-200">14. Neon Tomb</h2>
+                <div class="image-container rounded-lg" data-image-src="m14g.jpg" data-caption="Neon Tomb - Ground Floor">
+                    <img src="m14g.jpg" alt="Ground Floor Map for Neon Tomb" class="rounded-lg" onerror="this.onerror=null;this.src='https://placehold.co/600x450/334155/E2E8F0?text=Ground+Floor+Map+Missing'">
+                    <div class="image-overlay">
+                        <span class="image-overlay-text">Ground Floor</span>
+                    </div>
+                </div>
+                <div class="image-container rounded-lg" data-image-src="m14f1.jpg" data-caption="Neon Tomb - Floor 1">
+                    <img src="m14f1.jpg" alt="Floor 1 Map for Neon Tomb" class="rounded-lg" onerror="this.onerror=null;this.src='https://placehold.co/600x450/334155/E2E8F0?text=Floor+1+Map+Missing'">
+                    <div class="image-overlay">
+                        <span class="image-overlay-text">Floor 1</span>
+                    </div>
+                </div>
+                    <div class="image-container rounded-lg" data-image-src="m14i.png" data-caption="Intel/OBJs">
+                    <img src="m14i.png" alt="Intel/OBJs" class="rounded-lg" onerror="this.onerror=null;this.src='https://placehold.co/600x450/334155/E2E8F0?text=Map+Missing'">
+                    <div class="image-overlay">
+                        <span class="image-overlay-text">Intel/OBJs</span>
+                    </div>
+                </div>
+                <div class="tips-text text-slate-300 leading-relaxed">
+                    <ul class="list-disc ml-5 space-y-2">
+                        <li>No soft objectives, just secure everything.</li>
+                        <li>Be prepared for suicide bombers (wearing explosives belt). They often detonate themselves running to you so keep some distance and use every LTL items to subdue them and arrest safely.</li>
+                    </ul>
+                </div>
+            </section>
+
+            <section id="buy-cheap-buy-twice" class="mission-card p-6 rounded-xl shadow-lg">
+                <h2 class="text-2xl font-semibold mb-4 text-slate-200">15. Buy Cheap Buy Twice</h2>
+                <div class="image-container rounded-lg" data-image-src="m15g.jpg" data-caption="Buy Cheap Buy Twice - Ground Map">
+                    <img src="m15g.jpg" alt="Ground Floor Map for Buy Cheap Buy Twice" class="rounded-lg" onerror="this.onerror=null;this.src='https://placehold.co/600x450/334155/E2E8F0?text=Ground+Map+Missing'">
+                    <div class="image-overlay">
+                        <span class="image-overlay-text">Ground Map</span>
+                    </div>
+                </div>
+                <div class="image-container rounded-lg" data-image-src="m15f1.jpg" data-caption="Buy Cheap Buy Twice - Floor 1">
+                    <img src="m15f1.jpg" alt="Floor 1 Map for Buy Cheap Buy Twice" class="rounded-lg" onerror="this.onerror=null;this.src='https://placehold.co/600x450/334155/E2E8F0?text=Floor+1+Map+Missing'">
+                    <div class="image-overlay">
+                        <span class="image-overlay-text">Floor 1</span>
+                    </div>
+                </div>
+                    <div class="image-container rounded-lg" data-image-src="m15i.jpg" data-caption="Intel/OBJs">
+                    <img src="m15i.jpg" alt="Intel/OBJs" class="rounded-lg" onerror="this.onerror=null;this.src='https://placehold.co/600x450/334155/E2E8F0?text=Map+Missing'">
+                    <div class="image-overlay">
+                        <span class="image-overlay-text">Intel/OBJs</span>
+                    </div>
+                </div>
+                <div class="tips-text text-slate-300 leading-relaxed">
+                    <ul class="list-disc ml-5 space-y-2">
+                        <li><strong>Soft Objectives:</strong>
+                            <ul class="list-circle ml-5 mt-1">
+                                <li>Money or drugs in the garage.</li>
+                                <li>Whiteboard in the office.</li>
+                            </ul>
+                        </li>
+                        <li>Undercover officer is upstairs.</li>
+                    </ul>
+                </div>
+            </section>
+
+            <section id="carriers-of-the-vine" class="mission-card p-6 rounded-xl shadow-lg">
+                <h2 class="text-2xl font-semibold mb-4 text-slate-200">16. Carriers of the Vine</h2>
+
+                <div class="image-container rounded-lg" data-image-src="m16g.png" data-caption="Carriers of the Vine - Ground">
+                    <img src="m16g.png" alt="Ground Map for Carriers of the Vine" class="rounded-lg" onerror="this.onerror=null;this.src='https://placehold.co/600x450/334155/E2E8F0?text=Ground+Map+Missing'">
+                    <div class="image-overlay">
+                        <span class="image-overlay-text">Ground</span>
+                    </div>
+                </div>
+                    <div class="image-container rounded-lg" data-image-src="m16ug.png" data-caption="Carriers of the Vine - Underground">
+                    <img src="m16ug.png" alt="Underground Map for Carriers of the Vine" class="rounded-lg" onerror="this.onerror=null;this.src='https://placehold.co/600x450/334155/E2E8F0?text=Underground+Map+Missing'">
+                    <div class="image-overlay">
+                        <span class="image-overlay-text">Underground</span>
+                    </div>
+                </div>
+                <div class="image-container rounded-lg" data-image-src="m16f1.png" data-caption="Carriers of the Vine - Floor 1">
+                    <img src="m16f1.png" alt="Floor 1 Map for Carriers of the Vine" class="rounded-lg" onerror="this.onerror=null;this.src='https://placehold.co/600x450/334155/E2E8F0?text=Floor+1+Map+Missing'">
+                    <div class="image-overlay">
+                        <span class="image-overlay-text">Floor 1</span>
+                    </div>
+                </div>
+                    <div class="image-container rounded-lg" data-image-src="m16i.jpg" data-caption="Intel/OBJs">
+                    <img src="m16i.jpg" alt="Intel/OBJs" class="rounded-lg" onerror="this.onerror=null;this.src='https://placehold.co/600x450/334155/E2E8F0?text=Map+Missing'">
+                    <div class="image-overlay">
+                        <span class="image-overlay-text">Intel/OBJs</span>
+                    </div>
+                </div>
+                <div class="tips-text text-slate-300 leading-relaxed">
+                    <ul class="list-disc ml-5 space-y-2">
+                        <li><strong>Soft Objective:</strong> Conspiracy evidence (map drawings) in the first big house.</li>
+                    </ul>
+                </div>
+            </section>
+
+            <section id="relapse" class="mission-card p-6 rounded-xl shadow-lg">
+                <h2 class="text-2xl font-semibold mb-4 text-slate-200">17. Relapse</h2>
+                <div class="image-container rounded-lg" data-image-src="m17g.png" data-caption="Relapse - Ground Floor">
+                    <img src="m17g.png" alt="Ground Floor Map for Relapse" class="rounded-lg" onerror="this.onerror=null;this.src='https://placehold.co/600x450/334155/E2E8F0?text=Ground+Floor+Map+Missing'">
+                    <div class="image-overlay">
+                        <span class="image-overlay-text">Ground Floor</span>
+                    </div>
+                </div>
+                <div class="image-container rounded-lg" data-image-src="m17f1.png" data-caption="Relapse - Floor 1">
+                    <img src="m17f1.png" alt="Floor 1 Map for Relapse" class="rounded-lg" onerror="this.onerror=null;this.src='https://placehold.co/600x450/334155/E2E8F0?text=Floor+1+Map+Missing'">
+                    <div class="image-overlay">
+                        <span class="image-overlay-text">Floor 1</span>
+                    </div>
+                </div>
+                <div class="image-container rounded-lg" data-image-src="m17f2.png" data-caption="Relapse - Floor 2">
+                    <img src="m17f2.png" alt="Floor 2 Map for Relapse" class="rounded-lg" onerror="this.onerror=null;this.src='https://placehold.co/600x450/334155/E2E8F0?text=Floor+2+Map+Missing'">
+                    <div class="image-overlay">
+                        <span class="image-overlay-text">Floor 2</span>
+                    </div>
+                </div>
+                    <div class="image-container rounded-lg" data-image-src="m17i.jpg" data-caption="Intel/OBJs">
+                    <img src="m17i.jpg" alt="Intel/OBJs" class="rounded-lg" onerror="this.onerror=null;this.src='https://placehold.co/600x450/334155/E2E8F0?text=Map+Missing'">
+                    <div class="image-overlay">
+                        <span class="image-overlay-text">Intel/OBJs</span>
+                    </div>
+                </div>
+                <div class="tips-text text-slate-300 leading-relaxed">
+                   <ul class="list-disc ml-5 space-y-2">
+    <li>
+        <strong>No soft objectives to report.</strong> Recommended priority is to defuse both bombs. They are always located on the top floor of each main hospital building (unlike random placements in the 'Elephant' mission they always are in the same spots).
+
+        <ul class="list-disc ml-5 mt-2 space-y-1">
+            <li>
+                <strong>Bomb #1:</strong><br>
+                Located in the first building, top floor, in the largest room (with bathrooms and visible wires).<br>
+                Access via either main staircase.
+            </li>
+            <li>
+                <strong>Bomb #2:</strong><br>
+                After crossing the interior bridge, enter the first double doors on the left, then turn right.<br>
+                Located in another large, top-floor room with visible wires.
+            </li>
+        </ul>
+    </li>
+</ul>
+
+                </div>
+            </section>
+
+            <section id="hide-and-seek" class="mission-card p-6 rounded-xl shadow-lg">
+                <h2 class="text-2xl font-semibold mb-4 text-slate-200">18. Hide and Seek</h2>
+                <div class="image-container rounded-lg" data-image-src="m18g.png" data-caption="Hide and Seek - Ground Floor">
+                    <img src="m18g.png" alt="Ground Floor Map for Hide and Seek" class="rounded-lg" onerror="this.onerror=null;this.src='https://placehold.co/600x450/334155/E2E8F0?text=Ground+Floor+Map+Missing'">
+                    <div class="image-overlay">
+                        <span class="image-overlay-text">Ground Floor</span>
+                    </div>
+                </div>
+                <div class="image-container rounded-lg" data-image-src="m18f1.png" data-caption="Hide and Seek - Floor 1">
+                    <img src="m18f1.png" alt="Floor 1 Map for Hide and Seek" class="rounded-lg" onerror="this.onerror=null;this.src='https://placehold.co/600x450/334155/E2E8F0?text=Floor+1+Map+Missing'">
+                    <div class="image-overlay">
+                        <span class="image-overlay-text">Floor 1</span>
+                    </div>
+                </div>
+                <div class="image-container rounded-lg" data-image-src="m18f2.png" data-caption="Hide and Seek - Floor 2">
+                    <img src="m18f2.png" alt="Floor 2 Map for Hide and Seek" class="rounded-lg" onerror="this.onerror=null;this.src='https://placehold.co/600x450/334155/E2E8F0?text=Floor+2+Map+Missing'">
+                    <div class="image-overlay">
+                        <span class="image-overlay-text">Floor 2</span>
+                    </div>
+                </div>
+                    <div class="image-container rounded-lg" data-image-src="m18i.jpg" data-caption="Intel/OBJs">
+                    <img src="m18i.jpg" alt="Intel/OBJs" class="rounded-lg" onerror="this.onerror=null;this.src='https://placehold.co/600x450/334155/E2E8F0?text=Map+Missing'">
+                    <div class="image-overlay">
+                        <span class="image-overlay-text">Intel/OBJs</span>
+                    </div>
+                </div>
+                <div class="tips-text text-slate-300 leading-relaxed">
+                    <ul class="list-disc ml-5 space-y-2">
+                        <li><strong>Five Soft Objectives:</strong>
+                            <ul class="list-circle ml-5 mt-1">
+                                <li>Report weapon storage – Look for yellow containers with spider spray and lighting.</li>
+                                <li>Report drug storage – Same method as weapon containers.</li>
+                                <li>Report slavery auction – Found deep inside Warehouse 13, in a makeshift living area.</li>
+                                <li>Report missing persons container – Also a yellow container.</li>
+                                <li>Close the missing person container you just opened – Follow the order received on radio.</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </section>
+
+            <section id="dlc-dorms" class="mission-card p-6 rounded-xl shadow-lg">
+                <h2 class="text-2xl font-semibold mb-4 text-slate-200">19. H.I. DLC - Dorms</h2>
+                <div class="image-container rounded-lg" data-image-src="m19ground.png" data-caption="DLC - Dorms - Ground Floor">
+                    <img src="m19ground.png" alt="Ground Floor Map for DLC - Dorms" class="rounded-lg" onerror="this.onerror=null;this.src='https://placehold.co/600x450/334155/E2E8F0?text=Ground+Floor+Map+Missing'">
+                    <div class="image-overlay">
+                        <span class="image-overlay-text">Ground Floor</span>
+                    </div>
+                </div>
+                <div class="image-container rounded-lg" data-image-src="m19f1.png" data-caption="DLC - Dorms - Floor 1">
+                    <img src="m19f1.png" alt="Floor 1 Map for DLC - Dorms" class="rounded-lg" onerror="this.onerror=null;this.src='https://placehold.co/600x450/334155/E2E8F0?text=Floor+1+Map+Missing'">
+                    <div class="image-overlay">
+                        <span class="image-overlay-text">Floor 1</span>
+                    </div>
+                </div>
+                <div class="image-container rounded-lg" data-image-src="m19i.jpg" data-caption="Intel/OBJs">
+                    <img src="m19i.jpg" alt="Intel/OBJs" class="rounded-lg" onerror="this.onerror=null;this.src='https://placehold.co/600x450/334155/E2E8F0?text=Map+Missing'">
+                    <div class="image-overlay">
+                        <span class="image-overlay-text">Intel/OBJs</span>
+                    </div>
+                </div>
+                <div class="tips-text text-slate-300 leading-relaxed">
+                    <ul class="list-disc ml-5 space-y-2">
+                        <li><strong>One soft objective:</strong> the bong in the 'spirit' room, floor 1. vip civilian shown for reference, not a direct objective.</li>
+                    </ul>
+                </div>
+            </section>
+
+            <section id="dlc-narcos" class="mission-card p-6 rounded-xl shadow-lg">
+                <h2 class="text-2xl font-semibold mb-4 text-slate-200">20. H.I. DLC - Narcos</h2>
+                <div class="image-container rounded-lg" data-image-src="m20narc.png" data-caption="DLC - Narcos Map">
+                    <img src="m20narc.png" alt="Map for DLC - Narcos" class="rounded-lg" onerror="this.onerror=null;this.src='https://placehold.co/600x450/334155/E2E8F0?text=Map+Missing'">
+                    <div class="image-overlay">
+                        <span class="image-overlay-text">Click to view full size</span>
+                    </div>
+                </div>
+                <div class="image-container rounded-lg" data-image-src="m20i.jpg" data-caption="Intel/OBJs">
+                    <img src="m20i.jpg" alt="Intel/OBJs" class="rounded-lg" onerror="this.onerror=null;this.src='https://placehold.co/600x450/334155/E2E8F0?text=Map+Missing'">
+                    <div class="image-overlay">
+                        <span class="image-overlay-text">Intel/OBJs</span>
+                    </div>
+                </div>
+                <div class="tips-text text-slate-300 leading-relaxed">
+                    <ul class="list-disc ml-5 space-y-2">
+                        <li><strong>3 soft objectives:</strong>
+                            <ul class="list-circle ml-5 mt-1">
+                                <li>In the first house near the spawn zone, report hidden files and a torture scene involving a bloodied chair and car battery.</li>
+                                <li>Upon exiting and turning right into the nearest house with a white decorative fence, report a crime scene involving a killed dog.</li>
+                            </ul>
+                        </li>
+                        <li><strong>The undercover officer is the bloodied guy crawling around someonwhere, often in the middle of the map.</strong>
+                            </li>
+                    </ul>
+                </div>
+            </section>
+
+            <section id="dlc-lawmaker" class="mission-card p-6 rounded-xl shadow-lg">
+                <h2 class="text-2xl font-semibold mb-4 text-slate-200">21. H.I. DLC - Lawmaker</h2>
+                <div class="image-container rounded-lg" data-image-src="m21g.png" data-caption="H.I. DLC - Lawmaker - Ground Floor">
+                    <img src="m21g.png" alt="Ground Floor Map for H.I. DLC - Lawmaker" class="rounded-lg" onerror="this.onerror=null;this.src='https://placehold.co/600x450/334155/E2E8F0?text=Ground+Floor+Map+Missing'">
+                    <div class="image-overlay">
+                        <span class="image-overlay-text">Ground Floor</span>
+                    </div>
+                </div>
+                <div class="image-container rounded-lg" data-image-src="m21f1.png" data-caption="H.I. DLC - Lawmaker - Floor 1">
+                    <img src="m21f1.png" alt="Floor 1 Map for H.I. DLC - Lawmaker" class="rounded-lg" onerror="this.onerror=null;this.src='https://placehold.co/600x450/334155/E2E8F0?text=Floor+1+Map+Missing'">
+                    <div class="image-overlay">
+                        <span class="image-overlay-text">Floor 1</span>
+                    </div>
+                </div>
+                <div class="image-container rounded-lg" data-image-src="m21f2.png" data-caption="H.I. DLC - Lawmaker - Floor 2">
+                    <img src="m21f2.png" alt="Floor 2 Map for H.I. DLC - Lawaled" class="rounded-lg" onerror="this.onerror=null;this.src='https://placehold.co/600x450/334155/E2E8F0?text=Floor+2+Map+Missing'">
+                    <div class="image-overlay">
+                        <span class="image-overlay-text">Floor 2</span>
+                    </div>
+                </div>
+                    <div class="image-container rounded-lg" data-image-src="m21i.jpg" data-caption="Intel/Objs">
+                    <img src="m21i.jpg" alt="Intel H.I. DLC - Lawmaker" class="rounded-lg" onerror="this.onerror=null;this.src='https://placehold.co/600x450/334155/E2E8F0?text=Missing'">
+                    <div class="image-overlay">
+                        <span class="image-overlay-text">Intel</span>
+                    </div>
+                </div>
+                <div class="tips-text text-slate-300 leading-relaxed">
+                    <ul class="list-disc ml-5 space-y-2">
+                        <li>No soft objectives.</li>
+                        <li>Interact with panic room either on first or second floor and save Sven.</li>
+                    </ul>
+                </div>
+            </section>
+
+            <section id="dlc-mirage-at-sea" class="mission-card p-6 rounded-xl shadow-lg">
+                <h2 class="text-2xl font-semibold mb-4 text-slate-200">22. D.W. DLC - Mirage at Sea</h2>
+                <div class="image-container rounded-lg" data-image-src="m22mas.jpg" data-caption="D.W. DLC - Mirage at Sea Map">
+                    <img src="m22mas.jpg" alt="Map for D.W. DLC - Mirage at Sea" class="rounded-lg" onerror="this.onerror=null;this.src='https://placehold.co/600x450/334155/E2E8F0?text=Map+Missing'">
+                    <div class="image-overlay">
+                        <span class="image-overlay-text">Click to view full size</span>
+                    </div>
+                </div>
+                <div class="image-container rounded-lg" data-image-src="m22i.jpg" data-caption="Intel/OBJs">
+                    <img src="m22i.jpg" alt="Intel/OBJs" class="rounded-lg" onerror="this.onerror=null;this.src='https://placehold.co/600x450/334155/E2E8F0?text=Map+Missing'">
+                    <div class="image-overlay">
+                        <span class="image-overlay-text">Intel/OBJs</span>
+                    </div>
+                </div>
+                <div class="tips-text text-slate-300 leading-relaxed">
+                    <li>2 soft objectives:</li>
+<p class="mb-3">There is a static (always in the same place) crime scene (blood pool) on the UPPER DECK (check map). The other soft objective, the 'Hidden Body', can spawn in three different locations: either near the Middle Deck kitchen’s adjacent rooms or on the lowest engineering deck. (In summary, the Hidden Body can spawn in three locations, while the Crime Scene always spawns in the same place.) </p>
+<li>Sah'id is the suspect wearing traditional clothing.</li>
+                </div>
+            </section>
+
+            <section id="dlc-leviathan" class="mission-card p-6 rounded-xl shadow-lg">
+                <h2 class="text-2xl font-semibold mb-4 text-slate-200">23. D.W. DLC - Leviathan</h2>
+                <div class="image-container rounded-lg" data-image-src="m23l.jpg" data-caption="D.W. DLC - Leviathan - Lower Deck">
+                    <img src="m23l.jpg" alt="Lower Deck Map for D.W. DLC - Leviathan" class="rounded-lg" onerror="this.onerror=null;this.src='https://placehold.co/600x450/334155/E2E8F0?text=Map+Missing'">
+                    <div class="image-overlay">
+                        <span class="image-overlay-text">Lower Deck</span>
+                    </div>
+                </div>
+                <div class="image-container rounded-lg" data-image-src="m23m.jpg" data-caption="D.W. DLC - Leviathan - Middle Deck">
+                    <img src="m23m.jpg" alt="Middle Deck Map for D.W. DLC - Leviathan" class="rounded-lg" onerror="this.onerror=null;this.src='https://placehold.co/600x450/334155/E2E8F0?text=Map+Missing'">
+                    <div class="image-overlay">
+                        <span class="image-overlay-text">Middle Deck</span>
+                    </div>
+                </div>
+                <div class="image-container rounded-lg" data-image-src="m23u.jpg" data-caption="D.W. DLC - Leviathan - Upper Deck">
+                    <img src="m23u.jpg" alt="Upper Deck Map for D.W. DLC - Leviathan" class="rounded-lg" onerror="this.onerror=null;this.src='https://placehold.co/600x450/334155/E2E8F0?text=Map+Missing'">
+                    <div class="image-overlay">
+                        <span class="image-overlay-text">Upper Deck</span>
+                    </div>
+                </div>
+                <div class="image-container rounded-lg" data-image-src="m23i.jpg" data-caption="Intel/OBJs">
+                    <img src="m23i.jpg" alt="Intel/OBJs" class="rounded-lg" onerror="this.onerror=null;this.src='https://placehold.co/600x450/334155/E2E8F0?text=Map+Missing'">
+                    <div class="image-overlay">
+                        <span class="image-overlay-text">Intel/OBJs</span>
+                    </div>
+                </div>
+                <div class="tips-text text-slate-300 leading-relaxed">
+                    <ul class="list-disc ml-5 space-y-2">
+                        <li><strong>Terminate Livestream Objective:</strong>
+                            <p class="mb-3">This objective doesn't always spawn in the same location. It is frequently found on the lower part of the rig in the room with the double doors just down the stairs to the left of the helipad. Another common location is the central control room just below the drill control room. While these two areas are the most frequent, the objective can appear in other spots as well.</p>
+                        </li>
+                        <li><strong>Soft Objective – "Rig the Drill":</strong>
+                            <p class="mb-3">This objective always spawns in the same location. From the helipad, head directly south. When the path forces you, turn east. Continue past the living quarters and ascend the stairs—you'll arrive at the drill control room. Refer to the green line on the map for a clear path.</p>
+                        </li>
+                    </ul>
+                </div>
+            </section>
+
+            <section id="dlc-3-letter-triad" class="mission-card p-6 rounded-xl shadow-lg">
+                <h2 class="text-2xl font-semibold mb-4 text-slate-200">24. D.W. DLC - 3 Letter Triad</h2>
+                <div class="image-container rounded-lg" data-image-src="m24g.jpg" data-caption="D.W. DLC - 3 Letter Triad - Ground Map">
+                    <img src="m24g.jpg" alt="Ground Map for D.W. DLC - 3 Letter Triad" class="rounded-lg" onerror="this.onerror=null;this.src='https://placehold.co/600x450/334155/E2E8F0?text=Map+Missing'">
+                    <div class="image-overlay">
+                        <span class="image-overlay-text">Ground Map</span>
+                    </div>
+                </div>
+                <div class="image-container rounded-lg" data-image-src="m241.jpg" data-caption="D.W. DLC - 3 Letter Triad - Top Floor">
+                    <img src="m241.jpg" alt="Top Floor Map for D.W. DLC - 3 Letter Triad" class="rounded-lg" onerror="this.onerror=null;this.src='https://placehold.co/600x450/334155/E2E8F0?text=Map+Missing'">
+                    <div class="image-overlay">
+                        <span class="image-overlay-text">Top Floor</span>
+                    </div>
+                </div>
+                <div class="image-container rounded-lg" data-image-src="m24i.jpg" data-caption="Intel/OBJs">
+                    <img src="m24i.jpg" alt="Intel/OBJs" class="rounded-lg" onerror="this.onerror=null;this.src='https://placehold.co/600x450/334155/E2E8F0?text=Map+Missing'">
+                    <div class="image-overlay">
+                        <span class="image-overlay-text">Intel/OBJs</span>
+                    </div>
+                </div>
+                <div class="tips-text text-slate-300 leading-relaxed">
+                    <ul class="list-disc ml-5 space-y-2">
+                        <li>No soft objectives, just secure everything, the package is in the room near the lobby, top floor, check map.</li>
+                    </ul>
+                </div>
+            </section>
+
+            <section id="dlc-hunger-strike" class="mission-card p-6 rounded-xl shadow-lg">
+                <h2 class="text-2xl font-semibold mb-4 text-slate-200">25. L.S.S. DLC - Hunger Strike</h2>
+                <div class="image-container rounded-lg" data-image-src="m25.jpg" data-caption="L.S.S. DLC - Hunger Strike Map">
+                    <img src="m25.jpg" alt="Map for L.S.S. DLC - Hunger Strike" class="rounded-lg" onerror="this.onerror=null;this.src='https://placehold.co/600x450/334155/E2E8F0?text=Map+Missing'">
+                    <div class="image-overlay">
+                        <span class="image-overlay-text">Click to view full size</span>
+                    </div>
+                </div>
+                <div class="image-container rounded-lg" data-image-src="m25i.jpg" data-caption="Intel/OBJs">
+                    <img src="m25i.jpg" alt="Intel/OBJs" class="rounded-lg" onerror="this.onerror=null;this.src='https://placehold.co/600x450/334155/E2E8F0?text=Map+Missing'">
+                    <div class="image-overlay">
+                        <span class="image-overlay-text">Intel/OBJs</span>
+                    </div>
+                </div>
+                <div class="tips-text text-slate-300 leading-relaxed">
+                    <ul class="list-disc ml-5 space-y-2">
+                        <li><strong>Soft Objectives:</strong>
+                            <ul class="list-circle ml-5 mt-1">
+                                <li>Suspects Vehicle: When you start, go to the far left and up the street from the outside of the restaurant, you'll see a van.</li>
+                                <li>Shredded Paper Evidence: When you get to the second floor, go to the office; there will be bags of "potential evidence."</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </section>
+
+            <section id="dlc-stolen-valor" class="mission-card p-6 rounded-xl shadow-lg">
+                <h2 class="text-2xl font-semibold mb-4 text-slate-200">26. L.S.S. DLC - Stolen Valor</h2>
+                <div class="image-container rounded-lg" data-image-src="m26b.jpg" data-caption="L.S.S. DLC - Stolen Valor - Basement">
+                    <img src="m26b.jpg" alt="Basement Map for L.S.S. DLC - Stolen Valor" class="rounded-lg" onerror="this.onerror=null;this.src='https://placehold.co/600x450/334155/E2E8F0?text=Map+Missing'">
+                    <div class="image-overlay">
+                        <span class="image-overlay-text">Basement (Rodriguez's location)</span>
+                    </div>
+                </div>
+                <div class="image-container rounded-lg" data-image-src="m261.jpg" data-caption="L.S.S. DLC - Stolen Valor - First Floor">
+                    <img src="m261.jpg" alt="First Floor Map for L.S.S. DLC - Stolen Valor" class="rounded-lg" onerror="this.onerror=null;this.src='https://placehold.co/600x450/334155/E2E8F0?text=Map+Missing'">
+                    <div class="image-overlay">
+                        <span class="image-overlay-text">First Floor</span>
+                    </div>
+                </div>
+                <div class="image-container rounded-lg" data-image-src="m262.jpg" data-caption="L.S.S. DLC - Stolen Valor - Second Floor">
+                    <img src="m262.jpg" alt="Second Floor Map for L.S.S. DLC - Stolen Valor" class="rounded-lg" onerror="this.onerror=null;this.src='https://placehold.co/600x450/334155/E2E8F0?text=Map+Missing'">
+                    <div class="image-overlay">
+                        <span class="image-overlay-text">Second Floor</span>
+                    </div>
+                </div>
+                <div class="image-container rounded-lg" data-image-src="m26i.jpg" data-caption="Intel/OBJs">
+                    <img src="m26i.jpg" alt="Intel/OBJs" class="rounded-lg" onerror="this.onerror=null;this.src='https://placehold.co/600x450/334155/E2E8F0?text=Map+Missing'">
+                    <div class="image-overlay">
+                        <span class="image-overlay-text">Intel/OBJs</span>
+                    </div>
+                </div>
+                <div class="tips-text text-slate-300 leading-relaxed">
+                    <ul class="list-disc ml-5 space-y-2">
+                        <li><strong>1 Soft Objective:</strong> Exhibition of guns on the second floor.</li>
+                        <li>Peek / pie every door and cut tripwires.</li>
+                        <li>To find Rodriguez, from the start head down the small exterior stairs on the left, leading to the east side at the back of the building. The map labels this level as the "basement," but it's actually more like ground level (not fully underground).</li>
+                    </ul>
+                </div>
+            </section>
+
+        </main>
+
+        <div id="imageModal" class="modal">
+            <span class="close">&times;</span>
+            <img class="modal-content" id="img01">
+            <div id="caption" class="modal-caption"></div>
+        </div>
+
+    </div>
+
+    <script>
+        // Image Modal functionality
+        const modal = document.getElementById("imageModal");
+        const modalImg = document.getElementById("img01");
+        const captionText = document.getElementById("caption");
+        const closeBtn = document.getElementsByClassName("close")[0];
+
+        document.querySelectorAll('.image-container').forEach(container => {
+            container.addEventListener('click', function() {
+                modal.classList.add('show');
+                modalImg.src = this.dataset.imageSrc; // Use data-image-src for the original full-size image
+                captionText.innerHTML = this.dataset.caption || ''; // Get caption from data-caption attribute
+            });
+        });
+
+        closeBtn.addEventListener('click', function() {
+            modal.classList.remove('show');
+        });
+
+        // Close modal when clicking on the modal background or the image itself
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal || e.target === modalImg) {
+                modal.classList.remove('show');
+            }
+        });
+
+        // Optics Preview Button functionality
+        document.getElementById('opticsPreviewBtn').addEventListener('click', function() {
+            modal.classList.add('show');
+            modalImg.src = 'optics.jpg';
+            captionText.innerHTML = '';
+        });
+
+
+        // Mission selector functionality
+        const missionSelect = document.getElementById('mission-select');
+
+        missionSelect.addEventListener('change', handleMissionSelect);
+        missionSelect.addEventListener('click', handleMissionSelect); // catches re-clicks of same option
+
+        function handleMissionSelect() {
+            const selectedId = missionSelect.value;
+            if (selectedId) {
+                const targetElement = document.getElementById(selectedId);
+                if (targetElement) {
+                    targetElement.scrollIntoView({ behavior: 'auto', block: 'start' });
+                    missionSelect.dataset.lastSelected = selectedId;
+                }
+            }
+        }
+
+    </script>
+    <footer class="mt-16 text-center text-slate-400 text-sm px-4 pb-8">
+        <hr>
+        <br>
+        <p>
+            This is a guide for <strong>Ready Or Not</strong>, made openly for all players to enjoy and use as a reference while playing.<br>
+            🎖️Huge praise to Enex and Daan for the excellent maps from <a href="https://steamcommunity.com/sharedfiles/filedetails/?id=3137562299" target="_blank" class="underline text-slate-300">this post</a> and
+            GralgarTheWolf for soft objectives references from <a href="https://steamcommunity.com/sharedfiles/filedetails/?id=3113593191" target="_blank" class="underline text-slate-300">this post</a>,
+            other visuals are screenshots from YouTube or in-game.<br><br><a href="mailto:rakha6727@gmail.com" class="underline text-slate-300">Contact</a>
+            <br>
+        </p>
+    </footer>
+
+</body>
+</html>

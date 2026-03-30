@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tactical Operations Guide </title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&family=Oswald:wght@700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --dark-bg: #1a1a1a;
+            --medium-dark-bg: #2a2a2a;
+            --light-text: #e0e0e0;
+            --accent-green: #4CAF50;
+            --border-color: #444;
+            --header-font: 'Oswald', sans-serif;
+            --body-font: 'Roboto Mono', monospace;
+        }
+
+        body {
+            font-family: var(--body-font);
+            background-color: var(--dark-bg);
+            color: var(--light-text);
+            margin: 0;
+            padding: 20px 0;
+            line-height: 1.6;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 95%;
+            max-width: 900px;
+            background-color: var(--medium-dark-bg);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+            box-sizing: border-box;
+            border: 1px solid var(--border-color);
+        }
+
+        h1, h2, h3 {
+            font-family: var(--header-font);
+            color: var(--accent-green);
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 15px;
+        }
+
+        h1 {
+            font-size: 2.2em;
+            margin-top: 0;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--accent-green);
+        }
+
+        h2 {
+            font-size: 1.8em;
+            margin-top: 30px;
+            padding-bottom: 5px;
+            border-bottom: 1px dashed var(--border-color);
+        }
+
+        h3 {
+            font-size: 1.4em;
+            margin-top: 25px;
+            text-align: left;
+        }
+
+        p {
+            margin-bottom: 10px;
+        }
+
+        ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        ul li {
+            margin-bottom: 8px;
+            position: relative;
+            padding-left: 20px;
+        }
+
+        ul li::before {
+            content: '»';
+            color: var(--accent-green);
+            position: absolute;
+            left: 0;
+            font-weight: bold;
+        }
+
+        strong {
+            color: var(--accent-green);
+        }
+
+        em {
+            font-style: normal;
+            color: var(--light-text);
+        }
+
+        .section-separator {
+            border: none;
+            border-top: 1px solid var(--border-color);
+            margin: 30px 0;
+        }
+
+        blockquote {
+            background-color: var(--dark-bg);
+            border-left: 5px solid var(--accent-green);
+            margin: 20px 0;
+            padding: 15px 20px;
+            font-style: italic;
+            color: #ccc;
+        }
+
+        .note {
+            background-color: #3a3a3a;
+            border-left: 3px solid #ffc107;
+            padding: 10px 15px;
+            margin: 15px 0;
+            color: #ffe082;
+        }
+
+        .grid-container {
+            display: grid;
+            gap: 15px;
+            grid-template-columns: 1fr;
+        }
+
+        @media (min-width: 768px) {
+            .grid-container {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        
+        .subsection {
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: var(--dark-bg);
+            border-radius: 5px;
+            border: 1px solid var(--border-color);
+        }
+
+        .subsection h4 {
+            font-family: var(--header-font);
+            color: var(--accent-green);
+            margin-top: 0;
+            font-size: 1.1em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Tactical Operations Guide</h1>
+
+        <section>
+            <h2>Philosophy</h2>
+            <p>To role-play effectively and operate at realistic standards, mastering foundational tactics is essential. These techniques should become second nature. While not exhaustive, applying these principles consistently will ensure immersive, enjoyable, and realistic gameplay for Ghost Recon (and other similar games) operations.</p>
+        </section>
+
+        <hr class="section-separator">
+
+        <section>
+            <h2>Fireteam Composition (4-Man Team) EXAMPLES</h2>
+            <ul>
+                <li><strong>1st Position – Pointman</strong>
+                    <ul>
+                        <li>Covers front sector.</li>
+                        <li>Armed with ASR or SMG, secondary shotgun if tasked as breacher with lots of CQC.</li>
+                    </ul>
+                </li>
+                <li><strong>2nd & 3rd Positions – Flex Roles</strong>
+                    <ul>
+                        <li>Cover left and right sectors.</li>
+                        <li>Role examples: Demolitions/EOD, Rifleman, JTAC, Medic, Gunner (LMG), Grenadier, etc.</li>
+                    </ul>
+                </li>
+                <li><strong>4th Position – Overwatch</strong>
+                    <ul>
+                        <li>Covers rear sector.</li>
+                        <li>Equipped with DMR or sniper rifle.</li>
+                    </ul>
+                </li>
+            </ul>
+<div class="fireteam-note">
+        <p><strong>Balanced team composition example:</strong> 1 = Pointman (SMG) - 2 = Gunner (LMG) - 3 = Medic (ASR) - 4 = Overwatch (DMR or SNR)</p>
+    </div>
+        </section>
+
+        <hr class="section-separator">
+
+        <section>
+            <h2>Vehicle Protocol</h2>
+            <ul>
+                <li>On entering: Announce your number + “set” (e.g., “2 set”).</li>
+                <li>Last person to board says: “LAST MAN.”</li>
+            </ul>
+        </section>
+
+        <hr class="section-separator">
+
+        <section>
+            <h2>Airborne Insertion Techniques</h2>
+            <ul>
+                <li><strong>HALO:</strong> High Altitude, Low Opening. Parachute opens near ground level.</li>
+                <li><strong>HAHO:</strong> High Altitude, High Opening. Parachute opens shortly after jump.</li>
+<li><strong>LALO:</strong> Jumpers exit the aircraft at a low altitude and open their parachutes immediately after exiting.</li>
+                <li><strong>HELOCAST:</strong> Helo hovers just above water, team drops directly into it.</li>
+                <li><strong>On Heli Landing:</strong> Upon exiting, secure 360 the LZ. Check for enemy patrols.</li>
+            </ul>
+        </section>
+
+        <hr class="section-separator">
+
+<section>
+    <h2>Systems for Position Reporting</h2>
+    <p>Common methods for communicating position and direction:</p>
+    <ol>
+        <li>
+            <strong>Clock Directions</strong> — Used relative to team bearing; ideal for close enemy contact and general quick-reference callouts (e.g., “Enemy at 3 o’clock”).
+        </li>
+        <li>
+            <strong>Left/Right (Relative to Team Direction)</strong> — Frequently used in close-quarters combat (CQC) scenarios, especially when all team members share the same orientation (e.g., “Breaching left!”).
+        </li>
+        <li>
+            <strong>Cardinal Directions (N/E/S/W)</strong> — Useful for map navigation, wide-area movement, recon coordination, radio comms, and maintaining overall orientation.
+        </li>
+        <li>
+            <strong>Coordinates</strong> — Used for precision location reporting, especially in scenarios like fire support, CAS (Close Air Support), grid-based map work, GPS navigation, or target designation in roleplay.
+        </li>
+    </ol>
+</section>
+
+
+        <hr class="section-separator">
+<section>
+    <h2>Tactical Movement Formations</h2>
+    
+    <div class="subsection">
+        <h4>Column / Stack</h4>
+        <p>General purpose formation when moving across open terrain. Maintains a minimal silhouette.</p>
+        <pre style="line-height: 1.4em; font-size: 1.2em;">
+🟢
+🟢
+🟢
+🟢
+        </pre>
+    </div>
+
+    <div class="subsection">
+        <h4>Line</h4>
+        <p>Best for engaging enemies head-on. Maximizes forward firepower but lacks flank coverage.</p>
+        <pre style="line-height: 1.4em; font-size: 1.2em;">
+🟢 🟢 🟢 🟢
+        </pre>
+    </div>
+
+    <div class="subsection">
+        <h4>Diamond</h4>
+        <p>Balanced formation with 360° security. Ideal for patrolling or escorting a VIP.</p>
+        <pre style="line-height: 1.4em; font-size: 1.2em;">
+   🟢
+ 🟢  🟢
+   🟢
+        </pre>
+    </div>
+
+    <div class="subsection">
+        <h4>Staggered</h4>
+        <p>Generally used when moving along roads, provides good field of fire and flexibility.</p>
+        <pre style="line-height: 1.4em; font-size: 1.2em;">
+🟢
+  🟢
+🟢
+  🟢
+        </pre>
+    </div>
+</section>
+
+
+
+        <hr class="section-separator">
+
+        <section>
+            <h2>Bounding Overwatch</h2>
+            <p>A leapfrog movement tactic ensuring constant security:</p>
+            <ul>
+                <li>Team splits into two pairs (A & B).</li>
+                <li>Pair A overwatches while Pair B advances.</li>
+                <li>Alternate roles.</li>
+            </ul>
+            <blockquote>Efficient for reducing exposure while maintaining forward progress.</blockquote>
+        </section>
+
+        <hr class="section-separator">
+
+        <section>
+            <h2>Target Engagement Protocol</h2>
+            <h3>Engagement Example:</h3>
+            <ul>
+                <li>Pointman: “Eyes on three hostiles, 4 o'clock.”</li>
+                <li>Teammates:
+                    <ul>
+                        <li>“2: Holding left.”</li>
+                        <li>“3: Holding center.”</li>
+                        <li>“4: Holding right.”</li>
+                    </ul>
+                </li>
+                <li>Team Lead: “3, 2, 1, execute.” or “Red, Yellow, Green.”</li>
+            </ul>
+            <div class="note">
+                <strong>Notes:</strong>
+                <ul>
+                    <li>Never fire without command.</li>
+                    <li>Call “Standby” if visual not acquired.</li>
+                    <li>Confirm once locked on target.</li>
+                </ul>
+            </div>
+        </section>
+
+        <hr class="section-separator">
+
+        <section>
+            <h2>Reconnaissance (H.E.A.T. reminder)</h2>
+            <p>Call out:</p>
+            <ul>
+                <li>H.ostiles</li>
+                <li>E.ntry/Exit points</li>
+                <li>A.reas of interest (e.g., generator, helipad)</li>
+                <li>T.argets of interest (e.g., turrets, vehicles, high profile enemies)</li>
+            </ul>
+            <p><strong>Use absolute directions (N/S/E/W), not relative ("left/right").</strong></p>
+        </section>
+
+        <hr class="section-separator">
+
+        <section>
+            <h2>Close Quarters Combat (CQC)</h2>
+            <div class="grid-container">
+                <div class="subsection">
+                    <h4>Breach Types:</h4>
+                    <ul>
+                        <li><strong>Standard Breach:</strong> Weapons ready.</li>
+                        <li><strong>Soft Breach:</strong> Flashbang entry.</li>
+                        <li><strong>Hard Breach:</strong> Frag entry.</li>
+                        <li><strong>Thermal Breach:</strong> Torch cutting through fencing.</li>
+                    </ul>
+                </div>
+                <div class="subsection">
+                    <h4>Procedure:</h4>
+                    <ul>
+                        <li>“SET” when in position.</li>
+                        <li>Entry order:
+                            <ul>
+                                <li>1 breaches left</li>
+                                <li>2 breaches right</li>
+                                <li>3 follows 1 (left)</li>
+                                <li>4 follows 2 (right), covers rear</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <h3>Staircases:</h3>
+            <ul>
+                <li>1 looks up</li>
+                <li>2 covers rear and 1’s back</li>
+            </ul>
+        </section>
+
+        <hr class="section-separator">
+
+        <section>
+            <h2>MSR (Main Supply Route) Crossings</h2>
+            <ul>
+                <li>Part of team cover 9 & 3 o'clock while others cross.</li>
+                <li>Cross quickly, regroup, and reform.</li>
+            </ul>
+        </section>
+
+        <hr class="section-separator">
+
+        <section>
+            <h2>Demolitions Protocol</h2>
+            <ul>
+                <li><strong>Standard:</strong> One C4 per target.</li>
+                <li><strong>Bundling:</strong> Combine multiple targets if feasible.</li>
+                <li><strong>Only detonate with team leader’s clearance.</strong></li>
+                <li><strong>Always confirm all teammates are clear.</strong></li>
+            </ul>
+            <h3>Detonation Callout:</h3>
+            <blockquote>“DET in 5, 4, 3, 2, 1 — FIRE IN THE HOLE! FIRE IN THE HOLE!”</blockquote>
+            <div class="note">
+                <strong>Safety Reminders:</strong>
+                <ul>
+                    <li>Stay clear of flaming vehicles due to secondary explosions.</li>
+                </ul>
+            </div>
+        </section>
+
+        <hr class="section-separator">
+
+        <section>
+            <h2>Navigation Communication</h2>
+            <h3>Vehicle Instructions:</h3>
+            <ul>
+                <li>Be clear, early, and use the TACMAP.</li>
+                <li>Example:
+                    <blockquote>“In 500 meters, HARD LEFT onto the dirt road / ASR. HARD LEFT in 3...2...1...”</blockquote>
+                </li>
+            </ul>
+            <h3>Aircraft Instructions:</h3>
+            <ul>
+                <li>Use heading and distance:
+                    <blockquote>“Adjust 30° right. Target 2 o’clock, 1 klick out.”</blockquote>
+                </li>
+            </ul>
+        </section>
+
+        <hr class="section-separator">
+
+        <section>
+            <h2>Breachable Fences</h2>
+            <ul>
+                <li>Any fence which has \\\\ markings on it's frame is breachable.</li>
+                <li>Unmarked = not breachable.</li>
+            </ul>
+        </section>
+
+        <hr class="section-separator">
+
+        <section>
+            <h2>Loud Firefight Tactics</h2>
+            <ol>
+                <li><strong>Shift Gears Quickly:</strong>
+                    <ul>
+                        <li>Move from stealth to fast cover.</li>
+                    </ul>
+                </li>
+                <li><strong>Sector Coverage & Comms:</strong>
+                    <ul>
+                        <li>Short, clear updates.</li>
+                    </ul>
+                </li>
+                <li><strong>Anticipate Threats:</strong>
+                    <ul>
+                        <li>Prepare for RPGs, snipers, etc.</li>
+                    </ul>
+                </li>
+                <li><strong>Break Enemy Advance:</strong>
+                    <ul>
+                        <li>Use grenades/flashbangs/EMPs.</li>
+                    </ul>
+                </li>
+                <li><strong>Hold Position & Return Fire:</strong>
+                    <ul>
+                        <li>Don’t expose unnecessarily.</li>
+                        <li>Use cover fire, blind fire if needed.</li>
+                    </ul>
+                </li>
+                <li><strong>Wounded Teammate:</strong>
+                    <ul>
+                        <li>Prioritize safety.</li>
+                        <li>Assist only when secure.</li>
+                    </ul>
+                </li>
+                <li><strong>Stay Calm During Lulls:</strong>
+                    <ul>
+                        <li>Let enemies make mistakes.</li>
+                    </ul>
+                </li>
+                <li><strong>Post-Fight Sweep:</strong>
+                    <ul>
+                        <li>Regroup and clear the area methodically.</li>
+                    </ul>
+                </li>
+            </ol>
+        </section>
+
+        <hr class="section-separator">
+
+        <section>
+            <h2>P.A.C.E. Planning Framework</h2>
+            <blockquote>"Fail to prepare, prepare to fail.", "P.A.C.E. yourself" for mission resilience:</blockquote>
+            <ul>
+                <li><strong>Primary:</strong> Most effective, ideal plan.</li>
+                <li><strong>Alternate:</strong> Reliable backup route or method.</li>
+                <li><strong>Contingency:</strong> Improvised but workable plan.</li>
+                <li><strong>Emergency:</strong> Survival plan when all else fails.</li>
+            </ul>
+            <h3>Operational Flow:</h3>
+            <blockquote>INFIL ⟶ RECON ⟶ P.A.C.E. ⟶ EXECUTION ⟶ EXFIL</blockquote>
+            
+        </section>
+    </div>
+</body>
+
+</html>
+
+

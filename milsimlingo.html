@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MILSIM LINGO</title>
+    <style>
+        /* CSS for Dark Green and Black Theme */
+        :root {
+            --color-bg-primary: #121212; /* Deep Black/Very Dark Gray */
+            --color-bg-secondary: #1e1e1e; /* Darker card background */
+            --color-text-primary: #e0e0e0; /* Off-White for body text */
+            --color-accent-green: #38761d; /* Dark Olive Green - Main theme color */
+            --color-accent-light: #6aa84f; /* Lighter Green - For hover/focus */
+            --color-border: #2c2c2c;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: var(--color-bg-primary);
+            color: var(--color-text-primary);
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 20px auto;
+            padding: 0 15px;
+        }
+
+        /* Header */
+        header {
+            text-align: center;
+            padding: 20px 0;
+            background-color: var(--color-accent-green);
+            border-bottom: 3px solid var(--color-accent-light);
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2.5em;
+            color: #ffffff;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+        }
+
+        /* Search Bar */
+        #search-bar {
+            width: 100%;
+            padding: 12px 20px;
+            margin-bottom: 25px;
+            box-sizing: border-box;
+            border: 2px solid var(--color-accent-light);
+            background-color: var(--color-bg-secondary);
+            color: var(--color-text-primary);
+            font-size: 1.1em;
+            border-radius: 5px;
+            transition: border-color 0.3s;
+        }
+
+        #search-bar:focus {
+            border-color: #ffffff;
+            outline: none;
+        }
+
+        /* Lingo List */
+        #lingo-list {
+            display: grid;
+            gap: 15px;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        }
+
+        .lingo-item {
+            background-color: var(--color-bg-secondary);
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+            border-left: 5px solid var(--color-accent-green);
+            cursor: pointer;
+            transition: transform 0.2s, background-color 0.2s;
+        }
+
+        .lingo-item:hover {
+            transform: translateY(-3px);
+            background-color: #2a2a2a; /* Slightly lighter on hover */
+            border-left-color: var(--color-accent-light);
+        }
+
+        .lingo-term {
+            font-weight: bold;
+            font-size: 1.3em;
+            color: var(--color-accent-light);
+            margin-bottom: 5px;
+            text-transform: uppercase;
+        }
+
+        .lingo-definition {
+            font-size: 0.95em;
+            color: var(--color-text-primary);
+        }
+        
+        /* Message for copy and no results */
+        #message {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--color-accent-green);
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+            opacity: 0;
+            transition: opacity 0.5s, bottom 0.5s;
+            z-index: 1000;
+        }
+        
+        #message.show {
+            opacity: 1;
+            bottom: 30px;
+        }
+
+        /* No Results Message */
+        #no-results {
+            grid-column: 1 / -1;
+            text-align: center;
+            font-size: 1.2em;
+            color: var(--color-accent-green);
+            padding: 40px;
+            border: 1px dashed var(--color-accent-green);
+            border-radius: 5px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>MILSIM LINGO</h1>
+    </header>
+
+    <div class="container">
+        <input type="text" id="search-bar" placeholder="Search for a term (e.g., AAR, CONTACT, HOT LZ)...">
+        
+        <div id="lingo-list">
+            <div id="no-results">No terms match your search. Try a different keyword.</div>
+            </div>
+    </div>
+
+    <div id="message"></div>
+
+    <script>
+        // Data structure (array of objects)
+        const lingoData = [
+            {term: "203", definition: "A underbarrel grenade launched from a rifle. (abbreviation of the M203 Grenade Launcher also called 40 MIKE MIKE)"},
+            {term: "AAR", definition: "After Action Review. A structured, official debrief and critique of a mission conducted to identify lessons learned and improve performance."},
+            {term: "ALL CLEAR", definition: "A report confirming that an area, route, or facility has been checked and is now considered secure from threat."},
+            {term: "ASR", definition: "Alternate Supply Route is a less-preferred road (RED DIRT ROAD IN BREAKPOINT)."},
+            {term: "BAR", definition: "BEFORE ACTION REVIEW. A briefing tells the team what to do, while a BAR is the team huddle to ask, 'Are we all on the same page, and have we thought through all the ways this could go wrong?'"},
+            {term: "BASE CLEAR", definition: "A confirmation that the main facility or established perimeter is free of immediate threats."},
+            {term: "BIRD", definition: "Slang for any aircraft, but most commonly refers to a rotary-wing aircraft or helicopter."},
+            {term: "BLACK", definition: "Slang or jargon for being out of ammunition, particularly for small arms."},
+            {term: "BOUNDING OVERWATCH", definition: "A basic fire and movement tactic where two elements alternate movement, with one covering the other."},
+            {term: "BREAK CONTACT", definition: "A command to execute a tactical disengagement from the enemy (usually under fire) and move quickly to a safe distance."},
+            {term: "BREACH", definition: "The action of forcibly creating an entry point through an obstacle (like a door or wall) for the passage of troops."},
+            {term: "CAS", definition: "Close Air Support, which is air strikes conducted by aircraft against hostile targets in close proximity to friendly forces."},
+            {term: "CEASE FIRE", definition: "An immediate, urgent command to stop all shooting and weapons manipulation."},
+            {term: "CHARLIE MIKE", definition: "A term meaning \"Continue Mission,\" a command to proceed with the operation or movement as planned."},
+            {term: "CLEARED HOT", definition: "A term giving permission to a firing unit to fire on a designated target without further restrictions."},
+            {term: "COC", definition: "The Chain of Command, which is the established sequence of authority and reporting throughout a military organization."},
+            {term: "COLD LZ", definition: "A Landing Zone confirmed to be free of enemy fire and secured, making operations relatively safe."},
+            {term: "Column", definition: "Personnel are placed one behind the other in a vertical line, providing good speed and maneuverability but a narrow field of fire."},
+            {term: "CONTACT", definition: "An observation or awareness of the enemy, usually followed by a direction for engagement."},
+            {term: "COPY", definition: "I have received and understood your transmission."},
+            {term: "CQC", definition: "Close Quarters Combat, which refers to fighting in short range, usually involving infantry in confined spaces or structures."},
+            {term: "DANGER CLOSE", definition: "Indicates that supporting fire is near enough to friendly forces to risk casualties, requiring commander acceptance of the risk."},
+            {term: "DEAD MAN SWITCH", definition: "A system or mechanism designed to trigger a consequence if the operator is incapacitated or releases the control."},
+            {term: "DIAMOND", definition: "A four-person patrol formation where personnel cover 360 degrees, offering excellent all-around security."},
+            {term: "E&E", definition: "(ESCAPE AND EVADE) Tactics and procedures used by isolated personnel to return to friendly lines or areas of safety."},
+            {term: "EOD", definition: "Explosive Ordnance Disposal, the identification, rendering safe, and final disposal of explosive hazards and ordnance."},
+            {term: "ETA", definition: "The Estimated Time of Arrival, which is the projected time a unit is expected to reach its destination."},
+            {term: "EXECUTE", definition: "The order to commence a pre-planned action, such as initiating an assault or simultaneous firing of weapons."},
+            {term: "EXTERNAL", definition: "The action of a unit leaving a structure to move to the next objective or a different position."},
+            {term: "FLASH OUT", definition: "A warning yelled immediately after a flash/stun device has been thrown."},
+            {term: "FLASH READY", definition: "A verbal command/report that a non-lethal flash/stun device is prepared to be thrown."},
+            {term: "FOB", definition: "A Forward Operating Base, which is a secured military installation established near the front lines to support operations."},
+            {term: "FRAG OUT", definition: "A warning yelled immediately after a fragmentation hand grenade has been thrown."},
+            {term: "FRAG READY", definition: "A verbal command/report that a fragmentation hand grenade is armed and prepared to be thrown."},
+            {term: "FUBAR", definition: "An acronym meaning \"Fouled Up Beyond All Recognition/Repair,\" describing a completely broken or irredeemably bad situation."},
+            {term: "GET LOW", definition: "An urgent, immediate command to drop to the prone or otherwise protected position due to nearby incoming fire or explosion."},
+            {term: "GHOSTING", definition: "Moving through an area with extreme stealth and minimal noise to avoid detection or conduct clandestine operations."},
+            {term: "GOT YOUR SIX", definition: "A verbal confirmation that a team member is covering the person's rear arc (the 6 o'clock position)."},
+            {term: "GRID", definition: "A reference to a Grid Coordinate, a set of numbers used to pinpoint a precise location on a map or using GPS."},
+            {term: "HAHO", definition: "A parachuting technique where the jumper exits at high altitude and deploys the parachute almost immediately, allowing for long-distance travel under canopy."},
+            {term: "HALO", definition: "A parachuting technique where the jumper exits at high altitude and deploys the parachute at a low altitude."},
+            {term: "HELOCAST", definition: "A method of inserting personnel into a water landing zone by having them jump from a hovering or low-flying helicopter."},
+            {term: "HOLD", definition: "A command to stop all movement and maintain a static, defensive posture at the current location."},
+            {term: "HOT LZ", definition: "A Landing Zone currently or recently under effective enemy fire, making operations dangerous."},
+            {term: "HVT", definition: "A High-Value Target, which is a person, piece of equipment, or facility whose loss would significantly hurt the enemy's ability to operate."},
+            {term: "IED", definition: "An Improvised Explosive Device, which is a homemade bomb or trap."},
+            {term: "INTERNAL", definition: "The action of a unit entering and moving within a structure as part of an assault or clearance operation."},
+            {term: "KLICK", definition: "Military slang for a kilometer (1000 meters), used to reference distance."},
+            {term: "LALO", definition: "Low altitude Low opening. low-altitude exit followed by an immediate or near-immediate parachute deployment."},
+            {term: "LEAPFROG", definition: "A term for bounding overwatch when the moving element passes beyond the covering element before establishing the new overwatch position."},
+            {term: "Line (horizontally)", definition: "Personnel are abreast of each other in a single row, typically used for certain assaults or searches."},
+            {term: "LOOK ALIVE", definition: "A verbal command to increase situational awareness, check one's surroundings for threats, and heighten alertness."},
+            {term: "LZ", definition: "A Landing Zone, a specific area designated for the landing and/or takeoff of rotary-wing aircraft."},
+            {term: "MEDEVAC / CASEVAC", definition: "Medical Evacuation, the timely and efficient movement of wounded, injured, or ill personnel to a treatment facility."},
+            {term: "MSR", definition: "Main Supply Route is the primary road (WHHITE ROAD IN BREAKPOINT)."},
+            {term: "NODS", definition: "Slang or shorthand for Night Observation Devices or Night Vision Devices."},
+            {term: "OPSEC", definition: "Operational Security. A process of identifying and protecting sensitive information about military operations from being exploited by adversaries."},
+            {term: "OVERWATCH", definition: "A dedicated, stationary position that supports a moving element by providing effective observation and covering fire."},
+            {term: "PIE", definition: "moving around an area in small increments, revealing only a narrow \"slice\" of the area at a time while minimizing exposure to potential threats."},
+            {term: "QRF", definition: "A Quick Reaction Force, which is a unit maintained on a high level of alert to respond quickly to an emergency situation or aid a pinned-down element."},
+            {term: "RABBIT", definition: "A brevity term for an enemy soldier who is running away from friendly forces, attempting to escape."},
+            {term: "RALLY POINT", definition: "A pre-designated, easily identifiable, and secure location where a unit can reassemble after being dispersed or separated."},
+            {term: "RECON", definition: "Reconnaissance, a mission to obtain information by visual or other means about enemy activities or terrain."},
+            {term: "ROE", definition: "The Rules of Engagement, which are directives that delineate the circumstances and limitations under which forces will initiate or continue combat."},
+            {term: "ROGER", definition: "I have received and understood your last transmission."},
+            {term: "RTB", definition: "Return To Base, a command or report indicating the unit is disengaging and heading back to its main operating location."},
+            {term: "SITREP", definition: "A Situation Report, which is a formal briefing on the current tactical status of a unit, mission, or specific area."},
+            {term: "SMOKE UP", definition: "In aviation, a warning for an enemy missile’s infrared lock (SAM SITE)."},
+            {term: "SOP", definition: "A Standard Operating Procedure, which is a set of established, mandatory rules for carrying out a specific task."},
+            {term: "SQUIRTER", definition: "A term for an individual enemy combatant who is attempting to flee a position under attack or observation."},
+            {term: "SSR", definition: "Secondary Supply Route is a road to supplement the MSR or to provide an alternate route (YELLOW ROAD IN BREAKPOINT)."},
+            {term: "SSE", definition: "Sensitive Site Exploitation, the systematic collection and analysis of information found at a captured location for intelligence purposes."},
+            {term: "Staggered (left or right)", definition: "Zig zag patrol formation for more coverage (heavier on left or right)."},
+            {term: "STAND TO", definition: "An order for all troops to assume defensive positions, fully equipped and alert, ready for immediate action."},
+            {term: "SUPPRESSIVE FIRE", definition: "Fire placed on or near an enemy position to restrict their movement and ability to fire effectively."},
+            {term: "TANGO", definition: "The phonetic alphabet word for 'T', commonly used as shorthand for Target or Hostile Target."},
+            {term: "Wedge (left or right)", definition: "^ shape patrol formation (if wedge left one more operator on the left, if right one more on the right)."},
+            {term: "WHEELS DOWN", definition: "A report that an aircraft's landing gear is extended and locked, or that the aircraft has landed."},
+            {term: "WHEELS UP", definition: "A report or command that an aircraft's landing gear is extended and locked, or that the aircraft has landed."},
+            {term: "WILCO", definition: "I have received and understood your message and will comply with the instructions."},
+            {term: "WINCHESTER", definition: "A brevity code meaning all ordnance or ammunition stores have been expended or are exhausted."}
+        ];
+
+        const listContainer = document.getElementById('lingo-list');
+        const searchBar = document.getElementById('search-bar');
+        const noResults = document.getElementById('no-results');
+        const messageBox = document.getElementById('message');
+
+        // Function to create and display the list items
+        function renderLingoList(data) {
+            listContainer.innerHTML = '';
+            
+            if (data.length === 0) {
+                noResults.style.display = 'block';
+                return;
+            } else {
+                noResults.style.display = 'none';
+            }
+
+            data.forEach(item => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'lingo-item';
+                itemDiv.innerHTML = `
+                    <div class="lingo-term">${item.term}</div>
+                    <div class="lingo-definition">${item.definition}</div>
+                `;
+                
+                // Add click listener to copy the term
+                itemDiv.addEventListener('click', () => copyToClipboard(item.term));
+                
+                listContainer.appendChild(itemDiv);
+            });
+        }
+
+        // Function to copy text to clipboard and show feedback
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                messageBox.textContent = `Copied: ${text}`;
+                messageBox.classList.add('show');
+                setTimeout(() => {
+                    messageBox.classList.remove('show');
+                }, 1500);
+            }).catch(err => {
+                console.error('Could not copy text: ', err);
+            });
+        }
+
+        // Event listener for the search bar
+        searchBar.addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            const filteredData = lingoData.filter(item => 
+                item.term.toLowerCase().includes(searchTerm) || 
+                item.definition.toLowerCase().includes(searchTerm)
+            );
+            renderLingoList(filteredData);
+        });
+
+        // Initial render
+        renderLingoList(lingoData);
+    </script>
+
+</body>
+
+</html>

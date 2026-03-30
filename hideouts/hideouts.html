@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auroa Field Hideouts</title>
+    <style>
+        /* === MILITARY THEME CSS === */
+        body {
+            background-color: #1e261e;
+            color: #a3bfa3;
+            font-family: 'Courier New', Courier, monospace;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+            user-select: none;
+        }
+
+        h1 {
+            border-bottom: 2px solid #4a5e4a;
+            display: inline-block;
+            padding-bottom: 10px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            text-shadow: 0px 0px 5px #000;
+            margin-bottom: 10px; /* Adjusted for tip spacing */
+        }
+
+        /* Unit Link Styling */
+        .unit-link {
+            color: inherit;
+            text-decoration: none;
+            transition: color 0.3s, text-shadow 0.3s;
+            border-bottom: 1px dotted rgba(163, 191, 163, 0.3); /* Subtle hint it's clickable */
+        }
+
+        .unit-link:hover {
+            color: #fff;
+            text-shadow: 0 0 10px #4a5e4a;
+            border-bottom: 1px solid #fff;
+        }
+
+        /* Tip Text Styling */
+        .tip-text {
+            color: #ffffff;
+            font-size: 0.85rem;
+            margin-top: 0;
+            margin-bottom: 25px;
+           
+            opacity: 0.8;
+        }
+
+        /* Map Container */
+        .map-container {
+            position: relative;
+            display: inline-block;
+            border: 5px solid #0f140f;
+            box-shadow: 0 0 20px rgba(0,0,0,0.8);
+        }
+
+        #main-map {
+            display: block;
+            max-width: 100%;
+            height: auto;
+        }
+
+        /* === MARKER STYLES === */
+        .marker {
+            position: absolute;
+            background-color: rgba(255, 0, 0, 0.6);
+            border: 2px solid #a3bfa3;
+            border-radius: 50%;
+            cursor: pointer;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 10px rgb(255, 217, 0);
+            z-index: 10;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: background-color 0.2s, border-color 0.2s;
+        }
+
+        .marker:hover {
+            background-color: rgba(255, 0, 0, 0.8);
+            border-color: #fff;
+            z-index: 100;
+        }
+
+        /* Overlay Styles */
+        #overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            cursor: zoom-out;
+        }
+
+        #overlay img {
+            max-width: 90%;
+            max-height: 90%;
+            border: 2px solid #a3bfa3;
+            box-shadow: 0 0 30px #000;
+        }
+
+        #overlay-caption {
+            position: absolute;
+            bottom: 20px;
+            color: white;
+            background: rgba(30, 38, 30, 0.8);
+            padding: 5px 10px;
+            font-size: 1.2rem;
+            border: 1px solid #4a5e4a;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>
+        Auroa Field Hideouts
+    </h1>
+    
+    <p class="tip-text">CLICK THE 🔴 MARKERS TO VIEW EACH HIDEOUT</p>
+    
+    <div class="map-container" id="map-area">
+        <img src="map.jpg" alt="Operations Map" width="910" height="910" id="main-map">
+        
+        <div id="saved-markers-area">
+            <div class="marker" style="left: 82.19%; top: 6.75%; width: 10px; height: 10px;" 
+                data-img="safehouse.jpg" data-caption="Safehouse Cape North"></div>
+            <div class="marker" style="left: 75.38%; top: 33.35%; width: 10px; height: 10px;" 
+                data-img="russell.jpg" data-caption="Russell Homestead Sinking Country"></div>
+            <div class="marker" style="left: 72.84%; top: 21.63%; width: 10px; height: 10px;" 
+                data-img="schulz.jpg" data-caption="Schulz Homestead Sinking Country"></div>
+            <div class="marker" style="left: 65%; top: 40.75%; width: 10px; height: 10px;" 
+                data-img="summers.jpg" data-caption="Summers Homestead Fen Bog"></div>
+            <div class="marker" style="left: 67.58%; top: 38.41%; width: 10px; height: 10px;" 
+                data-img="harris.jpg" data-caption="Harris Homestead Fen Bog"></div>
+            <div class="marker" style="left: 30.28%; top: 26.33%; width: 10px; height: 10px;" 
+                data-img="makeshift.jpg" data-caption="Makeshift Runway Wild Coast"></div>
+            <div class="marker" style="left: 51.28%; top: 42.4%; width: 10px; height: 10px;" 
+                data-img="brown.jpg" data-caption="Brown Homestead"></div>
+            <div class="marker" style="left: 13.33%; top: 47.62%; width: 10px; height: 10px;" 
+                data-img="bunker1.jpg" data-caption="Underground Bunker Channels"></div>
+            <div class="marker" style="left: 33.96%; top: 58.54%; width: 10px; height: 10px;" 
+                data-img="bunker2.jpg" data-caption="Underground Bunker Restricted Area 01"></div>
+            <div class="marker" style="left: 14.02%; top: 56.69%; width: 10px; height: 10px;" 
+                data-img="wed.jpg" data-caption="Equipment Depot Seal Islands"></div>
+            <div class="marker" style="left: 25.6%; top: 33.81%; width: 10px; height: 10px;" 
+                data-img="cave1.jpg" data-caption="Cave Hideout Whalers Bay"></div>
+            <div class="marker" style="left: 47.15%; top: 79.46%; width: 10px; height: 10px;" 
+                data-img="outcastfob.jpg" data-caption="Outcast FOB (Only on Conquest Mode)"></div>
+            <div class="marker" style="left: 56.09%; top: 32.52%; width: 10px; height: 10px;" 
+                data-img="erewhon.jpg" data-caption="Erewhon Mount Hodgson"></div>
+            <div class="marker" style="left: 25.98%; top: 82.64%; width: 10px; height: 10px;" 
+                data-img="southcape.jpg" data-caption="South Cape Station Windy Islands"></div>
+            <div class="marker" style="left: 63.92%; top: 77.16%; width: 10px; height: 10px;" 
+                data-img="egg.jpg" data-caption="Egg Island Safehouse"></div>
+        </div>
+    </div>
+
+    <div id="overlay" onclick="closeOverlay()">
+        <img id="overlay-img" src="" alt="Intel View">
+        <div id="overlay-caption"></div>
+    </div>
+
+    <script>
+        // 1. OVERLAY LOGIC
+        function openOverlay(imageSrc, captionText) {
+            const overlay = document.getElementById('overlay');
+            const img = document.getElementById('overlay-img');
+            const caption = document.getElementById('overlay-caption');
+            
+            // Set source and caption
+            img.src = imageSrc || 'placeholder.jpg';
+            caption.innerText = captionText || 'CLASSIFIED INTEL';
+            
+            // Show overlay
+            overlay.style.display = 'flex';
+        }
+
+        function closeOverlay() {
+            document.getElementById('overlay').style.display = 'none';
+            document.getElementById('overlay-img').src = '';
+        }
+
+        // 2. INITIALIZATION (Read Only Mode)
+        window.onload = function() {
+            const markers = document.querySelectorAll('.marker');
+            
+            markers.forEach(marker => {
+                // Attach simple click event only
+                marker.onclick = function() {
+                    openOverlay(marker.dataset.img, marker.dataset.caption);
+                };
+            });
+        };
+    </script>
+
+</body>
+</html>

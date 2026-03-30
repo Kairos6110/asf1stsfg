@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ghost Recon Tactical Operations Center</title>
+  <link rel="icon" type="image/png" href="patch.png">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      /* Base dark colors, now with a subtle green tint */
+      --dark-bg: #0a170f; /* Changed from blue-ish to green-ish dark */
+      --darker-bg: #05120a; /* Changed from blue-ish to green-ish darker */
+      
+      /* Glassmorphism elements with green hues */
+      --glass-bg: rgba(15, 40, 25, 0.7); /* Green tint for glass background */
+      --glass-border: rgba(80, 255, 150, 0.15); /* Green tint for glass border */
+      
+      /* Accent colors */
+      --accent-green: #00e676; /* Bright primary green accent - kept */
+      --secondary-accent-green: #33cc66; /* New secondary green accent, replaces accent-blue */
+      --accent-red: #ff3d71; /* Red accent - kept */
+      
+      /* Text colors with subtle green tint */
+      --text-light: #e0ffe0; /* Light green-ish white */
+      --text-lighter: #ffffff; /* Pure white - kept */
+      
+      /* Subtle white for close button, kept for contrast */
+      --subtle-white: rgba(255, 255, 255, 0.6);
+      --subtle-white-hover: rgba(255, 255, 255, 0.8);
+      
+      /* Brighter status bar text color, now green-tinted */
+      --status-text-bright: #e0ffe0; 
+      
+      --header-font: 'Roboto Mono', monospace;
+      --body-font: 'Roboto Mono', monospace;
+      --transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: var(--body-font);
+    }
+
+    body {
+      background: var(--dark-bg);
+      color: var(--text-light);
+      min-height: 100vh;
+      overflow-x: hidden;
+      background-image: 
+        radial-gradient(circle at 10% 20%, rgba(0, 150, 80, 0.1) 0%, transparent 20%), /* Green tint */
+        radial-gradient(circle at 90% 80%, rgba(0, 255, 180, 0.1) 0%, transparent 20%), /* Green tint */
+        linear-gradient(to bottom, var(--darker-bg), var(--dark-bg));
+      background-attachment: fixed;
+      position: relative;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* Animated background elements */
+    .grid-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: 
+        linear-gradient(rgba(0, 150, 80, 0.03) 1px, transparent 1px), /* Green tint */
+        linear-gradient(90deg, rgba(0, 150, 80, 0.03) 1px, transparent 1px); /* Green tint */
+      background-size: 40px 40px;
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    /* Particle effect styles */
+    .particles-js-canvas-el {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .main-content-wrapper {
+      width: 95%; /* Adjusted to 95% of screen width */
+      max-width: 500px;
+      margin: 20px auto 30px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .title-container {
+      position: relative;
+      padding: 7px 20px;
+      border-radius: 16px;
+      background: var(--glass-bg);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      overflow: hidden;
+      text-align: center;
+      width: 100%;
+      border: 1px solid var(--glass-border); /* Added subtle contour line */
+    }
+
+    .title-image {
+      width: 100%;
+      max-width: 600px;
+      height: auto;
+      margin: 0 auto;
+      filter: drop-shadow(0 5px 15px rgba(0, 255, 180, 0.3)); /* Green tint */
+    }
+
+    .title-subtext {
+      font-family: var(--header-font);
+      font-size: 1.4rem;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      margin-top: 20px;
+      color: var(--accent-green);
+      font-weight: 500;
+      text-shadow: 0 0 0 transparent; /* Removed text glow */
+    }
+
+    .content-grid {
+      display: flex; 
+      flex-direction: column; 
+      gap: 10px; /* Reduced gap between buttons */
+      width: 100%;
+    }
+
+    .grid-item {
+      position: relative;
+      background: var(--glass-bg);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--glass-border);
+      border-radius: 12px;
+      overflow: hidden;
+      transition: var(--transition);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+      height: 50px; /* Reduced vertical height */
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 5px 20px; 
+      cursor: pointer;
+      transform: translateY(0);
+      text-align: left;
+    }
+
+    .grid-item:hover {
+      transform: translateY(0); /* Removed raise effect */
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2); /* Reset box-shadow */
+      border-color: var(--glass-border); /* Reset border-color */
+    }
+    .grid-item:active {
+      transform: translateY(0); /* Removed raise effect */
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2); /* Reset box-shadow */
+      border-color: var(--glass-border); /* Reset border-color */
+    }
+
+    .grid-item .emoji {
+      font-size: 1.8rem; /* Slightly smaller emoji */
+      margin-right: 15px;
+      text-shadow: none; /* Removed text glow */
+      flex-shrink: 0;
+    }
+
+    .grid-item h3 {
+      font-family: var(--header-font);
+      font-weight: 600;
+      font-size: 1rem; /* Slightly smaller text */
+      color: var(--text-lighter);
+      margin-bottom: 0;
+      letter-spacing: 1px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      text-transform: uppercase;
+    }
+
+    .grid-item p {
+      display: none;
+    }
+
+    .iframe-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: var(--darker-bg);
+      z-index: 100;
+      display: none;
+      flex-direction: column;
+      opacity: 0;
+      transition: opacity 0.4s ease;
+    }
+
+    .iframe-container.active {
+      display: flex;
+      opacity: 1;
+    }
+
+    .iframe-header {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 10px 20px; /* Adjusted vertical padding */
+      background: rgba(10, 30, 20, 0.95); /* Greenish tint for iframe header */
+      border-bottom: 1px solid rgba(0, 255, 150, 0.2); /* Green tint */
+      height: 55px; /* Reduced height */
+      position: relative;
+    }
+
+    .iframe-title {
+      display: none;
+    }
+
+    .close-button {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: var(--subtle-white);
+      width: 35px; /* Slightly smaller close button */
+      height: 35px; /* Slightly smaller close button */
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem; /* Slightly smaller font size for close button */
+      cursor: pointer;
+      transition: var(--transition);
+      box-shadow: none; /* Removed glow around close button */
+      /* REMOVE absolute positioning to let the parent's flexbox center it */
+      /* position: absolute; */
+      /* right: 20px; */
+    }
+
+    .close-button:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.25);
+      color: var(--subtle-white-hover);
+      transform: rotate(90deg);
+    }
+
+    .iframe-content {
+      flex: 1;
+      width: 100%;
+      overflow: hidden;
+      /* Added to manage the single iframe element */
+      position: relative; 
+    }
+
+    .iframe-content iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      /* Make sure the iframe is a block element inside the container */
+      display: block; 
+    }
+
+    .status-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      padding: 10px 20px;
+      background: rgba(10, 30, 20, 0.8); /* Greenish tint for status bar */
+      border-top: 1px solid rgba(0, 255, 150, 0.1); /* Green tint */
+      display: flex;
+      justify-content: center; /* Changed to center */
+      font-size: 0.8rem;
+      color: var(--status-text-bright);
+      font-family: var(--header-font);
+      letter-spacing: 1px;
+      align-items: center;
+      flex-wrap: wrap; /* Allow items to wrap */
+    }
+
+    .status-time {
+      white-space: nowrap;
+      margin: 0 10px; /* Adjusted spacing for centering */
+    }
+
+    .status-indicators {
+      display: flex;
+      gap: 20px;
+      flex-wrap: nowrap;
+      justify-content: center; /* Changed to center */
+      width: 100%; /* Occupy full width to center effectively */
+      margin-top: 5px; /* Add some space if it wraps */
+    }
+
+    @media (min-width: 768px) {
+      .status-indicators {
+        width: auto; /* Revert width on larger screens */
+        margin-top: 0;
+      }
+    }
+
+    .status-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent-green); /* Primary green dot */
+      box-shadow: none; /* Removed glow */
+    }
+
+    .status-dot.blue { /* This class is now repurposed for a secondary green dot */
+      background: var(--secondary-accent-green); /* Secondary green dot */
+      box-shadow: none; /* Removed glow */
+    }
+
+    .footer {
+      margin-top: 50px;
+      text-align: center;
+      padding: 20px;
+      color: rgba(150, 190, 220, 0.6); /* Kept subtle blue-ish tint for footer text */
+      font-size: 0.9rem;
+    }
+
+    /* Animations */
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(0, 230, 118, 0); } /* Removed glow */
+      70% { box-shadow: 0 0 0 0 rgba(0, 230, 118, 0); } /* Removed glow */
+      100% { box-shadow: 0 0 0 0 rgba(0, 230, 118, 0); } /* Removed glow */
+    }
+
+    .pulse {
+      animation: none; /* Disabled pulse animation for glow */
+    }
+
+    /* Responsive design */
+    @media (max-width: 768px) {
+      .title-container {
+        padding: 20px;
+      }
+      
+      .title-subtext {
+        font-size: 1.1rem;
+      }
+      
+      .main-content-wrapper {
+        max-width: 500px;
+      }
+      
+      .grid-item {
+        height: 48px; /* Further reduced height for mobile */
+        padding: 5px 15px; /* Adjusted padding */
+      }
+      
+      .grid-item .emoji {
+        font-size: 1.7rem; /* Slightly smaller emoji */
+        margin-right: 12px;
+      }
+      
+      .grid-item h3 {
+        font-size: 0.95rem; /* Slightly smaller text */
+      }
+      
+      .status-bar {
+        flex-direction: column; /* Changed to column for better centering on small screens */
+        padding: 8px 15px;
+      }
+      .status-indicators {
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 10px; /* Add more space when in column layout */
+      }
+      .close-button {
+        right: 15px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      body {
+        padding: 15px;
+      }
+      
+      .title-container {
+        padding: 15px;
+      }
+      
+      .title-subtext {
+        font-size: 1rem;
+      }
+      
+      .grid-item {
+        height: 45px; /* Even smaller height for small screens */
+        padding: 5px 12px; /* Adjusted padding */
+      }
+      
+      .grid-item .emoji {
+        font-size: 1.5rem; /* Smaller emoji */
+        margin-right: 10px;
+      }
+      
+      .grid-item h3 {
+        font-size: 0.85rem; /* Smaller text */
+      }
+      .status-bar {
+        padding: 8px 10px;
+        font-size: 0.75rem;
+      }
+      .status-indicators {
+        gap: 8px;
+      }
+      .close-button {
+        right: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="grid-overlay"></div>
+  <div id="particles-js"></div>
+
+  <div class="main-content-wrapper">
+    <div class="title-container">
+      <img src="title.png" alt="Ghost Recon Tactical Operations Center" class="title-image">
+    </div>
+
+    <div class="content-grid">
+      <div class="grid-item" data-href="OperationsArchive/opords.html">
+        <span class="emoji">🗃️</span>
+        <h3>Breakpoint Operations Vault</h3>
+      </div>
+
+      <div class="grid-item" data-href="https://github.com/Kairos6110/grms/releases/download/v1.0/campaign_wildfire.pdf" data-external="true">
+        <span class="emoji">🔥</span>
+        <h3>OP Wildfire (Campaign)</h3>
+      </div>
+
+      <div class="grid-item" data-href="https://github.com/Kairos6110/grms/releases/download/v1.0/campaign_silverstone.pdf" data-external="true">
+        <span class="emoji">⚔️</span>
+        <h3>OP Silverstone (Campaign)</h3>
+      </div>
+
+      <div class="grid-item" data-href="BpOpGenerator.html">
+        <span class="emoji">📝</span>
+        <h3>Breakpoint Operation Generator</h3>
+      </div>
+
+      <div class="grid-item" data-href="soundboard.html">
+        <span class="emoji">🔊</span>
+        <h3>Soundboard for Roleplay</h3>
+      </div>
+      
+      <div class="grid-item" data-href="Callsigns.html">
+        <span class="emoji">🏷️</span>
+        <h3>Callsigns for Radio Comms</h3>
+      </div>
+
+      <div class="grid-item" data-href="TacGuide.html">
+        <span class="emoji">📖</span>
+        <h3>Tactical Guide</h3>
+      </div>
+      
+      <div class="grid-item" data-href="teamlead.html">
+        <span class="emoji">💡</span>
+        <h3>Team Leader Guide</h3>
+      </div>
+
+      <div class="grid-item" data-href="https://bulletdrop.netlify.app/Breakpoint" data-external="true">
+        <span class="emoji">🎯</span>
+        <h3>Bullet Drop Compendium</h3>
+      </div>
+
+      <div class="grid-item" data-href="milsimlingo.html">
+        <span class="emoji">📚</span>
+        <h3>Milsim Lingo</h3>
+      </div>
+      
+      <div class="grid-item" data-href="hideouts/hideouts.html">
+        <span class="emoji">🗺️</span>
+        <h3>Auroa Field Hideouts</h3>
+      </div>
+
+      <div class="grid-item" data-href="fullgolem.jpg" data-external="true">
+        <span class="emoji">🌋</span>
+        <h3>Golem Island Map</h3>
+      </div>
+
+      <div class="grid-item" data-href="https://swissgameguides.com/maps/ghost_recon_breakpoint/auroa/interactive_map.html" data-external="true">
+        <span class="emoji">🌐</span>
+        <h3>Auroa Interactive Map</h3>
+      </div>
+
+      <div class="grid-item" data-href="https://youtu.be/CNIc_s2V_UI" data-external="true">
+        <span class="emoji">🖊️</span>
+        <h3>Operation Writing Tips</h3>
+      </div>
+
+      <div class="grid-item" data-href="https://youtu.be/N3RnMWQ-8tY?si=1K0ST4O2pikP4Ki5" data-external="true">
+        <span class="emoji">🦈</span>
+        <h3>Shark Base Guided Tour</h3>
+      </div>
+
+      <div class="grid-item" data-href="https://youtu.be/Hkk_nuFLSv8?si=DicLSIZIVgCAy5Em" data-external="true">
+        <span class="emoji">🏹</span>
+        <h3>Arrow Testing Zone Guided Tour</h3>
+      </div>
+
+      <div class="grid-item" data-href="WlOpGenerator.html">
+        <span class="emoji">⛰️</span>
+        <h3>Wildlands Operation Generator</h3>
+      </div>
+      
+      <div class="grid-item" id="discordLink" data-href="https://discord.gg/BXvQFwBq8z">
+        <span class="emoji">👥</span>
+        <h3>ASF 1st SFG Discord Server</h3>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="iframe-container" id="contentIframeContainer">
+    <div class="iframe-header">
+      <div class="iframe-title" id="iframeTitle">OPERATION CONTROL</div>
+      <div class="close-button" id="closeIframeButton">✕</div>
+    </div>
+    <div class="iframe-content" id="iframeContentWrapper">
+      </div>
+  </div>
+
+  <div class="status-bar">
+  <div id="timezone-clocks">
+    <span class="status-time" id="pacific-time"></span>
+    <span class="status-time" id="central-time"></span>
+    <span class="status-time" id="eastern-time"></span>
+    <span class="status-time" id="berlin-time"></span>
+  </div>
+  <div class="status-indicators">
+  </div>
+</div>
+
+<div class="footer">
+
+</div>
+
+ <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+ <script>
+  document.addEventListener('DOMContentLoaded', function() {
+   const gridItems = document.querySelectorAll('.grid-item:not(#discordLink)');
+   const discordItem = document.getElementById('discordLink');
+   const iframeContainer = document.getElementById('contentIframeContainer');
+   const closeButton = document.getElementById('closeIframeButton');
+   const iframeTitle = document.getElementById('iframeTitle');
+   const iframeContentWrapper = document.getElementById('iframeContentWrapper'); // New reference for the wrapper
+
+   // Update multiple timezone clocks
+   function updateTimezones() {
+    const now = new Date();
+
+        // Base options for time formatting (24-hour clock, no seconds)
+        const timeOptions = { hour: '2-digit', minute: '2-digit', hour12: false };
+        // Options including the short timezone abbreviation
+        const fullOptions = { ...timeOptions, timeZoneName: 'short' };
+
+
+    // Pacific Time (Los Angeles)
+    const pacificOptions = { timeZone: 'America/Los_Angeles', ...fullOptions };
+        const pacificTimeString = now.toLocaleTimeString('en-US', pacificOptions);
+    document.getElementById('pacific-time').textContent = `${pacificTimeString.replace(':', '')}`;
+
+    // Central Time (Chicago)
+        const centralOptions = { timeZone: 'America/Chicago', ...fullOptions };
+        const centralTimeString = now.toLocaleTimeString('en-US', centralOptions);
+    document.getElementById('central-time').textContent = `${centralTimeString.replace(':', '')}`;
+
+    // Eastern Time (New York)
+        const easternOptions = { timeZone: 'America/New_York', ...fullOptions };
+        const easternTimeString = now.toLocaleTimeString('en-US', easternOptions);
+    document.getElementById('eastern-time').textContent = `${easternTimeString.replace(':', '')}`;
+
+    // Europe (Berlin)
+   const berlinOptions = {
+    timeZone: 'Europe/Berlin',
+    // Specify only hour and minute to control the format
+    hour: '2-digit',
+    minute: '2-digit',
+    // Use the 24-hour clock to avoid AM/PM
+    hour12: false
+};
+ // 1. Get the time string (e.g., "15:01")
+const berlinTimeString = now.toLocaleTimeString('en-US', berlinOptions);
+
+// 2. Remove the colon and append "CET"
+const formattedTimeString = berlinTimeString.replace(':', '') + ' CET';
+
+// 3. Update the DOM
+document.getElementById('berlin-time').textContent = formattedTimeString;
+    
+
+        // Run every minute
+        setTimeout(updateTimezones, 60000); 
+   }
+
+      // Initial call to display time immediately
+      updateTimezones();
+
+      // Initialize particles.js
+      particlesJS('particles-js', {
+        "particles": {
+          "number": {
+            "value": 80,
+            "density": {
+              "enable": true,
+              "value_area": 800
+            }
+          },
+          "color": {
+            "value": "#00e676" /* Accent green */
+          },
+          "shape": {
+            "type": "circle",
+            "stroke": {
+              "width": 0,
+              "color": "#000000"
+            },
+            "polygon": {
+              "nb_sides": 5
+            }
+          },
+          "opacity": {
+            "value": 0.2,
+            "random": false,
+            "anim": {
+              "enable": false,
+              "speed": 1,
+              "opacity_min": 0.1,
+              "sync": false
+            }
+          },
+          "size": {
+            "value": 3,
+            "random": true,
+            "anim": {
+              "enable": false,
+              "speed": 40,
+              "size_min": 0.1,
+              "sync": false
+            }
+          },
+          "line_linked": {
+            "enable": true,
+            "distance": 150,
+            "color": "#33cc66", /* Changed to secondary accent green */
+            "opacity": 0.3,
+            "width": 1
+          },
+          "move": {
+            "enable": true,
+            "speed": 3, /* Changed from 6 to 3 to slow down the animation */
+            "direction": "none",
+            "random": false,
+            "straight": false,
+            "out_mode": "out",
+            "bounce": false,
+            "attract": {
+              "enable": false,
+              "rotateX": 600,
+              "rotateY": 1200
+            }
+          }
+        },
+        "interactivity": {
+          "detect_on": "canvas",
+          "events": {
+            "onhover": {
+              "enable": true,
+              "mode": "grab"
+            },
+            "onclick": {
+              "enable": true,
+              "mode": "push"
+            },
+            "resize": true
+          },
+          "modes": {
+            "grab": {
+              "distance": 140,
+              "line_linked": {
+                "opacity": 1
+              }
+            },
+            "bubble": {
+              "distance": 400,
+              "size": 40,
+              "duration": 2,
+              "opacity": 8,
+              "speed": 3
+            },
+            "repulse": {
+              "distance": 200,
+              "duration": 0.4
+            },
+            "push": {
+              "particles_nb": 4
+            },
+            "remove": {
+              "particles_nb": 2
+            }
+          }
+        },
+        "retina_detect": true
+      });
+
+      // *** UPDATED loadIframeContent function with cache-busting and single-iframe logic ***
+      function loadIframeContent(url, title) {
+        // 1. Remove any existing iframe to ensure a clean slate and fresh load
+        iframeContentWrapper.innerHTML = '';
+        
+        // 2. Create the cache-busted URL
+        const cacheBuster = `?v=${new Date().getTime()}`;
+        const newUrl = url + cacheBuster;
+
+        // 3. Create the new iframe element
+        const newIframe = document.createElement('iframe');
+        newIframe.src = newUrl;
+        newIframe.title = title;
+        newIframe.id = 'contentIframe'; // Give it a consistent ID if needed
+        newIframe.style.width = '100%';
+        newIframe.style.height = '100%';
+        newIframe.style.border = 'none';
+
+        // 4. Append the new iframe
+        iframeContentWrapper.appendChild(newIframe);
+
+        // 5. Update UI and visibility
+        iframeTitle.textContent = title.toUpperCase(); // Title to uppercase for military theme
+        iframeContainer.classList.add('active');
+        document.body.style.overflow = 'hidden';
+      }
+      // *** END UPDATED loadIframeContent function ***
+
+
+      // Handle clicks on grid items (all non-discord)
+      gridItems.forEach(item => {
+        item.addEventListener('click', function() {
+          const url = this.getAttribute('data-href');
+          
+                    // NEW LOGIC: Check for data-external attribute
+                    if (this.getAttribute('data-external') === 'true') {
+                        window.open(url, '_blank');
+                        // Stop processing and prevent the iframe logic below from running
+                        return;
+                    }
+                    
+          const title = this.querySelector('h3').textContent;
+          
+          loadIframeContent(url, title);
+          // Update history state without the cache buster for clean URLs
+          history.pushState({ iframeUrl: url, title: title }, title, `?page=${encodeURIComponent(url)}`);
+        });
+      });
+      
+      // Handle Discord button specifically
+      if (discordItem) {
+        discordItem.addEventListener('click', function() {
+          const url = this.getAttribute('data-href');
+          window.open(url, '_blank');
+        });
+      }
+
+      // Handle close button click
+      closeButton.addEventListener('click', function() {
+        iframeContainer.classList.remove('active');
+        document.body.style.overflow = 'auto';
+        // Remove the iframe when closing to ensure next load is fresh
+        iframeContentWrapper.innerHTML = '';
+        history.pushState({}, document.title, window.location.pathname); // Go back to the main page URL
+      });
+      
+      // Handle browser back/forward
+      window.addEventListener('popstate', function(event) {
+        if (event.state && event.state.iframeUrl) {
+          // If we're going back to an iframe state
+          loadIframeContent(event.state.iframeUrl, event.state.title);
+        } else {
+          // If we're going back to the main page or an initial load
+          iframeContainer.classList.remove('active');
+          document.body.style.overflow = 'auto';
+          // Remove the iframe content
+          iframeContentWrapper.innerHTML = '';
+        }
+      });
+      
+      // Check for initial page parameter on first load
+      const urlParams = new URLSearchParams(window.location.search);
+      const initialPageUrl = urlParams.get('page');
+      
+      if (initialPageUrl) {
+        const title = Array.from(gridItems).find(item => 
+          item.getAttribute('data-href') === initialPageUrl)?.querySelector('h3').textContent || 'OPERATION CONTROL';
+        loadIframeContent(initialPageUrl, title);
+        // Replace the state to ensure the initial load doesn't add an extra history entry
+        history.replaceState({ iframeUrl: initialPageUrl, title: title }, title, `?page=${encodeURIComponent(initialPageUrl)}`);
+      } else {
+        history.replaceState({}, document.title, window.location.pathname);
+      }
+    });
+  </script>
+</body>
+
+</html>
