@@ -295,7 +295,7 @@
 
         try {
             await navigator.clipboard.writeText(currentOperation.url);
-            status.textContent = "Link copied ✅ Paste it on Discord for your teammates.";
+            status.textContent = "📋 Link copied. Paste it on Discord for your teammates.";
         } catch (error) {
             const tempInput = document.createElement("input");
             tempInput.value = currentOperation.url;
