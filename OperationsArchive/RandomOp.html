@@ -7,15 +7,15 @@
 <style>
     :root {
         color-scheme: dark;
-        --bg-1: #07111a;
-        --bg-2: #0d1f2e;
-        --panel: rgba(11, 21, 31, 0.88);
-        --panel-border: rgba(131, 153, 176, 0.2);
-        --text: #f3f7fb;
-        --muted: #93a4b6;
-        --accent: #7dd3fc;
-        --accent-strong: #38bdf8;
-        --button-text: #03131e;
+        --bg-1: #0f120a;
+        --bg-2: #1e2413;
+        --panel: rgba(20, 24, 14, 0.92);
+        --panel-border: rgba(123, 133, 89, 0.28);
+        --text: #ecefdf;
+        --muted: #9ca286;
+        --accent: #7f8756;
+        --accent-strong: #98a16a;
+        --button-text: #111408;
         --shadow: 0 24px 60px rgba(0, 0, 0, 0.4);
     }
 
@@ -33,7 +33,7 @@
         font-family: Arial, sans-serif;
         color: var(--text);
         background:
-            radial-gradient(circle at top, rgba(56, 189, 248, 0.18), transparent 35%),
+            radial-gradient(circle at top, rgba(127, 135, 86, 0.16), transparent 35%),
             linear-gradient(180deg, var(--bg-2), var(--bg-1) 58%);
     }
 
@@ -67,7 +67,9 @@
         display: inline-block;
         margin: 0;
         color: var(--text);
-        text-decoration: none;
+        text-decoration: underline;
+        text-decoration-thickness: 0.06em;
+        text-underline-offset: 0.14em;
         font-size: clamp(2rem, 8vw, 4.6rem);
         font-weight: 700;
         line-height: 1.02;
@@ -109,12 +111,13 @@
     }
 
     .copy-button {
-        background: var(--accent);
-        color: var(--button-text);
+        background: rgba(255, 255, 255, 0.02);
+        color: var(--text);
+        border: 1px solid var(--panel-border);
     }
 
     .reroll-button {
-        background: transparent;
+        background: rgba(255, 255, 255, 0.02);
         color: var(--text);
         border: 1px solid var(--panel-border);
     }
@@ -142,7 +145,7 @@
     <section class="card" aria-labelledby="operationName">
         <p class="eyebrow">Random Operation</p>
         <a id="operationName" class="operation-name" href="#" target="_blank" rel="noopener noreferrer">Loading...</a>
-        <p class="hint">Copy the link, share it with teammates on the Discord.</p>
+        <p class="hint">Click operation title to preview it.</p>
         <div class="actions">
             <button id="copyButton" class="copy-button" type="button">Copy Briefing Link</button>
             <button id="rerollButton" class="reroll-button" type="button">Pick Another</button>
@@ -292,7 +295,7 @@
 
         try {
             await navigator.clipboard.writeText(currentOperation.url);
-            status.textContent = "Link copied.";
+            status.textContent = "Link copied ✅ Paste it on Discord for your teammates.";
         } catch (error) {
             const tempInput = document.createElement("input");
             tempInput.value = currentOperation.url;
@@ -300,7 +303,7 @@
             tempInput.select();
             document.execCommand("copy");
             document.body.removeChild(tempInput);
-            status.textContent = "Link copied.";
+            status.textContent = "Link copied ✅ Paste it on Discord for your teammates.";
         }
     }
 
