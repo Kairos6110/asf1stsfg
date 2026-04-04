@@ -68,12 +68,20 @@
         transform: translateY(-1px);
     }
     .discord-link {
-        display: inline-block;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
         margin-top: 10px;
         font-size: 0.8rem;
         letter-spacing: 0.8px;
-        text-decoration: underline;
+        text-decoration: none;
         opacity: 0.85;
+    }
+    .discord-link__icon {
+        width: 22px;
+        height: auto;
+        flex-shrink: 0;
+        fill: currentColor;
     }
     #operationSelect {
         width: min(320px, 90vw);
@@ -228,10 +236,14 @@
 
 
 <hr>
-<p style="font-size: 0.7em">Disclaimer: All content herein is entirely fictional and created solely for the purpose of military simulation (milsim) roleplay within the video game Ghost Recon Breakpoint. It is intended for entertainment use only and is not representative of real-world events, entities, or individuals.</p>
+<a class="discord-link" href="https://discord.gg/BXvQFwBq8z" onclick="window.open(this.href, 'asf-discord-window', 'noopener,noreferrer,popup=yes,width=1200,height=800'); return false;">
+    <svg class="discord-link__icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 127.14 96.36" aria-hidden="true" focusable="false">
+        <path d="M107.7 8.07A105.15 105.15 0 0 0 81.47 0a72.06 72.06 0 0 0-3.36 6.87 97.68 97.68 0 0 0-29.1 0A72.37 72.37 0 0 0 45.65 0a105.89 105.89 0 0 0-26.24 8.07C2.79 32.65-1.71 56.6.54 80.21a105.73 105.73 0 0 0 32.17 16.15 77.7 77.7 0 0 0 6.88-11.14 68.42 68.42 0 0 1-10.8-5.18c.91-.67 1.8-1.36 2.66-2.08a75.57 75.57 0 0 0 64.32 0c.87.72 1.76 1.41 2.66 2.08a68.68 68.68 0 0 1-10.81 5.19 77.25 77.25 0 0 0 6.88 11.13A105.25 105.25 0 0 0 126.6 80.2c2.64-27.29-4.5-51.03-18.9-72.13zM42.45 65.69c-6.14 0-11.18-5.64-11.18-12.57s4.96-12.57 11.18-12.57c6.23 0 11.27 5.64 11.18 12.57 0 6.93-4.95 12.57-11.18 12.57zm42.24 0c-6.14 0-11.18-5.64-11.18-12.57s4.96-12.57 11.18-12.57c6.23 0 11.27 5.64 11.18 12.57 0 6.93-4.95 12.57-11.18 12.57z"/>
+    </svg>
+    <span>ASF 1st SFG Discord Server</span>
+</a>
 
-<hr>
-<a class="discord-link" href="https://discord.gg/BXvQFwBq8z" onclick="window.open(this.href, 'asf-discord-window', 'noopener,noreferrer,popup=yes,width=1200,height=800'); return false;">Click here to reach the ASF 1st SFG Discord Server</a>
+<p style="font-size: 0.7em; opacity: 0.2;">Disclaimer: All content presented herein is entirely fictional and has been created exclusively for military simulation (milsim) roleplay within the video game Ghost Recon Breakpoint. This material is intended solely for entertainment purposes and does not represent or depict real-world events, organizations, or individuals. Any resemblance to actual persons, living or dead, or real-world entities is purely coincidental.</p>
 
 <script>
     function extractOperationName(rawValue) {
