@@ -5,212 +5,250 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Operation Renewed Hope</title>
 <style>
-@font-face {
-  font-family: "GG Sans";
-  src: url("Ground Branch Task Force - OPORDS BREAKPOINT ALPHA - op-renewed-hope [1132738687139057804].html_Files/ggsans-normal-400-1456D.woff2");
-  font-weight: 400;
-}
+    @font-face {
+      font-family: "GG Sans";
+      src: url("Ground Branch Task Force - OPORDS BREAKPOINT ALPHA - op-renewed-hope [1132738687139057804].html_Files/ggsans-normal-400-1456D.woff2") format("woff2");
+      font-weight: 400;
+      font-style: normal;
+    }
 
-@font-face {
-  font-family: "GG Sans";
-  src: url("Ground Branch Task Force - OPORDS BREAKPOINT ALPHA - op-renewed-hope [1132738687139057804].html_Files/ggsans-normal-600-C1EA8.woff2");
-  font-weight: 600;
-}
+    @font-face {
+      font-family: "GG Sans";
+      src: url("Ground Branch Task Force - OPORDS BREAKPOINT ALPHA - op-renewed-hope [1132738687139057804].html_Files/ggsans-normal-600-C1EA8.woff2") format("woff2");
+      font-weight: 600;
+      font-style: normal;
+    }
 
-@font-face {
-  font-family: "GG Sans";
-  src: url("Ground Branch Task Force - OPORDS BREAKPOINT ALPHA - op-renewed-hope [1132738687139057804].html_Files/ggsans-normal-700-1949A.woff2");
-  font-weight: 700;
-}
+    @font-face {
+      font-family: "GG Sans";
+      src: url("Ground Branch Task Force - OPORDS BREAKPOINT ALPHA - op-renewed-hope [1132738687139057804].html_Files/ggsans-normal-700-1949A.woff2") format("woff2");
+      font-weight: 700;
+      font-style: normal;
+    }
 
-:root {
-  --bg-top: #091015;
-  --bg-bottom: #162229;
-  --panel: rgba(16, 23, 28, 0.84);
-  --line: rgba(145, 168, 178, 0.2);
-  --text: #edf2f4;
-  --muted: #b8c4c9;
-  --accent: #b8c9d0;
-  --accent-strong: #d6b980;
-  --shadow: 0 24px 70px rgba(0, 0, 0, 0.42);
-  --gap: 18px;
-  --max: 1120px;
-}
+    :root {
+      --bg-top: #091015;
+      --bg-bottom: #162229;
+      --panel: rgba(16, 23, 28, 0.84);
+      --line: rgba(145, 168, 178, 0.2);
+      --text: #edf2f4;
+      --muted: #b8c4c9;
+      --accent: #b8c9d0;
+      --accent-strong: #d6b980;
+      --shadow: 0 24px 70px rgba(0, 0, 0, 0.42);
+      --gap: 18px;
+      --max: 1120px;
+    }
 
-* {
-  box-sizing: border-box;
-}
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
 
-body {
-  margin: 0;
-  background:
-    radial-gradient(circle at top left, rgba(92, 128, 145, 0.2), transparent 34%),
-    radial-gradient(circle at top right, rgba(143, 121, 81, 0.14), transparent 28%),
-    linear-gradient(180deg, var(--bg-top), #0f171d 45%, var(--bg-bottom));
-  color: var(--text);
-  font-family: "GG Sans", "Segoe UI Variable", "Trebuchet MS", sans-serif;
-}
+    body {
+      margin: 0;
+      min-width: 320px;
+      font-family: "GG Sans", "Segoe UI Variable", "Trebuchet MS", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(92, 128, 145, 0.2), transparent 30%),
+        radial-gradient(circle at top right, rgba(143, 121, 81, 0.14), transparent 24%),
+        linear-gradient(180deg, var(--bg-top) 0%, #0f171d 46%, var(--bg-bottom) 100%);
+    }
 
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  background-image:
-    linear-gradient(rgba(184, 196, 201, 0.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(184, 196, 201, 0.05) 1px, transparent 1px);
-  background-size: 32px 32px;
-  mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.8), transparent);
-}
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background:
+        linear-gradient(rgba(184, 201, 208, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(184, 201, 208, 0.03) 1px, transparent 1px);
+      background-size: 32px 32px;
+      mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.72), transparent 92%);
+    }
 
-.shell {
-  width: min(calc(100% - 32px), var(--max));
-  margin: 0 auto;
-  padding: 24px 0 48px;
-}
+    img {
+      display: block;
+      max-width: 100%;
+    }
 
-.hero,
-.meta-card,
-.panel,
-.intel,
-.objective,
-.support-card {
-  border: 1px solid var(--line);
-  border-radius: 28px;
-  background: var(--panel);
-  backdrop-filter: blur(12px);
-  box-shadow: var(--shadow);
-}
+    .shell {
+      width: min(calc(100% - 20px), var(--max));
+      margin: 0 auto;
+      padding: 16px 0 48px;
+    }
 
-.hero,
-.objective,
-.support-card {
-  overflow: hidden;
-}
+    .hero,
+    .meta-card,
+    .panel,
+    .intel,
+    .objective,
+    .support-card {
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      background: var(--panel);
+      backdrop-filter: blur(12px);
+      box-shadow: var(--shadow);
+    }
 
-.hero__content,
-.meta-card,
-.panel,
-.intel,
-.objective__body {
-  padding: 18px;
-}
+    .hero,
+    .objective,
+    .support-card {
+      overflow: hidden;
+    }
 
-h1,
-h2,
-h3,
-p {
-  margin: 0;
-}
+    .hero__content,
+    .meta-card,
+    .panel,
+    .intel,
+    .objective__body {
+      padding: 18px;
+    }
 
-h1,
-h2,
-h3 {
-  font-family: "Palatino Linotype", "Book Antiqua", Georgia, serif;
-  font-weight: 700;
-}
+    h1, h2, h3, .section__label {
+      font-family: "Palatino Linotype", "Book Antiqua", Georgia, serif;
+      letter-spacing: 0.02em;
+    }
 
-h1 {
-  font-size: clamp(3rem, 8vw, 5.5rem);
-  line-height: 0.92;
-  letter-spacing: -0.04em;
-  max-width: 760px;
-}
+    h1 {
+      margin: 0 0 12px;
+      font-size: clamp(2.2rem, 10vw, 5rem);
+      line-height: 0.92;
+      text-transform: uppercase;
+      overflow-wrap: anywhere;
+    }
 
-.hero__lede {
-  margin-top: 16px;
-  max-width: 760px;
-  font-size: 0.98rem;
-  line-height: 1.7;
-  color: var(--muted);
-}
+    .hero__lede {
+      max-width: 72ch;
+      margin: 0;
+      font-size: clamp(0.98rem, 3.8vw, 1.12rem);
+      line-height: 1.66;
+    }
 
-.hero__meta,
-.grid,
-.objectives,
-.support-grid {
-  display: grid;
-  gap: var(--gap);
-}
+    .hero__meta,
+    .grid,
+    .objectives,
+    .support-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: var(--gap);
+    }
 
-.hero__meta {
-  margin-top: 24px;
-}
+    .hero__meta {
+      margin-top: 24px;
+      gap: 12px;
+    }
 
-.meta-card__label,
-.panel__label,
-.intel__label,
-.objective__kicker {
-  font-size: 0.66rem;
-  font-weight: 700;
-  letter-spacing: 0.24em;
-  text-transform: uppercase;
-  color: var(--accent);
-}
+    .meta-card__label {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--muted);
+      font-size: 0.82rem;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+    }
 
-.meta-card__value {
-  margin-top: 12px;
-  font-size: 0.95rem;
-  line-height: 1.5;
-  color: var(--text);
-}
+    .meta-card__value {
+      font-size: 1.02rem;
+      font-weight: 700;
+      line-height: 1.45;
+    }
 
-.section {
-  margin-top: 18px;
-}
+    .grid { margin-top: var(--gap); }
 
-.panel h2,
-.intel h2,
-.objective h3 {
-  margin-top: 12px;
-  font-size: 1.8rem;
-  line-height: 1;
-  letter-spacing: -0.04em;
-}
+    .section__label {
+      margin: 0 0 14px;
+      color: var(--accent);
+      font-size: clamp(1.28rem, 5vw, 1.62rem);
+    }
 
-.panel p,
-.intel p,
-.objective p {
-  margin-top: 12px;
-  color: var(--muted);
-  font-size: 0.95rem;
-  line-height: 1.65;
-}
+    p, li { line-height: 1.7; }
+    p:last-child { margin-bottom: 0; }
 
-.objective,
-.support-card {
-  background: linear-gradient(180deg, rgba(25, 35, 42, 0.94), rgba(15, 22, 27, 0.94));
-}
+    .timeline {
+      display: grid;
+      gap: 12px;
+      margin: 18px 0 0;
+      padding: 0;
+      list-style: none;
+    }
 
-.objective__image,
-.support-card__image {
-  width: 100%;
-  display: block;
-  aspect-ratio: 16 / 9;
-  object-fit: contain;
-  object-position: center;
-  background: rgba(8, 12, 15, 0.92);
-}
+    .timeline li {
+      padding-top: 12px;
+      border-top: 1px solid rgba(184, 201, 208, 0.12);
+    }
 
-@media (min-width: 720px) {
-  .hero__meta,
-  .grid--two,
-  .objectives,
-  .support-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
+    .timeline li:first-child {
+      padding-top: 0;
+      border-top: 0;
+    }
 
-@media (min-width: 980px) {
-  .hero__meta {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
+    .timeline__time {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--accent-strong);
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
 
-  .grid--three {
-    grid-template-columns: 1.15fr 0.85fr 0.85fr;
-  }
-}
-</style>
+    .intel--alert {
+      background:
+        linear-gradient(180deg, rgba(84, 55, 42, 0.42), rgba(22, 23, 28, 0.88)),
+        var(--panel);
+    }
+
+    .objective,
+    .support-card {
+      background: linear-gradient(180deg, rgba(25, 35, 42, 0.94), rgba(15, 22, 27, 0.94));
+    }
+
+    .objective__kicker {
+      display: block;
+      margin-bottom: 10px;
+      color: var(--accent-strong);
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    .objective h3 {
+      margin: 0 0 10px;
+      font-size: 1.2rem;
+    }
+
+    .support-card__image {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      object-fit: contain;
+      object-position: center;
+      background: rgba(8, 12, 15, 0.92);
+    }
+
+    @media (min-width: 720px) {
+      .shell {
+        width: min(calc(100% - 36px), var(--max));
+        padding-top: 20px;
+      }
+
+      .hero__meta,
+      .grid--two,
+      .support-grid,
+      .objectives {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (min-width: 980px) {
+      .hero__meta {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+
+      .grid--three {
+        grid-template-columns: 1.15fr 0.85fr 0.85fr;
+      }
+    }
+  </style>
 </head>
 <body>
 <main class="shell">
@@ -220,61 +258,56 @@ h1 {
       <p class="hero__lede">Deploy from Erewhon, land northwest of Anti-Aircraft Ruins, rescue Julius Reilley, then roll through Sentinel Corp Land Base, the ammunition depot, and the equipment depot while standby teams move in to hold each cleared site.</p>
       <div class="hero__meta">
         <article class="meta-card">
-          <div class="meta-card__label">Launch Site</div>
-          <p class="meta-card__value">Erewhon HQ to LZ northwest of Anti-Aircraft Ruins.</p>
+          <span class="meta-card__label">Launch Site</span>
+          <div class="meta-card__value">Erewhon HQ to LZ northwest of Anti-Aircraft Ruins.</div>
         </article>
         <article class="meta-card">
-          <div class="meta-card__label">Primary Rescue</div>
-          <p class="meta-card__value">Julius Reilley, OST-6 marksman, held at Anti-Aircraft Ruins.</p>
+          <span class="meta-card__label">Primary Rescue</span>
+          <div class="meta-card__value">Julius Reilley, OST-6 marksman, held at Anti-Aircraft Ruins.</div>
         </article>
         <article class="meta-card">
-          <div class="meta-card__label">Depot Priority</div>
-          <p class="meta-card__value">Capture Land Base, Ammunition Depot, and Equipment Depot intact.</p>
+          <span class="meta-card__label">Depot Priority</span>
+          <div class="meta-card__value">Capture Land Base, Ammunition Depot, and Equipment Depot intact.</div>
         </article>
         <article class="meta-card">
-          <div class="meta-card__label">Air Threat</div>
-          <p class="meta-card__value">Active SAM coverage across Sinking Country. Use caution on movement and LZ timing.</p>
+          <span class="meta-card__label">Air Threat</span>
+          <div class="meta-card__value">Active SAM coverage across Sinking Country. Use caution on movement and LZ timing.</div>
         </article>
       </div>
     </div>
   </section>
 
-  <section class="section grid grid--two">
+  <section class="grid grid--two">
     <article class="panel">
-      <div class="panel__label">Situation</div>
-      <h2>Prisoner rescue and logistics recovery.</h2>
-      <p>Reilley was captured after heavy border fighting and is being held at the ruins. At the same time, ongoing battles have depleted friendly ammunition and kit stocks, and CYCLOPS has identified multiple Sentinel depots that can stabilize the line if seized quickly.</p>
+      <h2 class="section__label">Situation</h2>
+      <p>Prisoner rescue and logistics recovery. Reilley was captured after heavy border fighting and is being held at the ruins. At the same time, ongoing battles have depleted friendly ammunition and kit stocks, and CYCLOPS has identified multiple Sentinel depots that can stabilize the line if seized quickly.</p>
     </article>
     <article class="panel">
-      <div class="panel__label">Execution</div>
-      <h2>Clear each objective and call in the holding force.</h2>
-      <p>Insert at the northwest LZ, rescue Reilley, then move through each target site in sequence. Once a location is cleared, radio the standby teams forward so they can secure the perimeter while the assault element continues to the next objective.</p>
+      <h2 class="section__label">Execution</h2>
+      <p>Clear each objective and call in the holding force. Insert at the northwest LZ, rescue Reilley, then move through each target site in sequence. Once a location is cleared, radio the standby teams forward so they can secure the perimeter while the assault element continues to the next objective.</p>
     </article>
   </section>
 
-  <section class="section grid grid--three">
+  <section class="grid grid--three">
     <article class="intel">
-      <div class="intel__label">Target Of Opportunity</div>
-      <h2>Additional captures are greenlit.</h2>
-      <p>Any reachable Sentinel target can be hit if it does not compromise the core rescue/depot sequence.</p>
+      <h2 class="section__label">Target Of Opportunity</h2>
+      <p>Additional captures are greenlit. Any reachable Sentinel target can be hit if it does not compromise the core rescue/depot sequence.</p>
     </article>
     <article class="intel">
-      <div class="intel__label">Possible Detainees</div>
-      <h2>Check every site.</h2>
-      <p>ISR indicates detention cells may exist at all objectives, so sweep for imprisoned allies during each clearance.</p>
+      <h2 class="section__label">Possible Detainees</h2>
+      <p>Check every site. ISR indicates detention cells may exist at all objectives, so sweep for imprisoned allies during each clearance.</p>
     </article>
     <article class="intel">
-      <div class="intel__label">Comms Rhythm</div>
-      <h2>Report site handoff cleanly.</h2>
-      <p>Clearance calls should confirm all hostiles neutralized and authorize the standby element to advance and hold.</p>
+      <h2 class="section__label">Comms Rhythm</h2>
+      <p>Report site handoff cleanly. Clearance calls should confirm all hostiles neutralized and authorize the standby element to advance and hold.</p>
     </article>
   </section>
 
-  <section class="section objectives">
+  <section class="objectives">
     <article class="objective">
       <img class="objective__image" src="Ground Branch Task Force - OPORDS BREAKPOINT ALPHA - op-renewed-hope [1132738687139057804].html_Files/181838a6f9772-screenshotUrl-82F7A.png" alt="Anti-Aircraft Ruins objective reference" loading="lazy">
       <div class="objective__body">
-        <div class="objective__kicker">Alpha 1</div>
+        <span class="objective__kicker">Objective Alpha 1</span>
         <h3>Anti-Aircraft Ruins</h3>
         <p>Rescue Julius Reilley and secure the site as a secondary ammunition depot.</p>
       </div>
@@ -282,7 +315,7 @@ h1 {
     <article class="objective">
       <img class="objective__image" src="Ground Branch Task Force - OPORDS BREAKPOINT ALPHA - op-renewed-hope [1132738687139057804].html_Files/181838ad4b183-screenshotUrl-5AB11.png" alt="Sentinel Corp Land Base objective reference" loading="lazy">
       <div class="objective__body">
-        <div class="objective__kicker">Bravo 2</div>
+        <span class="objective__kicker">Objective Bravo 2</span>
         <h3>Sentinel Corp Land Base</h3>
         <p>Capture the base and convert it into the Outcast HQ for this sector.</p>
       </div>
@@ -290,7 +323,7 @@ h1 {
     <article class="objective">
       <img class="objective__image" src="Ground Branch Task Force - OPORDS BREAKPOINT ALPHA - op-renewed-hope [1132738687139057804].html_Files/181838b276c55-screenshotUrl-142AB.png" alt="Ammunition Depot objective reference" loading="lazy">
       <div class="objective__body">
-        <div class="objective__kicker">Charlie 3</div>
+        <span class="objective__kicker">Objective Charlie 3</span>
         <h3>Ammunition Depot</h3>
         <p>Clear the storage site and secure the stockpile for friendly resupply.</p>
       </div>
@@ -298,14 +331,14 @@ h1 {
     <article class="objective">
       <img class="objective__image" src="Ground Branch Task Force - OPORDS BREAKPOINT ALPHA - op-renewed-hope [1132738687139057804].html_Files/181838b5b0952-screenshotUrl-48178.png" alt="Equipment Depot objective reference" loading="lazy">
       <div class="objective__body">
-        <div class="objective__kicker">Delta 4</div>
+        <span class="objective__kicker">Objective Delta 4</span>
         <h3>Equipment Depot</h3>
         <p>Capture the final depot, finish the sweep for detainees, then RTB.</p>
       </div>
     </article>
   </section>
 
-  <section class="section support-grid">
+  <section class="support-grid">
     <article class="support-card">
       <img class="support-card__image" src="Ground Branch Task Force - OPORDS BREAKPOINT ALPHA - op-renewed-hope [1132738687139057804].html_Files/NEW_HOPE-5F412.png" alt="Operation Renewed Hope AO map" loading="lazy">
     </article>

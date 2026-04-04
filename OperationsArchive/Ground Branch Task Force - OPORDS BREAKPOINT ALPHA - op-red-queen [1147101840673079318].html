@@ -5,211 +5,250 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Operation Red Queen</title>
 <style>
-@font-face {
-  font-family: "GG Sans";
-  src: url("Ground Branch Task Force - OPORDS BREAKPOINT ALPHA - op-red-queen [1147101840673079318].html_Files/ggsans-normal-400-1456D.woff2");
-  font-weight: 400;
-}
+    @font-face {
+      font-family: "GG Sans";
+      src: url("Ground Branch Task Force - OPORDS BREAKPOINT ALPHA - op-red-queen [1147101840673079318].html_Files/ggsans-normal-400-1456D.woff2") format("woff2");
+      font-weight: 400;
+      font-style: normal;
+    }
 
-@font-face {
-  font-family: "GG Sans";
-  src: url("Ground Branch Task Force - OPORDS BREAKPOINT ALPHA - op-red-queen [1147101840673079318].html_Files/ggsans-normal-600-C1EA8.woff2");
-  font-weight: 600;
-}
+    @font-face {
+      font-family: "GG Sans";
+      src: url("Ground Branch Task Force - OPORDS BREAKPOINT ALPHA - op-red-queen [1147101840673079318].html_Files/ggsans-normal-600-C1EA8.woff2") format("woff2");
+      font-weight: 600;
+      font-style: normal;
+    }
 
-@font-face {
-  font-family: "GG Sans";
-  src: url("Ground Branch Task Force - OPORDS BREAKPOINT ALPHA - op-red-queen [1147101840673079318].html_Files/ggsans-normal-700-1949A.woff2");
-  font-weight: 700;
-}
+    @font-face {
+      font-family: "GG Sans";
+      src: url("Ground Branch Task Force - OPORDS BREAKPOINT ALPHA - op-red-queen [1147101840673079318].html_Files/ggsans-normal-700-1949A.woff2") format("woff2");
+      font-weight: 700;
+      font-style: normal;
+    }
 
-:root {
-  --bg-top: #091015;
-  --bg-bottom: #162229;
-  --panel: rgba(16, 23, 28, 0.84);
-  --line: rgba(145, 168, 178, 0.2);
-  --text: #edf2f4;
-  --muted: #b8c4c9;
-  --accent: #b8c9d0;
-  --accent-strong: #d6b980;
-  --shadow: 0 24px 70px rgba(0, 0, 0, 0.42);
-  --gap: 18px;
-  --max: 1120px;
-}
+    :root {
+      --bg-top: #091015;
+      --bg-bottom: #162229;
+      --panel: rgba(16, 23, 28, 0.84);
+      --line: rgba(145, 168, 178, 0.2);
+      --text: #edf2f4;
+      --muted: #b8c4c9;
+      --accent: #b8c9d0;
+      --accent-strong: #d6b980;
+      --shadow: 0 24px 70px rgba(0, 0, 0, 0.42);
+      --gap: 18px;
+      --max: 1120px;
+    }
 
-* {
-  box-sizing: border-box;
-}
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
 
-body {
-  margin: 0;
-  background:
-    radial-gradient(circle at top left, rgba(92, 128, 145, 0.2), transparent 34%),
-    radial-gradient(circle at top right, rgba(143, 121, 81, 0.14), transparent 28%),
-    linear-gradient(180deg, var(--bg-top), #0f171d 45%, var(--bg-bottom));
-  color: var(--text);
-  font-family: "GG Sans", "Segoe UI Variable", "Trebuchet MS", sans-serif;
-}
+    body {
+      margin: 0;
+      min-width: 320px;
+      font-family: "GG Sans", "Segoe UI Variable", "Trebuchet MS", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(92, 128, 145, 0.2), transparent 30%),
+        radial-gradient(circle at top right, rgba(143, 121, 81, 0.14), transparent 24%),
+        linear-gradient(180deg, var(--bg-top) 0%, #0f171d 46%, var(--bg-bottom) 100%);
+    }
 
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  background-image:
-    linear-gradient(rgba(184, 196, 201, 0.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(184, 196, 201, 0.05) 1px, transparent 1px);
-  background-size: 32px 32px;
-  mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.8), transparent);
-}
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background:
+        linear-gradient(rgba(184, 201, 208, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(184, 201, 208, 0.03) 1px, transparent 1px);
+      background-size: 32px 32px;
+      mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.72), transparent 92%);
+    }
 
-.shell {
-  width: min(calc(100% - 32px), var(--max));
-  margin: 0 auto;
-  padding: 24px 0 48px;
-}
+    img {
+      display: block;
+      max-width: 100%;
+    }
 
-.hero,
-.meta-card,
-.panel,
-.intel,
-.objective,
-.support-card {
-  border: 1px solid var(--line);
-  border-radius: 28px;
-  background: var(--panel);
-  backdrop-filter: blur(12px);
-  box-shadow: var(--shadow);
-}
+    .shell {
+      width: min(calc(100% - 20px), var(--max));
+      margin: 0 auto;
+      padding: 16px 0 48px;
+    }
 
-.hero,
-.objective,
-.support-card {
-  overflow: hidden;
-}
+    .hero,
+    .meta-card,
+    .panel,
+    .intel,
+    .objective,
+    .support-card {
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      background: var(--panel);
+      backdrop-filter: blur(12px);
+      box-shadow: var(--shadow);
+    }
 
-.hero__content,
-.meta-card,
-.panel,
-.intel,
-.objective__body {
-  padding: 18px;
-}
+    .hero,
+    .objective,
+    .support-card {
+      overflow: hidden;
+    }
 
-h1,
-h2,
-h3,
-p {
-  margin: 0;
-}
+    .hero__content,
+    .meta-card,
+    .panel,
+    .intel,
+    .objective__body {
+      padding: 18px;
+    }
 
-h1,
-h2,
-h3 {
-  font-family: "Palatino Linotype", "Book Antiqua", Georgia, serif;
-  font-weight: 700;
-}
+    h1, h2, h3, .section__label {
+      font-family: "Palatino Linotype", "Book Antiqua", Georgia, serif;
+      letter-spacing: 0.02em;
+    }
 
-h1 {
-  font-size: clamp(3rem, 8vw, 5.5rem);
-  line-height: 0.92;
-  letter-spacing: -0.04em;
-  max-width: 760px;
-}
+    h1 {
+      margin: 0 0 12px;
+      font-size: clamp(2.2rem, 10vw, 5rem);
+      line-height: 0.92;
+      text-transform: uppercase;
+      overflow-wrap: anywhere;
+    }
 
-.hero__lede {
-  margin-top: 16px;
-  max-width: 760px;
-  font-size: 0.98rem;
-  line-height: 1.7;
-  color: var(--muted);
-}
+    .hero__lede {
+      max-width: 72ch;
+      margin: 0;
+      font-size: clamp(0.98rem, 3.8vw, 1.12rem);
+      line-height: 1.66;
+    }
 
-.hero__meta,
-.grid,
-.objectives,
-.support-grid {
-  display: grid;
-  gap: var(--gap);
-}
+    .hero__meta,
+    .grid,
+    .objectives,
+    .support-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: var(--gap);
+    }
 
-.hero__meta {
-  margin-top: 24px;
-}
+    .hero__meta {
+      margin-top: 24px;
+      gap: 12px;
+    }
 
-.meta-card__label,
-.panel__label,
-.intel__label,
-.objective__kicker {
-  font-size: 0.66rem;
-  font-weight: 700;
-  letter-spacing: 0.24em;
-  text-transform: uppercase;
-  color: var(--accent);
-}
+    .meta-card__label {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--muted);
+      font-size: 0.82rem;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+    }
 
-.meta-card__value {
-  margin-top: 12px;
-  font-size: 0.95rem;
-  line-height: 1.5;
-  color: var(--text);
-}
+    .meta-card__value {
+      font-size: 1.02rem;
+      font-weight: 700;
+      line-height: 1.45;
+    }
 
-.section {
-  margin-top: 18px;
-}
+    .grid { margin-top: var(--gap); }
 
-.panel h2,
-.intel h2,
-.objective h3 {
-  margin-top: 12px;
-  font-size: 1.8rem;
-  line-height: 1;
-  letter-spacing: -0.04em;
-}
+    .section__label {
+      margin: 0 0 14px;
+      color: var(--accent);
+      font-size: clamp(1.28rem, 5vw, 1.62rem);
+    }
 
-.panel p,
-.intel p,
-.objective p {
-  margin-top: 12px;
-  color: var(--muted);
-  font-size: 0.95rem;
-  line-height: 1.65;
-}
+    p, li { line-height: 1.7; }
+    p:last-child { margin-bottom: 0; }
 
-.objective,
-.support-card {
-  background: linear-gradient(180deg, rgba(25, 35, 42, 0.94), rgba(15, 22, 27, 0.94));
-}
+    .timeline {
+      display: grid;
+      gap: 12px;
+      margin: 18px 0 0;
+      padding: 0;
+      list-style: none;
+    }
 
-.support-card__image {
-  width: 100%;
-  display: block;
-  aspect-ratio: 16 / 9;
-  object-fit: contain;
-  object-position: center;
-  background: rgba(8, 12, 15, 0.92);
-}
+    .timeline li {
+      padding-top: 12px;
+      border-top: 1px solid rgba(184, 201, 208, 0.12);
+    }
 
-@media (min-width: 720px) {
-  .hero__meta,
-  .grid--two,
-  .objectives,
-  .support-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
+    .timeline li:first-child {
+      padding-top: 0;
+      border-top: 0;
+    }
 
-@media (min-width: 980px) {
-  .hero__meta {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
+    .timeline__time {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--accent-strong);
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
 
-  .grid--three {
-    grid-template-columns: 1.15fr 0.85fr 0.85fr;
-  }
-}
-</style>
+    .intel--alert {
+      background:
+        linear-gradient(180deg, rgba(84, 55, 42, 0.42), rgba(22, 23, 28, 0.88)),
+        var(--panel);
+    }
+
+    .objective,
+    .support-card {
+      background: linear-gradient(180deg, rgba(25, 35, 42, 0.94), rgba(15, 22, 27, 0.94));
+    }
+
+    .objective__kicker {
+      display: block;
+      margin-bottom: 10px;
+      color: var(--accent-strong);
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    .objective h3 {
+      margin: 0 0 10px;
+      font-size: 1.2rem;
+    }
+
+    .support-card__image {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      object-fit: contain;
+      object-position: center;
+      background: rgba(8, 12, 15, 0.92);
+    }
+
+    @media (min-width: 720px) {
+      .shell {
+        width: min(calc(100% - 36px), var(--max));
+        padding-top: 20px;
+      }
+
+      .hero__meta,
+      .grid--two,
+      .support-grid,
+      .objectives {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (min-width: 980px) {
+      .hero__meta {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+
+      .grid--three {
+        grid-template-columns: 1.15fr 0.85fr 0.85fr;
+      }
+    }
+  </style>
 </head>
 <body>
 <main class="shell">
@@ -219,88 +258,83 @@ h1 {
       <p class="hero__lede">HALO from the Blackhawk at sundown, move in light black kits, restore Viper 04 comms, clear Checkpoint Viper Golf, raid Skell Foundation Head Office, recover the aircraft at Auroa Airport, then deliver it to Outcast allies at PLZ Watcher.</p>
       <div class="hero__meta">
         <article class="meta-card">
-          <div class="meta-card__label">Insertion</div>
-          <p class="meta-card__value">Blackhawk launch from HQ, HALO to the LZ at sundown.</p>
+          <span class="meta-card__label">Insertion</span>
+          <div class="meta-card__value">Blackhawk launch from HQ, HALO to the LZ at sundown.</div>
         </article>
         <article class="meta-card">
-          <div class="meta-card__label">Loadout</div>
-          <p class="meta-card__value">Light black kits for minimal footprint in the AO.</p>
+          <span class="meta-card__label">Loadout</span>
+          <div class="meta-card__value">Light black kits for minimal footprint in the AO.</div>
         </article>
         <article class="meta-card">
-          <div class="meta-card__label">Recon</div>
-          <p class="meta-card__value">No aerial ISR link. Mini drones are DCS-prepped and safe to use.</p>
+          <span class="meta-card__label">Recon</span>
+          <div class="meta-card__value">No aerial ISR link. Mini drones are DCS-prepped and safe to use.</div>
         </article>
         <article class="meta-card">
-          <div class="meta-card__label">End State</div>
-          <p class="meta-card__value">Fly plane and helicopter in formation to PLZ Watcher, then exfil to Hideout Neptune.</p>
+          <span class="meta-card__label">End State</span>
+          <div class="meta-card__value">Fly plane and helicopter in formation to PLZ Watcher, then exfil to Hideout Neptune.</div>
         </article>
       </div>
     </div>
   </section>
 
-  <section class="section grid grid--two">
+  <section class="grid grid--two">
     <article class="panel">
-      <div class="panel__label">Situation</div>
-      <h2>Critical infrastructure is under seizure across northeast Infinity.</h2>
-      <p>Enemy forces are taking over the comms network, blocking a key supply route, arresting Skell Technology civilians, and occupying Auroa Airport after receiving a plane with valuable equipment.</p>
+      <h2 class="section__label">Situation</h2>
+      <p>Critical infrastructure is under seizure across northeast Infinity. Enemy forces are taking over the comms network, blocking a key supply route, arresting Skell Technology civilians, and occupying Auroa Airport after receiving a plane with valuable equipment.</p>
     </article>
     <article class="panel">
-      <div class="panel__label">Execution</div>
-      <h2>Patrol, recon Alpha and Bravo, then flow through the full objective chain.</h2>
-      <p>Land undetected, conduct ground reconnaissance on the first two targets, clear each site in sequence, recover the plane at Delta, and transfer it to Outcast personnel at PLZ Watcher with a two-and-two formation split across aircraft and helicopter.</p>
+      <h2 class="section__label">Execution</h2>
+      <p>Patrol, recon Alpha and Bravo, then flow through the full objective chain. Land undetected, conduct ground reconnaissance on the first two targets, clear each site in sequence, recover the plane at Delta, and transfer it to Outcast personnel at PLZ Watcher with a two-and-two formation split across aircraft and helicopter.</p>
     </article>
   </section>
 
-  <section class="section grid grid--three">
+  <section class="grid grid--three">
     <article class="intel">
-      <div class="intel__label">Top Priority</div>
-      <h2>Restore comms and civilian security.</h2>
-      <p>Viper 04 must be reconnected to local teams, and civilians at Skell Foundation Head Office must be protected during the raid.</p>
+      <h2 class="section__label">Top Priority</h2>
+      <p>Restore comms and civilian security. Viper 04 must be reconnected to local teams, and civilians at Skell Foundation Head Office must be protected during the raid.</p>
     </article>
     <article class="intel">
-      <div class="intel__label">Route Interdiction</div>
-      <h2>Checkpoint Viper Golf must reopen.</h2>
-      <p>Clear the roadblock and intercept any enemy vehicles encountered on the MSR.</p>
+      <h2 class="section__label">Route Interdiction</h2>
+      <p>Checkpoint Viper Golf must reopen. Clear the roadblock and intercept any enemy vehicles encountered on the MSR.</p>
     </article>
     <article class="intel">
-      <div class="intel__label">Targets Of Opportunity</div>
-      <h2>Authorized if mission tempo holds.</h2>
-      <p>Additional objectives can be hit as long as they do not compromise the four primary tasks or the aircraft delivery.</p>
+      <h2 class="section__label">Targets Of Opportunity</h2>
+      <p>Authorized if mission tempo holds. Additional objectives can be hit as long as they do not compromise the four primary tasks or the aircraft delivery.</p>
     </article>
   </section>
 
-  <section class="section objectives">
+  <section class="objectives">
     <article class="objective">
       <div class="objective__body">
-        <div class="objective__kicker">Alpha</div>
+        <span class="objective__kicker">Objective Alpha</span>
         <h3>Control Station Viper 04</h3>
         <p>Secure the site and reestablish the local communications link.</p>
       </div>
     </article>
     <article class="objective">
       <div class="objective__body">
-        <div class="objective__kicker">Bravo</div>
+        <span class="objective__kicker">Objective Bravo</span>
         <h3>Checkpoint Viper Golf</h3>
         <p>Clear the checkpoint, reopen the supply corridor, and intercept enemy traffic.</p>
       </div>
     </article>
     <article class="objective">
       <div class="objective__body">
-        <div class="objective__kicker">Charlie</div>
+        <span class="objective__kicker">Objective Charlie</span>
         <h3>Skell Foundation Head Office</h3>
         <p>Exploit the office for intelligence and neutralize hostile forces threatening civilians.</p>
       </div>
     </article>
     <article class="objective">
       <div class="objective__body">
-        <div class="objective__kicker">Delta</div>
+        <span class="objective__kicker">Objective Delta</span>
         <h3>Auroa Airport</h3>
         <p>Secure the airfield, recover the plane, and depart toward PLZ Watcher.</p>
       </div>
     </article>
   </section>
 
-  <section class="section support-grid">
+  <section class="support-grid">
     <article class="support-card">
       <img class="support-card__image" src="Ground Branch Task Force - OPORDS BREAKPOINT ALPHA - op-red-queen [1147101840673079318].html_Files/18a50c0fc0993-screenshotUrl2-D10B7.jpg" alt="Operation Red Queen support image 1" loading="lazy">
     </article>
