@@ -88,6 +88,7 @@
     }
     #operationSelect {
         width: min(320px, 90vw);
+        box-sizing: border-box;
         padding: 14px 18px;
         border: 1px solid white;
         border-radius: 10px;
@@ -107,6 +108,78 @@
         color: white;
         text-align: center;
     }
+    .search-panel {
+        width: min(320px, 90vw);
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+    .search-panel label {
+        font-size: 0.95rem;
+    }
+    .search-input-row {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+    #operationSearchInput,
+    #searchResultsSelect {
+        width: 100%;
+        box-sizing: border-box;
+        padding: 14px 18px;
+        border: 1px solid white;
+        border-radius: 10px;
+        background-color: #202515;
+        color: white;
+        font-size: 1rem;
+        letter-spacing: 0.4px;
+        text-align: center;
+        box-shadow: 0 8px 18px rgba(0, 0, 0, 0.3);
+    }
+    #searchResultsSelect {
+        text-align: center;
+        text-align-last: center;
+        text-transform: uppercase;
+        cursor: pointer;
+    }
+    #searchResultsSelect option {
+        background-color: #202515;
+        color: white;
+        text-align: center;
+    }
+    #operationSearchInput::placeholder {
+        color: rgba(255, 255, 255, 0.65);
+    }
+    .search-button {
+        background: linear-gradient(180deg, #111 0%, #000 100%);
+        color: white;
+        width: 100%;
+        box-sizing: border-box;
+        padding: 14px 18px;
+        border: 1px solid white;
+        border-radius: 10px;
+        cursor: pointer;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+    }
+    .search-button:hover {
+        background: linear-gradient(180deg, #1c1c1c 0%, #050505 100%);
+    }
+    .search-status {
+        min-height: 1.1em;
+        font-size: 0.85rem;
+        font-weight: bold;
+        color: #f3d54e;
+    }
+    .search-results {
+        display: none;
+        flex-direction: column;
+        gap: 10px;
+    }
+    .search-results.is-visible {
+        display: flex;
+    }
     #operationLinks {
         display: none;
     }
@@ -125,6 +198,19 @@
     <select id="operationSelect" onchange="openSelectedOperation()">
         <option value="">...</option>
     </select>
+    <div class="search-panel">
+        <label for="operationSearchInput">or search op text by keyword:</label>
+        <div class="search-input-row">
+            <input id="operationSearchInput" type="text" placeholder="..." autocomplete="off">
+            <button type="button" class="search-button" onclick="searchOperations()">Search</button>
+        </div>
+        <div id="searchStatus" class="search-status" aria-live="polite"></div>
+        <div id="searchResultsContainer" class="search-results">
+            <select id="searchResultsSelect" onchange="openSearchResult()">
+                <option value="">...</option>
+            </select>
+        </div>
+    </div>
 </div>
 
 <div id="operationLinks">
@@ -248,6 +334,7 @@
 <hr>
 <p style="font-size: 0.7em; opacity: 0.2;">Disclaimer: All content presented herein is entirely fictional and has been created exclusively for military simulation (milsim) roleplay within the video game Ghost Recon Breakpoint. This material is intended solely for entertainment purposes and does not represent or depict real-world events, organizations, or individuals. Any resemblance to actual persons, living or dead, or real-world entities is purely coincidental.</p>
 
+<script src="op-search-index.js"></script>
 <script>
     function extractOperationName(rawValue) {
         const decodedValue = decodeURIComponent(rawValue);
@@ -282,6 +369,65 @@
         });
     }
 
+    function normalizeSearchText(value) {
+        return value
+            .toLowerCase()
+            .replace(/\s+/g, ' ')
+            .trim();
+    }
+
+    function toggleSearchResults(isVisible) {
+        const container = document.getElementById('searchResultsContainer');
+        container.classList.toggle('is-visible', isVisible);
+    }
+
+    function populateSearchResults(matches) {
+        const select = document.getElementById('searchResultsSelect');
+        const status = document.getElementById('searchStatus');
+
+        select.innerHTML = '<option value="">...</option>';
+
+        if (matches.length === 0) {
+            toggleSearchResults(true);
+            status.textContent = 'No matching operations found.';
+            return;
+        }
+
+        matches.forEach((operation) => {
+            const option = document.createElement('option');
+            option.value = operation.href;
+            option.textContent = extractOperationName(operation.href);
+            select.appendChild(option);
+        });
+
+        status.textContent = `${matches.length} matching operation${matches.length === 1 ? '' : 's'} found:`;
+        toggleSearchResults(true);
+    }
+
+    function searchOperations() {
+        const input = document.getElementById('operationSearchInput');
+        const rawQuery = input.value;
+        const normalizedQuery = normalizeSearchText(rawQuery);
+        const status = document.getElementById('searchStatus');
+        const operations = Array.isArray(window.OP_SEARCH_INDEX) ? window.OP_SEARCH_INDEX : [];
+
+        if (!normalizedQuery) {
+            status.textContent = 'Enter a keyword to search operation text.';
+            toggleSearchResults(false);
+            return;
+        }
+
+        const terms = normalizedQuery.split(' ');
+        const matches = operations
+            .filter((operation) => {
+                const haystack = `${operation.searchLabel || ''} ${operation.text || ''}`;
+                return terms.every((term) => haystack.includes(term));
+            })
+            .sort((left, right) => extractOperationName(left.href).localeCompare(extractOperationName(right.href)));
+
+        populateSearchResults(matches);
+    }
+
     function openSelectedOperation() {
         const selectedOperation = document.getElementById('operationSelect').value;
 
@@ -301,7 +447,29 @@
         }
     }
 
-    document.addEventListener('DOMContentLoaded', populateOperationDropdown);
+    function openSearchResult() {
+        const selectedOperation = document.getElementById('searchResultsSelect').value;
+
+        if (selectedOperation) {
+            window.location.href = selectedOperation;
+        }
+    }
+
+    function initializeSearch() {
+        const input = document.getElementById('operationSearchInput');
+
+        input.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                searchOperations();
+            }
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        populateOperationDropdown();
+        initializeSearch();
+    });
 </script>
 
 </body>
