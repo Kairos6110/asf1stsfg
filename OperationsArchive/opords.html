@@ -139,7 +139,6 @@
     #searchResultsSelect {
         text-align: center;
         text-align-last: center;
-        text-transform: uppercase;
         cursor: pointer;
     }
     #searchResultsSelect option {
@@ -207,7 +206,7 @@
         <div id="searchStatus" class="search-status" aria-live="polite"></div>
         <div id="searchResultsContainer" class="search-results">
             <select id="searchResultsSelect" onchange="openSearchResult()">
-                <option value="">...</option>
+                <option value="">Results</option>
             </select>
         </div>
     </div>
@@ -385,7 +384,7 @@
         const select = document.getElementById('searchResultsSelect');
         const status = document.getElementById('searchStatus');
 
-        select.innerHTML = '<option value="">...</option>';
+        select.innerHTML = '<option value="">Results</option>';
 
         if (matches.length === 0) {
             toggleSearchResults(true);
