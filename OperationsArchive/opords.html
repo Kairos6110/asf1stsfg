@@ -10,7 +10,7 @@
     color: white;
     font-family: Arial, sans-serif;
     text-align: center;
-    padding: 20px;
+    padding: 8px 20px 20px;
     }
     a {
     color: white;
@@ -23,7 +23,7 @@
     text-decoration: underline;
     }
     hr {
-        opacity: 0.5;
+        opacity: 0.25;
     }
     #searchContainer {
         margin-bottom: 20px;
@@ -85,6 +85,47 @@
         height: auto;
         flex-shrink: 0;
         fill: currentColor;
+    }
+    .disclaimer {
+        margin: 18px auto 0;
+        font-size: 0.7em;
+    }
+    .disclaimer-toggle {
+        background: none;
+        border: 0;
+        padding: 0;
+        color: rgba(255, 255, 255, 0.45);
+        font: inherit;
+        text-decoration: none;
+        cursor: pointer;
+    }
+    .disclaimer-toggle:hover,
+    .disclaimer-toggle:focus-visible {
+        color: rgba(255, 255, 255, 0.72);
+    }
+    .disclaimer-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        z-index: 1000;
+        background: rgba(0, 0, 0, 0.7);
+        padding: 24px;
+        box-sizing: border-box;
+        align-items: center;
+        justify-content: center;
+    }
+    .disclaimer.is-open .disclaimer-overlay {
+        display: flex;
+    }
+    .disclaimer-modal {
+        width: min(560px, 100%);
+        padding: 22px 24px;
+        border: 1px solid rgba(255, 255, 255, 0.45);
+        border-radius: 12px;
+        background: #202515;
+        color: rgba(255, 255, 255, 0.88);
+        line-height: 1.6;
+        box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
     }
     #operationSelect {
         width: min(320px, 90vw);
@@ -331,10 +372,25 @@
 </a>
 
 <hr>
-<p style="font-size: 0.7em; opacity: 0.2;">Disclaimer: All content presented herein is entirely fictional and has been created exclusively for military simulation (milsim) roleplay within the video game Ghost Recon Breakpoint. This material is intended solely for entertainment purposes and does not represent or depict real-world events, organizations, or individuals. Any resemblance to actual persons, living or dead, or real-world entities is purely coincidental.</p>
+<div id="disclaimer" class="disclaimer">
+    <button type="button" class="disclaimer-toggle" onclick="toggleDisclaimer()" aria-expanded="false" aria-controls="disclaimerOverlay">Disclaimer</button>
+    <div id="disclaimerOverlay" class="disclaimer-overlay" onclick="toggleDisclaimer()" aria-hidden="true">
+        <div class="disclaimer-modal" onclick="event.stopPropagation()">
+            <p>All content presented herein is entirely fictional and has been created exclusively for military simulation (milsim) roleplay within the video game Ghost Recon Breakpoint. This material is intended solely for entertainment purposes and does not represent or depict real-world events, organizations, or individuals. Any resemblance to actual persons, living or dead, or real-world entities is purely coincidental.</p>
+        </div>
+    </div>
+</div>
 
 <script src="op-search-index.js"></script>
 <script>
+    function toggleDisclaimer() {
+        const container = document.getElementById('disclaimer');
+        const button = container.querySelector('.disclaimer-toggle');
+        const isOpen = container.classList.toggle('is-open');
+        button.setAttribute('aria-expanded', String(isOpen));
+        document.getElementById('disclaimerOverlay').setAttribute('aria-hidden', String(!isOpen));
+    }
+
     function extractOperationName(rawValue) {
         const decodedValue = decodeURIComponent(rawValue);
         const fileName = decodedValue.split('/').pop().replace(/\.html$/i, '');
