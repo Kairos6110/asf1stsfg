@@ -5,8 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Ghost Recon Breakpoint Operations Vault </title>
 <style>
+    :root {
+        --ui-border-color: rgba(255, 255, 255, 0.5);
+    }
     body {
-    background-color: #333b24;
+    background-color: #2b311d;
     color: white;
     font-family: Arial, sans-serif;
     text-align: center;
@@ -22,16 +25,13 @@
     a:hover {
     text-decoration: underline;
     }
-    hr {
-        opacity: 0.25;
-    }
     #searchContainer {
         margin-bottom: 20px;
     }
     #searchContainer input[type="text"] {
         padding: 8px;
         width: 200px;
-        border: 1px solid white;
+        border: 1px solid var(--ui-border-color);
         background-color: #444;
         color: white;
     }
@@ -39,7 +39,7 @@
         background-color: black;
         color: white;
         padding: 8px 15px;
-        border: 1px solid white;
+        border: 1px solid var(--ui-border-color);
         cursor: pointer;
     }
     #searchContainer button:hover {
@@ -58,10 +58,10 @@
         font-size: 1rem;
         font-weight: bold;
         text-transform: uppercase;
-        letter-spacing: 1px;
+        letter-spacing: 0.8px;
         width: min(320px, 90vw);
         padding: 14px 18px;
-        border: 1px solid white;
+        border: 1px solid var(--ui-border-color);
         border-radius: 10px;
         cursor: pointer;
         box-shadow: 0 8px 18px rgba(0, 0, 0, 0.35);
@@ -86,52 +86,11 @@
         flex-shrink: 0;
         fill: currentColor;
     }
-    .disclaimer {
-        margin: 18px auto 0;
-        font-size: 0.7em;
-    }
-    .disclaimer-toggle {
-        background: none;
-        border: 0;
-        padding: 0;
-        color: rgba(255, 255, 255, 0.45);
-        font: inherit;
-        text-decoration: none;
-        cursor: pointer;
-    }
-    .disclaimer-toggle:hover,
-    .disclaimer-toggle:focus-visible {
-        color: rgba(255, 255, 255, 0.72);
-    }
-    .disclaimer-overlay {
-        display: none;
-        position: fixed;
-        inset: 0;
-        z-index: 1000;
-        background: rgba(0, 0, 0, 0.7);
-        padding: 24px;
-        box-sizing: border-box;
-        align-items: center;
-        justify-content: center;
-    }
-    .disclaimer.is-open .disclaimer-overlay {
-        display: flex;
-    }
-    .disclaimer-modal {
-        width: min(560px, 100%);
-        padding: 22px 24px;
-        border: 1px solid rgba(255, 255, 255, 0.45);
-        border-radius: 12px;
-        background: #202515;
-        color: rgba(255, 255, 255, 0.88);
-        line-height: 1.6;
-        box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
-    }
     #operationSelect {
         width: min(320px, 90vw);
         box-sizing: border-box;
         padding: 14px 18px;
-        border: 1px solid white;
+        border: 1px solid var(--ui-border-color);
         border-radius: 10px;
         background-color: #202515;
         color: white;
@@ -155,6 +114,12 @@
         flex-direction: column;
         gap: 10px;
     }
+    .search-panel__divider {
+        width: 100%;
+        height: 1px;
+        background: rgba(255, 255, 255, 0.28);
+        margin: 10px 0 6px;
+    }
     .search-panel label {
         font-size: 0.95rem;
     }
@@ -168,7 +133,7 @@
         width: 100%;
         box-sizing: border-box;
         padding: 14px 18px;
-        border: 1px solid white;
+        border: 1px solid var(--ui-border-color);
         border-radius: 10px;
         background-color: #202515;
         color: white;
@@ -196,7 +161,7 @@
         width: 100%;
         box-sizing: border-box;
         padding: 14px 18px;
-        border: 1px solid white;
+        border: 1px solid var(--ui-border-color);
         border-radius: 10px;
         cursor: pointer;
         font-weight: bold;
@@ -211,6 +176,9 @@
         font-size: 0.85rem;
         font-weight: bold;
         color: #f3d54e;
+    }
+    .search-status:empty {
+        display: none;
     }
     .search-results {
         display: none;
@@ -228,27 +196,22 @@
 <body>
 
 <img src="patch.png" alt="patch" style="display: block; margin: 0 auto 10px; width: 250px;">
-<br>
-<h2 style="margin-top: 0;">ASF 1st SFG Operations Vault</h2>
-
-<hr>
 <div class="operation-picker">
     <button type="button" class="random-op-button" onclick="pickRandomOperation()">Pick Random Operation</button>
     <label for="operationSelect">or select an operation:</label>
     <select id="operationSelect" onchange="openSelectedOperation()">
-        <option value="">...</option>
+        <option value="" hidden></option>
     </select>
     <div class="search-panel">
-        <label for="operationSearchInput">or search op text by keyword:</label>
+        <div class="search-panel__divider" aria-hidden="true"></div>
+        <label for="operationSearchInput">or search operation text:</label>
         <div class="search-input-row">
-            <input id="operationSearchInput" type="text" placeholder="..." autocomplete="off">
+            <input id="operationSearchInput" type="text" autocomplete="off">
             <button type="button" class="search-button" onclick="searchOperations()">Search</button>
         </div>
         <div id="searchStatus" class="search-status" aria-live="polite"></div>
         <div id="searchResultsContainer" class="search-results">
-            <select id="searchResultsSelect" onchange="openSearchResult()">
-                <option value="">Results</option>
-            </select>
+            <select id="searchResultsSelect" onchange="openSearchResult()"></select>
         </div>
     </div>
 </div>
@@ -363,7 +326,6 @@
 </div>
 
 
-<hr>
 <a class="discord-link" href="https://discord.gg/BXvQFwBq8z" onclick="window.open(this.href, 'asf-discord-window', 'noopener,noreferrer,popup=yes,width=1200,height=800'); return false;">
     <svg class="discord-link__icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 127.14 96.36" aria-hidden="true" focusable="false">
         <path d="M107.7 8.07A105.15 105.15 0 0 0 81.47 0a72.06 72.06 0 0 0-3.36 6.87 97.68 97.68 0 0 0-29.1 0A72.37 72.37 0 0 0 45.65 0a105.89 105.89 0 0 0-26.24 8.07C2.79 32.65-1.71 56.6.54 80.21a105.73 105.73 0 0 0 32.17 16.15 77.7 77.7 0 0 0 6.88-11.14 68.42 68.42 0 0 1-10.8-5.18c.91-.67 1.8-1.36 2.66-2.08a75.57 75.57 0 0 0 64.32 0c.87.72 1.76 1.41 2.66 2.08a68.68 68.68 0 0 1-10.81 5.19 77.25 77.25 0 0 0 6.88 11.13A105.25 105.25 0 0 0 126.6 80.2c2.64-27.29-4.5-51.03-18.9-72.13zM42.45 65.69c-6.14 0-11.18-5.64-11.18-12.57s4.96-12.57 11.18-12.57c6.23 0 11.27 5.64 11.18 12.57 0 6.93-4.95 12.57-11.18 12.57zm42.24 0c-6.14 0-11.18-5.64-11.18-12.57s4.96-12.57 11.18-12.57c6.23 0 11.27 5.64 11.18 12.57 0 6.93-4.95 12.57-11.18 12.57z"/>
@@ -371,26 +333,8 @@
     <span>ASF 1st SFG Discord Server</span>
 </a>
 
-<hr>
-<div id="disclaimer" class="disclaimer">
-    <button type="button" class="disclaimer-toggle" onclick="toggleDisclaimer()" aria-expanded="false" aria-controls="disclaimerOverlay">Disclaimer</button>
-    <div id="disclaimerOverlay" class="disclaimer-overlay" onclick="toggleDisclaimer()" aria-hidden="true">
-        <div class="disclaimer-modal" onclick="event.stopPropagation()">
-            <p>All content presented herein is entirely fictional and has been created exclusively for military simulation (milsim) roleplay within the video game Ghost Recon Breakpoint. This material is intended solely for entertainment purposes and does not represent or depict real-world events, organizations, or individuals. Any resemblance to actual persons, living or dead, or real-world entities is purely coincidental.</p>
-        </div>
-    </div>
-</div>
-
 <script src="op-search-index.js"></script>
 <script>
-    function toggleDisclaimer() {
-        const container = document.getElementById('disclaimer');
-        const button = container.querySelector('.disclaimer-toggle');
-        const isOpen = container.classList.toggle('is-open');
-        button.setAttribute('aria-expanded', String(isOpen));
-        document.getElementById('disclaimerOverlay').setAttribute('aria-hidden', String(!isOpen));
-    }
-
     function extractOperationName(rawValue) {
         const decodedValue = decodeURIComponent(rawValue);
         const fileName = decodedValue.split('/').pop().replace(/\.html$/i, '');
@@ -440,13 +384,14 @@
         const select = document.getElementById('searchResultsSelect');
         const status = document.getElementById('searchStatus');
 
-        select.innerHTML = '<option value="">Results</option>';
-
         if (matches.length === 0) {
-            toggleSearchResults(true);
-            status.textContent = 'No matching operations found.';
+            select.innerHTML = '';
+            toggleSearchResults(false);
+            status.textContent = 'No operations found with that text.';
             return;
         }
+
+        select.innerHTML = `<option value="">${matches.length} OP${matches.length === 1 ? '' : 's'} found:</option>`;
 
         matches.forEach((operation) => {
             const option = document.createElement('option');
@@ -455,7 +400,7 @@
             select.appendChild(option);
         });
 
-        status.textContent = `${matches.length} matching operation${matches.length === 1 ? '' : 's'} found:`;
+        status.textContent = '';
         toggleSearchResults(true);
     }
 
@@ -483,11 +428,15 @@
         populateSearchResults(matches);
     }
 
+    function openOperationWindow(targetUrl) {
+        window.open(targetUrl, '_blank', 'noopener,noreferrer');
+    }
+
     function openSelectedOperation() {
         const selectedOperation = document.getElementById('operationSelect').value;
 
         if (selectedOperation) {
-            window.location.href = selectedOperation;
+            openOperationWindow(selectedOperation);
         }
     }
 
@@ -496,7 +445,7 @@
 
         if (operations.length > 0) {
             const randomOperation = operations[Math.floor(Math.random() * operations.length)];
-            window.location.href = randomOperation.href;
+            openOperationWindow(randomOperation.href);
         } else {
             console.warn('No valid links available to pick from.');
         }
@@ -506,12 +455,42 @@
         const selectedOperation = document.getElementById('searchResultsSelect').value;
 
         if (selectedOperation) {
-            window.location.href = selectedOperation;
+            openOperationWindow(selectedOperation);
         }
     }
 
+    function prepareOperationSelection() {
+        const select = document.getElementById('operationSelect');
+
+        if (!select.value) {
+            return;
+        }
+
+        select.dataset.pendingValue = select.value;
+        select.value = '';
+    }
+
+    function restoreOperationSelection() {
+        const select = document.getElementById('operationSelect');
+
+        if (!select.value && select.dataset.pendingValue) {
+            select.value = select.dataset.pendingValue;
+        }
+
+        delete select.dataset.pendingValue;
+    }
+
     function initializeSearch() {
+        const operationSelect = document.getElementById('operationSelect');
         const input = document.getElementById('operationSearchInput');
+
+        operationSelect.addEventListener('pointerdown', prepareOperationSelection);
+        operationSelect.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter' || event.key === ' ' || event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+                prepareOperationSelection();
+            }
+        });
+        operationSelect.addEventListener('blur', restoreOperationSelection);
 
         input.addEventListener('keydown', (event) => {
             if (event.key === 'Enter') {
