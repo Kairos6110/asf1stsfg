@@ -6,17 +6,47 @@
 <title>Ghost Recon Breakpoint Operations Vault </title>
 <style>
     :root {
-        --ui-border-color: rgba(255, 255, 255, 0.5);
+        --bg-top: #091015;
+        --bg-bottom: #162229;
+        --panel: rgba(16, 23, 28, 0.84);
+        --panel-strong: rgba(20, 30, 36, 0.94);
+        --line: rgba(145, 168, 178, 0.2);
+        --line-strong: rgba(184, 201, 208, 0.36);
+        --text: #edf2f4;
+        --muted: #b8c4c9;
+        --accent: #b8c9d0;
+        --accent-strong: #d6b980;
+        --shadow: 0 24px 70px rgba(0, 0, 0, 0.42);
+        --ui-border-color: var(--line-strong);
+    }
+    * {
+        box-sizing: border-box;
     }
     body {
-    background-color: #2b311d;
-    color: white;
-    font-family: Arial, sans-serif;
+    margin: 0;
+    min-height: 100vh;
+    min-width: 320px;
+    color: var(--text);
+    font-family: "Segoe UI Variable", "Trebuchet MS", Arial, sans-serif;
     text-align: center;
-    padding: 8px 20px 20px;
+    padding: 14px 20px 28px;
+    background:
+        radial-gradient(circle at top left, rgba(92, 128, 145, 0.2), transparent 30%),
+        radial-gradient(circle at top right, rgba(143, 121, 81, 0.14), transparent 24%),
+        linear-gradient(180deg, var(--bg-top) 0%, #0f171d 46%, var(--bg-bottom) 100%);
+    }
+    body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        background:
+            linear-gradient(rgba(184, 201, 208, 0.03) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(184, 201, 208, 0.03) 1px, transparent 1px);
+        background-size: 32px 32px;
     }
     a {
-    color: white;
+    color: var(--text);
     text-decoration: none;
     font-size: 20px;
     display: block;
@@ -25,36 +55,30 @@
     a:hover {
     text-decoration: underline;
     }
-    #searchContainer {
-        margin-bottom: 20px;
+    .shell {
+        width: min(calc(100% - 20px), 720px);
+        margin: 0 auto;
+        position: relative;
+        z-index: 1;
     }
-    #searchContainer input[type="text"] {
-        padding: 8px;
-        width: 200px;
-        border: 1px solid var(--ui-border-color);
-        background-color: #444;
-        color: white;
-    }
-    #searchContainer button {
-        background-color: black;
-        color: white;
-        padding: 8px 15px;
-        border: 1px solid var(--ui-border-color);
-        cursor: pointer;
-    }
-    #searchContainer button:hover {
-        background-color: #1a1a1a;
+    .vault-card {
+        padding: 18px 20px 18px;
+        border: 1px solid var(--line);
+        border-radius: 28px;
+        background: var(--panel);
+        backdrop-filter: blur(12px);
+        box-shadow: var(--shadow);
     }
     .operation-picker {
         display: flex;
         flex-direction: column;
         align-items: center;
         gap: 16px;
-        margin: 24px auto 30px;
+        margin: 0 auto;
     }
     .random-op-button {
-        background: linear-gradient(180deg, #111 0%, #000 100%);
-        color: white;
+        background: linear-gradient(180deg, rgba(25, 35, 42, 0.94), rgba(15, 22, 27, 0.94));
+        color: var(--text);
         font-size: 1rem;
         font-weight: bold;
         text-transform: uppercase;
@@ -62,23 +86,24 @@
         width: min(320px, 90vw);
         padding: 14px 18px;
         border: 1px solid var(--ui-border-color);
-        border-radius: 10px;
+        border-radius: 16px;
         cursor: pointer;
-        box-shadow: 0 8px 18px rgba(0, 0, 0, 0.35);
+        box-shadow: 0 14px 34px rgba(0, 0, 0, 0.28);
     }
     .random-op-button:hover {
-        background: linear-gradient(180deg, #1c1c1c 0%, #050505 100%);
+        background: linear-gradient(180deg, rgba(37, 51, 60, 0.98), rgba(18, 26, 31, 0.98));
         transform: translateY(-1px);
     }
     .discord-link {
         display: inline-flex;
         align-items: center;
         gap: 10px;
-        margin-top: 10px;
-        font-size: 0.8rem;
+        margin-top: 20px;
+        font-size: 0.78rem;
         letter-spacing: 0.8px;
         text-decoration: none;
-        opacity: 0.85;
+        opacity: 0.8;
+        color: var(--muted);
     }
     .discord-link__icon {
         width: 22px;
@@ -86,14 +111,26 @@
         flex-shrink: 0;
         fill: currentColor;
     }
+    .discord-link:hover {
+        color: var(--text);
+        text-decoration: none;
+    }
+    .control-label {
+        margin: 0;
+        color: var(--muted);
+        font-size: 0.82rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.14em;
+    }
     #operationSelect {
         width: min(320px, 90vw);
         box-sizing: border-box;
         padding: 14px 18px;
         border: 1px solid var(--ui-border-color);
-        border-radius: 10px;
-        background-color: #202515;
-        color: white;
+        border-radius: 16px;
+        background: var(--panel-strong);
+        color: var(--text);
         font-size: 1rem;
         font-weight: bold;
         letter-spacing: 0.8px;
@@ -101,21 +138,22 @@
         text-align-last: center;
         text-transform: uppercase;
         cursor: pointer;
-        box-shadow: 0 8px 18px rgba(0, 0, 0, 0.3);
+        box-shadow: 0 14px 34px rgba(0, 0, 0, 0.28);
     }
     #operationSelect option {
-        background-color: #202515;
-        color: white;
+        background-color: #152027;
+        color: var(--text);
         text-align: center;
     }
     .search-panel {
         width: min(320px, 90vw);
         display: flex;
         flex-direction: column;
-        gap: 10px;
+        gap: 12px;
+        margin-top: 6px;
     }
     .search-panel label {
-        font-size: 0.95rem;
+        margin: 0;
     }
     .search-input-row {
         display: flex;
@@ -128,13 +166,13 @@
         box-sizing: border-box;
         padding: 14px 18px;
         border: 1px solid var(--ui-border-color);
-        border-radius: 10px;
-        background-color: #202515;
-        color: white;
+        border-radius: 16px;
+        background: var(--panel-strong);
+        color: var(--text);
         font-size: 1rem;
         letter-spacing: 0.4px;
         text-align: center;
-        box-shadow: 0 8px 18px rgba(0, 0, 0, 0.3);
+        box-shadow: 0 14px 34px rgba(0, 0, 0, 0.28);
     }
     #searchResultsSelect {
         text-align: center;
@@ -142,34 +180,34 @@
         cursor: pointer;
     }
     #searchResultsSelect option {
-        background-color: #202515;
-        color: white;
+        background-color: #152027;
+        color: var(--text);
         text-align: center;
     }
     #operationSearchInput::placeholder {
-        color: rgba(255, 255, 255, 0.65);
+        color: rgba(237, 242, 244, 0.42);
     }
     .search-button {
-        background: linear-gradient(180deg, #111 0%, #000 100%);
-        color: white;
+        background: linear-gradient(180deg, rgba(25, 35, 42, 0.94), rgba(15, 22, 27, 0.94));
+        color: var(--text);
         width: 100%;
         box-sizing: border-box;
         padding: 14px 18px;
         border: 1px solid var(--ui-border-color);
-        border-radius: 10px;
+        border-radius: 16px;
         cursor: pointer;
         font-weight: bold;
         text-transform: uppercase;
         letter-spacing: 0.8px;
     }
     .search-button:hover {
-        background: linear-gradient(180deg, #1c1c1c 0%, #050505 100%);
+        background: linear-gradient(180deg, rgba(37, 51, 60, 0.98), rgba(18, 26, 31, 0.98));
     }
     .search-status {
         min-height: 1.1em;
-        font-size: 0.85rem;
+        font-size: 0.82rem;
         font-weight: bold;
-        color: #f3d54e;
+        color: var(--accent-strong);
     }
     .search-status:empty {
         display: none;
@@ -188,27 +226,35 @@
 </style>
 </head>
 <body>
-
-<img src="patch.png" alt="patch" style="display: block; margin: 0 auto 10px; width: 250px;">
-<div class="operation-picker">
-    <button type="button" class="random-op-button" onclick="pickRandomOperation()">Pick Random Operation</button>
-    <label for="operationSelect">or select an operation:</label>
-    <select id="operationSelect" onchange="openSelectedOperation()">
-        <option value="" hidden></option>
-    </select>
-    <div class="search-panel">
-        <label for="operationSearchInput">or search operation text:</label>
-        <div class="search-input-row">
-            <input id="operationSearchInput" type="text" autocomplete="off">
-            <button type="button" class="search-button" onclick="searchOperations()">Search</button>
+<div class="shell">
+    <div class="vault-card">
+        <img src="patch.png" alt="patch" style="display: block; margin: 0 auto 20px; width: 250px;">
+        <div class="operation-picker">
+            <button type="button" class="random-op-button" onclick="pickRandomOperation()">Pick Random Operation</button>
+            <label class="control-label" for="operationSelect">or select an operation</label>
+            <select id="operationSelect" onchange="openSelectedOperation()">
+                <option value="" hidden></option>
+            </select>
+            <div class="search-panel">
+                <label class="control-label" for="operationSearchInput">or search operation text</label>
+                <div class="search-input-row">
+                    <input id="operationSearchInput" type="text" autocomplete="off">
+                    <button type="button" class="search-button" onclick="searchOperations()">Search</button>
+                </div>
+                <div id="searchStatus" class="search-status" aria-live="polite"></div>
+                <div id="searchResultsContainer" class="search-results">
+                    <select id="searchResultsSelect" onchange="openSearchResult()"></select>
+                </div>
+            </div>
         </div>
-        <div id="searchStatus" class="search-status" aria-live="polite"></div>
-        <div id="searchResultsContainer" class="search-results">
-            <select id="searchResultsSelect" onchange="openSearchResult()"></select>
-        </div>
+        <a class="discord-link" href="https://discord.gg/BXvQFwBq8z" onclick="window.open(this.href, 'asf-discord-window', 'noopener,noreferrer,popup=yes,width=1200,height=800'); return false;">
+            <svg class="discord-link__icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 127.14 96.36" aria-hidden="true" focusable="false">
+                <path d="M107.7 8.07A105.15 105.15 0 0 0 81.47 0a72.06 72.06 0 0 0-3.36 6.87 97.68 97.68 0 0 0-29.1 0A72.37 72.37 0 0 0 45.65 0a105.89 105.89 0 0 0-26.24 8.07C2.79 32.65-1.71 56.6.54 80.21a105.73 105.73 0 0 0 32.17 16.15 77.7 77.7 0 0 0 6.88-11.14 68.42 68.42 0 0 1-10.8-5.18c.91-.67 1.8-1.36 2.66-2.08a75.57 75.57 0 0 0 64.32 0c.87.72 1.76 1.41 2.66 2.08a68.68 68.68 0 0 1-10.81 5.19 77.25 77.25 0 0 0 6.88 11.13A105.25 105.25 0 0 0 126.6 80.2c2.64-27.29-4.5-51.03-18.9-72.13zM42.45 65.69c-6.14 0-11.18-5.64-11.18-12.57s4.96-12.57 11.18-12.57c6.23 0 11.27 5.64 11.18 12.57 0 6.93-4.95 12.57-11.18 12.57zm42.24 0c-6.14 0-11.18-5.64-11.18-12.57s4.96-12.57 11.18-12.57c6.23 0 11.27 5.64 11.18 12.57 0 6.93-4.95 12.57-11.18 12.57z"/>
+            </svg>
+            <span>ASF 1st SFG Discord Server</span>
+        </a>
     </div>
 </div>
-
 <div id="operationLinks">
     <a href="Ground%20Branch%20Task%20Force%20-%20OPORDS%20BREAKPOINT%20ALPHA%20-%20op-antidote%20%5B1132034939655831633%5D.html">op-antidote</a>
     <a href="Ground%20Branch%20Task%20Force%20-%20OPORDS%20BREAKPOINT%20ALPHA%20-%20op-backhand%20%5B1131651353249337494%5D.html">op-backhand</a>
@@ -318,13 +364,6 @@
     <a href="op-terminal.html">op-terminal</a>
 </div>
 
-
-<a class="discord-link" href="https://discord.gg/BXvQFwBq8z" onclick="window.open(this.href, 'asf-discord-window', 'noopener,noreferrer,popup=yes,width=1200,height=800'); return false;">
-    <svg class="discord-link__icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 127.14 96.36" aria-hidden="true" focusable="false">
-        <path d="M107.7 8.07A105.15 105.15 0 0 0 81.47 0a72.06 72.06 0 0 0-3.36 6.87 97.68 97.68 0 0 0-29.1 0A72.37 72.37 0 0 0 45.65 0a105.89 105.89 0 0 0-26.24 8.07C2.79 32.65-1.71 56.6.54 80.21a105.73 105.73 0 0 0 32.17 16.15 77.7 77.7 0 0 0 6.88-11.14 68.42 68.42 0 0 1-10.8-5.18c.91-.67 1.8-1.36 2.66-2.08a75.57 75.57 0 0 0 64.32 0c.87.72 1.76 1.41 2.66 2.08a68.68 68.68 0 0 1-10.81 5.19 77.25 77.25 0 0 0 6.88 11.13A105.25 105.25 0 0 0 126.6 80.2c2.64-27.29-4.5-51.03-18.9-72.13zM42.45 65.69c-6.14 0-11.18-5.64-11.18-12.57s4.96-12.57 11.18-12.57c6.23 0 11.27 5.64 11.18 12.57 0 6.93-4.95 12.57-11.18 12.57zm42.24 0c-6.14 0-11.18-5.64-11.18-12.57s4.96-12.57 11.18-12.57c6.23 0 11.27 5.64 11.18 12.57 0 6.93-4.95 12.57-11.18 12.57z"/>
-    </svg>
-    <span>ASF 1st SFG Discord Server</span>
-</a>
 
 <script src="op-search-index.js"></script>
 <script>
