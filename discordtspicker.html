@@ -6,315 +6,325 @@
   <meta name="theme-color" content="#0b0f14">
   <meta name="color-scheme" content="dark">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <title>Discord Timestamp Picker</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 64 64%27%3E%3Ctext y=%2750%27 font-size=%2750%27%3E%F0%9F%95%91%3C/text%3E%3C/svg%3E">
+  <title>Magic Discord Timestamp</title>
   <style>
     :root {
       color-scheme: dark;
-      --bg: #0b0f14;
-      --panel: rgba(15, 21, 29, 0.84);
-      --panel-strong: rgba(13, 19, 27, 0.96);
-      --text: #eef3f8;
-      --muted: #9aa7b4;
-      --accent: #4dd4a8;
-      --accent-strong: #269a79;
-      --accent-soft: rgba(77, 212, 168, 0.14);
+      --text: #ecf4ff;
+      --muted: #98a8bc;
+      --muted-strong: #bfd0e3;
+      --accent: #58d8ad;
+      --accent-strong: #2f9f7f;
+      --accent-soft: rgba(88, 216, 173, 0.16);
       --border: rgba(255, 255, 255, 0.1);
-      --shadow: 0 24px 60px rgba(0, 0, 0, 0.34);
-      --radius: 24px;
+      --panel: linear-gradient(180deg, rgba(16, 24, 33, 0.96), rgba(9, 14, 20, 0.98));
+      --frame-y: clamp(12px, 3dvh, 28px);
+      --frame-x: clamp(10px, 2.6vw, 24px);
+      --card-pad: clamp(14px, 2.2vmin, 24px);
+      --section-gap: clamp(12px, 2vh, 20px);
+      --stack-gap: clamp(10px, 1.6vh, 14px);
+      --radius: clamp(22px, 2.6vmin, 30px);
+      --field-h: clamp(46px, 6vh, 54px);
+      --btn-h: clamp(48px, 6.4vh, 56px);
+      --body-size: clamp(0.9rem, 1rem + 0.2vw, 1rem);
+      --label-size: clamp(0.76rem, 0.9rem + 0.1vw, 0.9rem);
     }
 
     * {
       box-sizing: border-box;
     }
 
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+
     body {
       margin: 0;
-      min-height: 100vh;
-      min-height: 100dvh;
+      height: 100dvh;
+      padding-top: max(var(--frame-y), env(safe-area-inset-top));
+      padding-right: max(var(--frame-x), env(safe-area-inset-right));
+      padding-bottom: max(var(--frame-y), env(safe-area-inset-bottom));
+      padding-left: max(var(--frame-x), env(safe-area-inset-left));
       display: grid;
       place-items: center;
-      padding: 24px;
-      font-family: "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
+      font-family: "Avenir Next", "Trebuchet MS", "Segoe UI", sans-serif;
+      font-size: var(--body-size);
       color: var(--text);
       background:
-        radial-gradient(circle at top left, rgba(77, 212, 168, 0.14), transparent 30%),
-        radial-gradient(circle at bottom right, rgba(58, 108, 255, 0.16), transparent 24%),
-        linear-gradient(160deg, #091018 0%, #0d141d 48%, #111a25 100%);
-    }
-
-    body::before,
-    body::after {
-      content: "";
-      position: fixed;
-      inset: auto;
-      border-radius: 999px;
-      filter: blur(12px);
-      z-index: 0;
-      pointer-events: none;
-    }
-
-    body::before {
-      width: 180px;
-      height: 180px;
-      top: 8%;
-      right: -48px;
-      background: rgba(77, 212, 168, 0.1);
-    }
-
-    body::after {
-      width: 220px;
-      height: 220px;
-      bottom: -60px;
-      left: -80px;
-      background: rgba(91, 124, 250, 0.12);
+        radial-gradient(circle at 14% 12%, rgba(88, 216, 173, 0.18), transparent 40%),
+        radial-gradient(circle at 88% 14%, rgba(54, 128, 232, 0.2), transparent 36%),
+        radial-gradient(circle at 50% 100%, rgba(52, 117, 170, 0.22), transparent 48%),
+        #060b11;
     }
 
     .shell {
-      position: relative;
-      z-index: 1;
-      width: min(100%, 420px);
-      display: grid;
-      place-items: center;
+      width: min(100%, 760px);
+      max-height: calc(100dvh - (2 * var(--frame-y)));
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
-    .trigger {
-      appearance: none;
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      background: linear-gradient(180deg, rgba(24, 32, 43, 0.96), rgba(15, 22, 31, 0.94));
-      color: var(--text);
+    .card {
       width: 100%;
-      min-height: 64px;
-      padding: 18px 24px;
-      border-radius: 999px;
-      box-shadow: var(--shadow);
-      font-size: 1rem;
-      font-weight: 700;
-      letter-spacing: 0.01em;
-      cursor: pointer;
-      transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-    }
-
-    .trigger:hover,
-    .trigger:focus-visible {
-      transform: translateY(-1px);
-      box-shadow: 0 28px 70px rgba(0, 0, 0, 0.42);
-      border-color: rgba(77, 212, 168, 0.3);
-      outline: none;
-    }
-
-    dialog {
-      width: min(calc(100vw - 28px), 420px);
-      border: 0;
-      padding: 0;
-      border-radius: 28px;
-      background: var(--panel-strong);
-      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.46);
-      color: var(--text);
-    }
-
-    dialog::backdrop {
-      background: rgba(3, 5, 8, 0.62);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
+      max-height: 100%;
+      border-radius: var(--radius);
+      background: var(--panel);
+      border: 1px solid rgba(255, 255, 255, 0.09);
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.06),
+        0 28px 60px rgba(0, 0, 0, 0.48);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
     }
 
     .panel {
-      padding: 22px;
+      margin: 0;
+      padding: var(--card-pad);
       display: grid;
-      gap: 18px;
-    }
-
-    .eyebrow {
-      margin: 0;
-      font-size: 0.78rem;
-      font-weight: 700;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--muted);
-    }
-
-    h1 {
-      margin: 0;
-      font-size: 1.45rem;
-      line-height: 1.1;
-    }
-
-    .description {
-      margin: 0;
-      color: var(--muted);
-      line-height: 1.5;
-      font-size: 0.96rem;
+      gap: var(--section-gap);
     }
 
     .stage {
       display: grid;
-      gap: 14px;
+      gap: var(--section-gap);
     }
 
-    .stage[hidden] {
-      display: none;
+    .field-grid {
+      display: grid;
+      gap: var(--stack-gap);
     }
 
     .field {
       display: grid;
-      gap: 8px;
+      gap: clamp(4px, 0.8vh, 7px);
     }
 
     .field label {
-      font-size: 0.92rem;
+      font-size: var(--label-size);
       font-weight: 700;
+      color: var(--muted-strong);
     }
 
     .field input {
       width: 100%;
-      min-height: 56px;
-      border-radius: 18px;
+      height: var(--field-h);
+      border-radius: clamp(12px, 1.8vmin, 18px);
       border: 1px solid var(--border);
-      padding: 0 16px;
+      padding: 0 clamp(10px, 2.2vmin, 16px);
       font: inherit;
       color: var(--text);
-      background: rgba(255, 255, 255, 0.04);
+      background: rgba(255, 255, 255, 0.045);
       outline: none;
     }
 
     .field input:focus-visible {
-      border-color: rgba(29, 107, 87, 0.45);
+      border-color: rgba(88, 216, 173, 0.52);
       box-shadow: 0 0 0 4px var(--accent-soft);
+    }
+
+    .preview-grid {
+      display: grid;
+      gap: var(--stack-gap);
     }
 
     .preview {
       margin: 0;
-      padding: 14px 16px;
-      border-radius: 18px;
-      background: rgba(255, 255, 255, 0.04);
+      padding: clamp(12px, 1.8vh, 16px) clamp(12px, 2vmin, 16px);
+      border-radius: clamp(12px, 1.9vmin, 18px);
+      background: rgba(255, 255, 255, 0.045);
       border: 1px solid rgba(255, 255, 255, 0.08);
-      line-height: 1.45;
+      line-height: 1.3;
+      color: var(--muted);
+      display: grid;
+      align-content: center;
+      gap: clamp(2px, 0.7vh, 5px);
+      min-height: 0;
+    }
+
+    .preview-label {
+      font-size: clamp(0.62rem, 1.1vh, 0.75rem);
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
       color: var(--muted);
     }
 
-    .preview strong {
+    .preview-value {
       color: var(--text);
+      word-break: break-word;
     }
 
     .actions {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
+      gap: var(--stack-gap);
     }
 
     .btn {
       appearance: none;
-      min-height: 52px;
-      border-radius: 16px;
+      height: var(--btn-h);
+      border-radius: clamp(12px, 1.8vmin, 16px);
       border: 0;
       font: inherit;
-      font-weight: 700;
+      font-weight: 800;
+      letter-spacing: 0.01em;
       cursor: pointer;
-      transition: transform 160ms ease, opacity 160ms ease, background 160ms ease;
+      transition: transform 140ms ease, filter 140ms ease, opacity 140ms ease;
     }
 
     .btn:disabled {
-      opacity: 0.45;
+      opacity: 0.48;
       cursor: not-allowed;
-    }
-
-    .btn-secondary {
-      background: rgba(255, 255, 255, 0.06);
-      color: var(--text);
     }
 
     .btn-primary {
       background: linear-gradient(180deg, var(--accent), var(--accent-strong));
-      color: #07110f;
-      box-shadow: 0 14px 30px rgba(38, 154, 121, 0.28);
+      color: #07140f;
+      box-shadow: 0 12px 24px rgba(47, 159, 127, 0.28);
     }
 
     .btn:not(:disabled):hover,
     .btn:not(:disabled):focus-visible {
       transform: translateY(-1px);
+      filter: brightness(1.04);
       outline: none;
     }
 
     .toast {
       position: fixed;
       left: 50%;
-      bottom: 18px;
-      width: min(calc(100vw - 24px), 560px);
-      transform: translate(-50%, 130%);
-      padding: 16px 18px;
-      border-radius: 22px;
-      background: rgba(9, 13, 18, 0.96);
-      color: #eef3f8;
-      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.4);
-      transition: transform 220ms ease;
-      z-index: 20;
-      line-height: 1.5;
+      top: 50%;
+      width: min(calc(100vw - 28px), 520px);
+      transform: translate(-50%, -50%) scale(0.92);
+      padding: clamp(16px, 2.8vh, 22px) clamp(16px, 3vmin, 24px);
+      border-radius: clamp(18px, 2.6vmin, 24px);
+      border: 1px solid rgba(88, 216, 173, 0.28);
+      background:
+        linear-gradient(180deg, rgba(16, 24, 33, 0.98), rgba(8, 12, 18, 0.98));
+      color: #ecf4ff;
+      box-shadow:
+        0 28px 60px rgba(0, 0, 0, 0.56),
+        0 0 0 1px rgba(255, 255, 255, 0.04);
+      transition: transform 220ms ease, opacity 220ms ease;
+      z-index: 30;
+      line-height: 1.45;
+      font-size: clamp(0.92rem, 1.95vh, 1.05rem);
+      text-align: center;
+      opacity: 0;
+      pointer-events: none;
     }
 
     .toast.show {
-      transform: translate(-50%, 0);
+      transform: translate(-50%, -50%) scale(1);
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .toast-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(3, 7, 12, 0.78);
+      backdrop-filter: blur(12px) saturate(0.62);
+      -webkit-backdrop-filter: blur(12px) saturate(0.62);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 220ms ease;
+      z-index: 25;
+    }
+
+    .toast-backdrop.show {
+      opacity: 1;
+      pointer-events: auto;
     }
 
     .mono {
       font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
     }
 
-    @media (min-width: 640px) {
-      .panel {
-        padding: 26px;
+    @media (min-width: 760px) {
+      .field-grid,
+      .preview-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 760px) {
+      .shell {
+        width: min(100%, 540px);
+      }
+    }
+
+    @media (max-height: 640px) {
+      :root {
+        --frame-y: 8px;
+        --card-pad: 10px;
+        --section-gap: 8px;
+        --stack-gap: 7px;
+        --field-h: 40px;
+        --btn-h: 42px;
       }
 
-      h1 {
-        font-size: 1.65rem;
+      .preview {
+        padding: 9px 10px;
       }
     }
   </style>
 </head>
 <body>
   <main class="shell">
-    <button class="trigger" id="openPicker" type="button">🕑 Pick Date Time</button>
+    <section class="card">
+      <form class="panel">
+        <section class="stage">
+          <button class="btn btn-primary" id="pickAction" type="button">Pick date and time</button>
+
+          <div class="field-grid">
+            <div class="field">
+              <label for="dateInput">Date</label>
+              <input id="dateInput" name="date" type="date" required>
+            </div>
+            <div class="field">
+              <label for="timeInput">Time</label>
+              <input id="timeInput" name="time" type="time" step="60" required>
+            </div>
+          </div>
+
+          <div class="preview-grid" id="previewText">
+            <p class="preview">
+              <span class="preview-label">Current Date Time Selection</span>
+              <span class="preview-value">Select a time to preview the full result.</span>
+            </p>
+            <p class="preview">
+              <span class="preview-label">Magic Discord Timestamp</span>
+              <span class="preview-value mono">Waiting for selection</span>
+            </p>
+          </div>
+        </section>
+
+        <div class="actions">
+          <button class="btn btn-primary" id="primaryAction" type="button">Copy</button>
+        </div>
+      </form>
+    </section>
   </main>
 
-  <dialog id="pickerDialog">
-    <form class="panel" method="dialog">
-      <p class="eyebrow">Discord Timestamp</p>
-      <h1>Pick a date, then a precise time.</h1>
-      <p class="description">Choose the date and time together, then confirm to copy the Discord timestamp.</p>
-
-      <section class="stage">
-        <div class="field">
-          <label for="dateInput">Date</label>
-          <input id="dateInput" name="date" type="date" required>
-        </div>
-        <div class="field">
-          <label for="timeInput">Time</label>
-          <input id="timeInput" name="time" type="time" step="60" required>
-        </div>
-        <p class="preview" id="previewText">Select a time to preview the full result.</p>
-      </section>
-
-      <div class="actions">
-        <button class="btn btn-secondary" id="secondaryAction" type="button">Cancel</button>
-        <button class="btn btn-primary" id="primaryAction" type="button">Confirm</button>
-      </div>
-    </form>
-  </dialog>
-
+  <div class="toast-backdrop" id="toastBackdrop" aria-hidden="true"></div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
   <script>
-    const openPickerButton = document.getElementById("openPicker");
-    const pickerDialog = document.getElementById("pickerDialog");
     const dateInput = document.getElementById("dateInput");
     const timeInput = document.getElementById("timeInput");
     const previewText = document.getElementById("previewText");
+    const pickAction = document.getElementById("pickAction");
     const primaryAction = document.getElementById("primaryAction");
-    const secondaryAction = document.getElementById("secondaryAction");
+    const toastBackdrop = document.getElementById("toastBackdrop");
     const toast = document.getElementById("toast");
 
     let toastTimer = 0;
+    let autoOpenTimeAfterDate = false;
 
     const formatter = new Intl.DateTimeFormat(undefined, {
       weekday: "long",
@@ -349,15 +359,24 @@
       }
     }
 
+    function escapeHtml(value) {
+      return value
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll("\"", "&quot;")
+        .replaceAll("'", "&#39;");
+    }
+
     function updatePreview() {
       if (!dateInput.value || !timeInput.value) {
-        previewText.innerHTML = "Select a time to preview the full result.";
+        previewText.innerHTML = `<p class="preview"><span class="preview-label">Current Date Time Selection</span><span class="preview-value">Select a time to preview the full result.</span></p><p class="preview"><span class="preview-label">Magic Discord Timestamp</span><span class="preview-value mono">Waiting for selection</span></p>`;
         return null;
       }
 
       const selected = new Date(`${dateInput.value}T${timeInput.value}`);
       if (Number.isNaN(selected.getTime())) {
-        previewText.textContent = "The selected date or time is invalid.";
+        previewText.innerHTML = `<p class="preview"><span class="preview-label">Current Date Time Selection</span><span class="preview-value">The selected date or time is invalid.</span></p><p class="preview"><span class="preview-label">Magic Discord Timestamp</span><span class="preview-value mono">Unavailable</span></p>`;
         return null;
       }
 
@@ -365,7 +384,7 @@
       const formatted = formatter.format(selected);
       const timestamp = `<t:${unix}:F>`;
 
-      previewText.innerHTML = `<strong>${formatted}</strong><br><span class="mono">${timestamp}</span>`;
+      previewText.innerHTML = `<p class="preview"><span class="preview-label">Current Date Time Selection</span><span class="preview-value">${formatted}</span></p><p class="preview"><span class="preview-label">Magic Discord Timestamp</span><span class="preview-value mono">${escapeHtml(timestamp)}</span></p>`;
 
       return { selected, unix, formatted, timestamp };
     }
@@ -377,25 +396,40 @@
       }
 
       await navigator.clipboard.writeText(details.timestamp);
-      pickerDialog.close();
-      showToast(`The timestamp <span class="mono">${details.timestamp}</span> for <strong>${details.formatted}</strong> has been copied to clipboard, paste it to Discord so others see the set time in their own local time.`);
+      showToast(`<span class="mono">${escapeHtml(details.timestamp)}</span> copied.<br>Paste it in your Discord message.<br>Everyone will see it <strong>in their local time.</strong>`);
     }
 
     function showToast(message) {
       window.clearTimeout(toastTimer);
       toast.innerHTML = message;
+      toastBackdrop.classList.add("show");
       toast.classList.add("show");
       toastTimer = window.setTimeout(() => {
-        toast.classList.remove("show");
-      }, 4200);
+        hideToast();
+      }, 7200);
     }
 
-    openPickerButton.addEventListener("click", () => {
-      resetPicker();
-      pickerDialog.showModal();
-      window.setTimeout(() => {
-        showNativePicker(dateInput);
-      }, 30);
+    function hideToast() {
+      window.clearTimeout(toastTimer);
+      toastBackdrop.classList.remove("show");
+      toast.classList.remove("show");
+    }
+
+    function dismissToastOnOutsideClick(event) {
+      if (!toast.classList.contains("show") || toast.contains(event.target)) {
+        return;
+      }
+
+      hideToast();
+    }
+
+    function initializeAutoPickers() {
+      autoOpenTimeAfterDate = true;
+      showNativePicker(dateInput);
+    }
+
+    pickAction.addEventListener("click", () => {
+      initializeAutoPickers();
     });
 
     primaryAction.addEventListener("click", async () => {
@@ -416,13 +450,29 @@
       }
     });
 
-    secondaryAction.addEventListener("click", () => {
-      pickerDialog.close();
-    });
+    dateInput.addEventListener("change", () => {
+      updatePreview();
 
-    dateInput.addEventListener("change", updatePreview);
+      if (!autoOpenTimeAfterDate || !dateInput.value) {
+        return;
+      }
+
+      autoOpenTimeAfterDate = false;
+      window.setTimeout(() => {
+        showNativePicker(timeInput);
+      }, 30);
+    });
     timeInput.addEventListener("change", updatePreview);
     timeInput.addEventListener("input", updatePreview);
+    dateInput.addEventListener("click", () => {
+      initializeAutoPickers();
+    });
+    timeInput.addEventListener("click", () => {
+      showNativePicker(timeInput);
+    });
+    toast.addEventListener("click", hideToast);
+    toastBackdrop.addEventListener("click", hideToast);
+    document.addEventListener("pointerdown", dismissToastOnOutsideClick);
 
     resetPicker();
   </script>
