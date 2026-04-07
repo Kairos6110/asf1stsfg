@@ -279,8 +279,6 @@
     <section class="card">
       <form class="panel">
         <section class="stage">
-          <button class="btn btn-primary" id="pickAction" type="button">Pick date and time</button>
-
           <div class="field-grid">
             <div class="field">
               <label for="dateInput">Date</label>
@@ -318,7 +316,6 @@
     const dateInput = document.getElementById("dateInput");
     const timeInput = document.getElementById("timeInput");
     const previewText = document.getElementById("previewText");
-    const pickAction = document.getElementById("pickAction");
     const primaryAction = document.getElementById("primaryAction");
     const toastBackdrop = document.getElementById("toastBackdrop");
     const toast = document.getElementById("toast");
@@ -427,10 +424,6 @@
       autoOpenTimeAfterDate = true;
       showNativePicker(dateInput);
     }
-
-    pickAction.addEventListener("click", () => {
-      initializeAutoPickers();
-    });
 
     primaryAction.addEventListener("click", async () => {
       if (!dateInput.value) {
