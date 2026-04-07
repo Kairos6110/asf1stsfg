@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0b0f14">
+  <meta name="color-scheme" content="dark">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Discord Timestamp Picker</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #0b0f14;
+      --panel: rgba(15, 21, 29, 0.84);
+      --panel-strong: rgba(13, 19, 27, 0.96);
+      --text: #eef3f8;
+      --muted: #9aa7b4;
+      --accent: #4dd4a8;
+      --accent-strong: #269a79;
+      --accent-soft: rgba(77, 212, 168, 0.14);
+      --border: rgba(255, 255, 255, 0.1);
+      --shadow: 0 24px 60px rgba(0, 0, 0, 0.34);
+      --radius: 24px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      font-family: "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(77, 212, 168, 0.14), transparent 30%),
+        radial-gradient(circle at bottom right, rgba(58, 108, 255, 0.16), transparent 24%),
+        linear-gradient(160deg, #091018 0%, #0d141d 48%, #111a25 100%);
+    }
+
+    body::before,
+    body::after {
+      content: "";
+      position: fixed;
+      inset: auto;
+      border-radius: 999px;
+      filter: blur(12px);
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    body::before {
+      width: 180px;
+      height: 180px;
+      top: 8%;
+      right: -48px;
+      background: rgba(77, 212, 168, 0.1);
+    }
+
+    body::after {
+      width: 220px;
+      height: 220px;
+      bottom: -60px;
+      left: -80px;
+      background: rgba(91, 124, 250, 0.12);
+    }
+
+    .shell {
+      position: relative;
+      z-index: 1;
+      width: min(100%, 420px);
+      display: grid;
+      place-items: center;
+    }
+
+    .trigger {
+      appearance: none;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: linear-gradient(180deg, rgba(24, 32, 43, 0.96), rgba(15, 22, 31, 0.94));
+      color: var(--text);
+      width: 100%;
+      min-height: 64px;
+      padding: 18px 24px;
+      border-radius: 999px;
+      box-shadow: var(--shadow);
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: 0.01em;
+      cursor: pointer;
+      transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+    }
+
+    .trigger:hover,
+    .trigger:focus-visible {
+      transform: translateY(-1px);
+      box-shadow: 0 28px 70px rgba(0, 0, 0, 0.42);
+      border-color: rgba(77, 212, 168, 0.3);
+      outline: none;
+    }
+
+    dialog {
+      width: min(calc(100vw - 28px), 420px);
+      border: 0;
+      padding: 0;
+      border-radius: 28px;
+      background: var(--panel-strong);
+      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.46);
+      color: var(--text);
+    }
+
+    dialog::backdrop {
+      background: rgba(3, 5, 8, 0.62);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    .panel {
+      padding: 22px;
+      display: grid;
+      gap: 18px;
+    }
+
+    .eyebrow {
+      margin: 0;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 1.45rem;
+      line-height: 1.1;
+    }
+
+    .description {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.5;
+      font-size: 0.96rem;
+    }
+
+    .stage {
+      display: grid;
+      gap: 14px;
+    }
+
+    .stage[hidden] {
+      display: none;
+    }
+
+    .field {
+      display: grid;
+      gap: 8px;
+    }
+
+    .field label {
+      font-size: 0.92rem;
+      font-weight: 700;
+    }
+
+    .field input {
+      width: 100%;
+      min-height: 56px;
+      border-radius: 18px;
+      border: 1px solid var(--border);
+      padding: 0 16px;
+      font: inherit;
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.04);
+      outline: none;
+    }
+
+    .field input:focus-visible {
+      border-color: rgba(29, 107, 87, 0.45);
+      box-shadow: 0 0 0 4px var(--accent-soft);
+    }
+
+    .preview {
+      margin: 0;
+      padding: 14px 16px;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      line-height: 1.45;
+      color: var(--muted);
+    }
+
+    .preview strong {
+      color: var(--text);
+    }
+
+    .actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .btn {
+      appearance: none;
+      min-height: 52px;
+      border-radius: 16px;
+      border: 0;
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 160ms ease, opacity 160ms ease, background 160ms ease;
+    }
+
+    .btn:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--text);
+    }
+
+    .btn-primary {
+      background: linear-gradient(180deg, var(--accent), var(--accent-strong));
+      color: #07110f;
+      box-shadow: 0 14px 30px rgba(38, 154, 121, 0.28);
+    }
+
+    .btn:not(:disabled):hover,
+    .btn:not(:disabled):focus-visible {
+      transform: translateY(-1px);
+      outline: none;
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 18px;
+      width: min(calc(100vw - 24px), 560px);
+      transform: translate(-50%, 130%);
+      padding: 16px 18px;
+      border-radius: 22px;
+      background: rgba(9, 13, 18, 0.96);
+      color: #eef3f8;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.4);
+      transition: transform 220ms ease;
+      z-index: 20;
+      line-height: 1.5;
+    }
+
+    .toast.show {
+      transform: translate(-50%, 0);
+    }
+
+    .mono {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+
+    @media (min-width: 640px) {
+      .panel {
+        padding: 26px;
+      }
+
+      h1 {
+        font-size: 1.65rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <button class="trigger" id="openPicker" type="button">🕑 Pick Date Time</button>
+  </main>
+
+  <dialog id="pickerDialog">
+    <form class="panel" method="dialog">
+      <p class="eyebrow">Discord Timestamp</p>
+      <h1>Pick a date, then a precise time.</h1>
+      <p class="description">Choose the date and time together, then confirm to copy the Discord timestamp.</p>
+
+      <section class="stage">
+        <div class="field">
+          <label for="dateInput">Date</label>
+          <input id="dateInput" name="date" type="date" required>
+        </div>
+        <div class="field">
+          <label for="timeInput">Time</label>
+          <input id="timeInput" name="time" type="time" step="60" required>
+        </div>
+        <p class="preview" id="previewText">Select a time to preview the full result.</p>
+      </section>
+
+      <div class="actions">
+        <button class="btn btn-secondary" id="secondaryAction" type="button">Cancel</button>
+        <button class="btn btn-primary" id="primaryAction" type="button">Confirm</button>
+      </div>
+    </form>
+  </dialog>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    const openPickerButton = document.getElementById("openPicker");
+    const pickerDialog = document.getElementById("pickerDialog");
+    const dateInput = document.getElementById("dateInput");
+    const timeInput = document.getElementById("timeInput");
+    const previewText = document.getElementById("previewText");
+    const primaryAction = document.getElementById("primaryAction");
+    const secondaryAction = document.getElementById("secondaryAction");
+    const toast = document.getElementById("toast");
+
+    let toastTimer = 0;
+
+    const formatter = new Intl.DateTimeFormat(undefined, {
+      weekday: "long",
+      month: "long",
+      day: "2-digit",
+      year: "numeric",
+      hour: "numeric",
+      minute: "2-digit"
+    });
+
+    function getDefaultDateParts() {
+      const now = new Date();
+      const local = new Date(now.getTime() - now.getTimezoneOffset() * 60000);
+      return {
+        date: local.toISOString().slice(0, 10),
+        time: `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`
+      };
+    }
+
+    function resetPicker() {
+      const defaults = getDefaultDateParts();
+      dateInput.value = defaults.date;
+      timeInput.value = defaults.time;
+      updatePreview();
+    }
+
+    function showNativePicker(input) {
+      if (typeof input.showPicker === "function") {
+        input.showPicker();
+      } else {
+        input.focus();
+      }
+    }
+
+    function updatePreview() {
+      if (!dateInput.value || !timeInput.value) {
+        previewText.innerHTML = "Select a time to preview the full result.";
+        return null;
+      }
+
+      const selected = new Date(`${dateInput.value}T${timeInput.value}`);
+      if (Number.isNaN(selected.getTime())) {
+        previewText.textContent = "The selected date or time is invalid.";
+        return null;
+      }
+
+      const unix = Math.floor(selected.getTime() / 1000);
+      const formatted = formatter.format(selected);
+      const timestamp = `<t:${unix}:F>`;
+
+      previewText.innerHTML = `<strong>${formatted}</strong><br><span class="mono">${timestamp}</span>`;
+
+      return { selected, unix, formatted, timestamp };
+    }
+
+    async function copyTimestamp() {
+      const details = updatePreview();
+      if (!details) {
+        return;
+      }
+
+      await navigator.clipboard.writeText(details.timestamp);
+      pickerDialog.close();
+      showToast(`The timestamp <span class="mono">${details.timestamp}</span> for <strong>${details.formatted}</strong> has been copied to clipboard, paste it to Discord so others see the set time in their own local time.`);
+    }
+
+    function showToast(message) {
+      window.clearTimeout(toastTimer);
+      toast.innerHTML = message;
+      toast.classList.add("show");
+      toastTimer = window.setTimeout(() => {
+        toast.classList.remove("show");
+      }, 4200);
+    }
+
+    openPickerButton.addEventListener("click", () => {
+      resetPicker();
+      pickerDialog.showModal();
+      window.setTimeout(() => {
+        showNativePicker(dateInput);
+      }, 30);
+    });
+
+    primaryAction.addEventListener("click", async () => {
+      if (!dateInput.value) {
+        showNativePicker(dateInput);
+        return;
+      }
+
+      if (!timeInput.value) {
+        showNativePicker(timeInput);
+        return;
+      }
+
+      try {
+        await copyTimestamp();
+      } catch (error) {
+        showToast("Clipboard access failed. Copying requires browser permission.");
+      }
+    });
+
+    secondaryAction.addEventListener("click", () => {
+      pickerDialog.close();
+    });
+
+    dateInput.addEventListener("change", updatePreview);
+    timeInput.addEventListener("change", updatePreview);
+    timeInput.addEventListener("input", updatePreview);
+
+    resetPicker();
+  </script>
+</body>
+</html>
