@@ -393,7 +393,7 @@
       }
 
       await navigator.clipboard.writeText(details.timestamp);
-      showToast(`<span class="mono">${escapeHtml(details.timestamp)}</span> copied.<br>Paste it in your Discord message.<br>Everyone will see it <strong>in their local time.</strong>`);
+      showToast(`<span class="mono">${escapeHtml(details.timestamp)}</span> copied.<br>Paste it in your Discord message.<br>Everyone will see the selected time <strong>in their local time.</strong>`);
     }
 
     function showToast(message) {
