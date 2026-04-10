@@ -274,7 +274,7 @@
                 <div id="generator-message" class="action-message"></div>
                 <div id="opord-output" class="opord-output">
                     <div class="opord-output-header">
-                        <h3>Generated OPORD</h3>
+                        <h3 id="opord-output-title">Generated OPORD</h3>
                         <button class="opord-copy-btn" id="copy-opord-btn" onclick="copyGeneratedOpord()" style="display:none;">📋 Copy OPORD</button>
                     </div>
                     <div id="opord-content" class="opord-content"></div>
@@ -594,6 +594,7 @@ USER DATA: ${selectedData.join(', ')}`;
     function hideOpordOutput() {
         document.getElementById("opord-output").classList.remove("open");
         document.getElementById("opord-content").innerHTML = "";
+        document.getElementById("opord-output-title").textContent = "Generated OPORD";
         document.getElementById("copy-opord-btn").style.display = "none";
     }
 
@@ -650,6 +651,13 @@ USER DATA: ${selectedData.join(', ')}`;
     function getRandomOpordModel() {
         const randomIndex = Math.floor(Math.random() * OPORD_MODELS.length);
         return OPORD_MODELS[randomIndex];
+    }
+
+    function formatModelLabel(model) {
+        if (!model) return "Generated OPORD";
+
+        const shortName = String(model).split("/").pop() || model;
+        return `Generated OPORD (${shortName})`;
     }
 
     function extractParts(payload) {
@@ -773,6 +781,7 @@ USER DATA: ${selectedData.join(', ')}`;
             }
 
             lastGeneratedOpordText = reply;
+            document.getElementById("opord-output-title").textContent = formatModelLabel(selectedModel);
             showOpordOutput(renderOpordText(reply));
             document.getElementById("copy-opord-btn").style.display = "inline-block";
             setGeneratorMessage(`OPORD generated with ${selectedModel}.`, "success");
