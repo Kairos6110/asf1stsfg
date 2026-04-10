@@ -741,7 +741,7 @@ USER DATA: ${selectedData.join(', ')}`;
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    model: selectedModel,
+                    model: { id: selectedModel },
                     system: "Answer for the end user only. Do not include reasoning, thinking, chain-of-thought, or tool narration.",
                     parts: [{ type: "text", text: prompt }]
                 })
