@@ -3,6 +3,7 @@
   "width": 12710,
   "height": 16000,
   "tileSize": 256,
-  "format": "png",
-  "maxNativeZoom": 6
+  "format": "webp",
+  "maxNativeZoom": 6,
+  "quality": 88
 }

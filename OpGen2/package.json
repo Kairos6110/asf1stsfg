@@ -1,6 +1,7 @@
 {
   "scripts": {
-    "build:tiles": "node scripts/generate-tiles.js"
+    "build:tiles": "node scripts/generate-tiles.js",
+    "convert:tiles:webp": "node scripts/convert-tiles-webp.js tiles 88"
   },
   "dependencies": {
     "sharp": "^0.34.5"

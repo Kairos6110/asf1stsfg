@@ -5,7 +5,7 @@ const sharp = require("sharp");
 const SOURCE_IMAGE = process.argv[2] || "auroa_fl.jpg";
 const OUTPUT_DIR = process.argv[3] || "tiles";
 const TILE_SIZE = 256;
-const PNG_COMPRESSION_LEVEL = 9;
+const WEBP_QUALITY = 88;
 
 async function removeDirIfExists(targetPath) {
   await fs.rm(targetPath, { recursive: true, force: true });
@@ -31,7 +31,7 @@ async function main() {
   await fs.mkdir(outputParent, { recursive: true });
 
   await image
-    .png({ compressionLevel: PNG_COMPRESSION_LEVEL })
+    .webp({ quality: WEBP_QUALITY, effort: 4, smartSubsample: true })
     .tile({
       size: TILE_SIZE,
       overlap: 0,
@@ -47,7 +47,8 @@ async function main() {
         width: metadata.width,
         height: metadata.height,
         tileSize: TILE_SIZE,
-        format: "png",
+        format: "webp",
+        quality: WEBP_QUALITY,
         maxNativeZoom: maxZoom
       },
       null,
