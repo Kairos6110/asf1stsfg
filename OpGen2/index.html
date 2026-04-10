@@ -276,7 +276,7 @@
       border-radius: 14px;
       background: rgba(3, 7, 5, 0.78);
       color: var(--text);
-      padding: 15px 14px 15px 84px;
+      padding: 15px 48px 15px 84px;
       font: inherit;
       transition: border-color 0.14s ease, box-shadow 0.14s ease, background 0.14s ease;
     }
@@ -286,6 +286,35 @@
       border-color: var(--accent);
       background: rgba(4, 8, 6, 0.92);
       box-shadow: 0 0 0 3px rgba(196, 219, 84, 0.12);
+    }
+
+    .search-clear-button {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 30px;
+      height: 30px;
+      padding: 0;
+      transform: translateY(-50%);
+      border: 0;
+      border-radius: 6px;
+      background: transparent;
+      color: #9aa09a;
+      font-size: 1rem;
+      font-weight: 700;
+      line-height: 1;
+      text-align: center;
+      z-index: 1;
+    }
+
+    .search-clear-button:hover {
+      transform: translateY(-50%);
+      border-color: transparent;
+      background: rgba(157, 176, 160, 0.12);
+      color: #c1c6c1;
     }
 
     button {
@@ -760,7 +789,8 @@
 
         <section class="panel sidebar-controls">
           <div class="search-input-wrap">
-            <input id="searchInput" type="text" placeholder="Depot, factory, residence...">
+            <input id="searchInput" type="text" placeholder="Depot, Factory, Port, etc...">
+            <button class="search-clear-button" id="searchClearButton" type="button" aria-label="Clear search" hidden>X</button>
           </div>
         </section>
 
@@ -901,6 +931,7 @@
     const selectedCount = document.getElementById("selectedCount");
     const sidebar = document.getElementById("sidebar");
     const searchInput = document.getElementById("searchInput");
+    const searchClearButton = document.getElementById("searchClearButton");
     const searchResultsSection = document.getElementById("searchResultsSection");
     const searchResultsToggle = document.getElementById("searchResultsToggle");
     const searchResultsCount = document.getElementById("searchResultsCount");
@@ -1198,7 +1229,9 @@
     }
 
     function selectedMarkers() {
-      return markers.filter((marker) => selectedIds.has(marker.id));
+      return Array.from(selectedIds)
+        .map((id) => markers.find((marker) => marker.id === id))
+        .filter(Boolean);
     }
 
     function normalizeMarkerData(sourceMarkers, { idPrefix, namePrefix = "Location", offsetX = 0, offsetY = 0 }) {
@@ -1230,6 +1263,7 @@
       const visibleMarkers = filteredMarkers();
       const query = searchQuery.trim();
       markerList.innerHTML = "";
+      searchClearButton.hidden = searchInput.value.length === 0;
       searchResultsSection.hidden = !query;
       searchResultsCount.textContent = String(visibleMarkers.length);
       syncCollapsibleSection(searchResultsToggle, searchResultsBody, searchResultsCollapsed);
@@ -1488,6 +1522,13 @@ ${selectedLocationLines}
     searchInput.addEventListener("input", (event) => {
       searchQuery = event.target.value;
       renderSearchList();
+    });
+
+    searchClearButton.addEventListener("click", () => {
+      searchInput.value = "";
+      searchQuery = "";
+      renderSearchList();
+      searchInput.focus();
     });
 
     instructionsBtn.addEventListener("click", () => {
