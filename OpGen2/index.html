@@ -234,11 +234,6 @@
       margin-top: 12px;
     }
 
-    .search-actions {
-      display: flex;
-      justify-content: center;
-    }
-
     .search-input-wrap {
       position: relative;
       min-width: 0;
@@ -299,13 +294,6 @@
     button:hover {
       transform: translateY(-1px);
       border-color: var(--accent);
-    }
-
-    .ghost-button {
-      min-width: 74px;
-      padding: 8px 12px;
-      background: rgba(6, 10, 8, 0.44);
-      text-align: center;
     }
 
     .danger-button {
@@ -765,9 +753,6 @@
           <div class="search-input-wrap">
             <input id="searchInput" type="text" placeholder="Depot, factory, residence...">
           </div>
-          <div class="search-actions">
-            <button class="ghost-button" id="clearSearchBtn" type="button" hidden>Clear Search</button>
-          </div>
         </section>
 
         <div class="sidebar-body">
@@ -907,7 +892,6 @@
     const selectedCount = document.getElementById("selectedCount");
     const sidebar = document.getElementById("sidebar");
     const searchInput = document.getElementById("searchInput");
-    const clearSearchBtn = document.getElementById("clearSearchBtn");
     const searchResultsSection = document.getElementById("searchResultsSection");
     const searchResultsToggle = document.getElementById("searchResultsToggle");
     const searchResultsCount = document.getElementById("searchResultsCount");
@@ -1239,7 +1223,6 @@
       markerList.innerHTML = "";
       searchResultsSection.hidden = !query;
       searchResultsCount.textContent = String(visibleMarkers.length);
-      clearSearchBtn.hidden = !query;
       syncCollapsibleSection(searchResultsToggle, searchResultsBody, searchResultsCollapsed);
 
       if (!query) {
@@ -1496,13 +1479,6 @@ ${selectedLocationLines}
     searchInput.addEventListener("input", (event) => {
       searchQuery = event.target.value;
       renderSearchList();
-    });
-
-    clearSearchBtn.addEventListener("click", () => {
-      searchQuery = "";
-      searchInput.value = "";
-      renderSearchList();
-      searchInput.focus();
     });
 
     instructionsBtn.addEventListener("click", () => {
