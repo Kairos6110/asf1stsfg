@@ -376,6 +376,10 @@
 
 <script>
     const BASE_URL = "https://2846-174-95-0-54.ngrok-free.app";
+    const OPORD_MODELS = [
+        "opencode/minimax-m2.5-free",
+        "opencode/qwen3.6-plus-free"
+    ];
 
     // COMPLETE DATABASE
     const db = {
@@ -643,6 +647,11 @@ USER DATA: ${selectedData.join(', ')}`;
         return values.find(value => value !== undefined && value !== null && value !== "");
     }
 
+    function getRandomOpordModel() {
+        const randomIndex = Math.floor(Math.random() * OPORD_MODELS.length);
+        return OPORD_MODELS[randomIndex];
+    }
+
     function extractParts(payload) {
         return getFirstDefined(
             payload.parts,
@@ -701,6 +710,7 @@ USER DATA: ${selectedData.join(', ')}`;
 
         try {
             const prompt = buildOpordPrompt();
+            const selectedModel = getRandomOpordModel();
 
             const sessionRes = await fetch(`${BASE_URL}/session`, {
                 method: 'POST',
@@ -723,6 +733,7 @@ USER DATA: ${selectedData.join(', ')}`;
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
+                    model: selectedModel,
                     system: "Answer for the end user only. Do not include reasoning, thinking, chain-of-thought, or tool narration.",
                     parts: [{ type: "text", text: prompt }]
                 })
@@ -764,7 +775,7 @@ USER DATA: ${selectedData.join(', ')}`;
             lastGeneratedOpordText = reply;
             showOpordOutput(renderOpordText(reply));
             document.getElementById("copy-opord-btn").style.display = "inline-block";
-            setGeneratorMessage("OPORD generated.", "success");
+            setGeneratorMessage(`OPORD generated with ${selectedModel}.`, "success");
         } catch (error) {
             lastGeneratedOpordText = "";
             showOpordOutput(`<p style="color:#ff8585;">Error: ${escapeHtml(error.message)}</p>`);
