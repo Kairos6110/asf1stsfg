@@ -1,1 +1,157 @@
-test
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>OpenCode AI Chat</title>
+    <style>
+        body { font-family: sans-serif; max-width: 600px; margin: 20px auto; line-height: 1.6; }
+        #output { background: #f4f4f4; padding: 15px; border-radius: 5px; min-height: 50px; white-space: pre-wrap; }
+        .controls { display: flex; gap: 10px; margin-bottom: 20px; }
+        input { flex-grow: 1; padding: 8px; }
+        button { padding: 8px 15px; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+    <h2>AI Prompt Box</h2>
+    
+    <div class="controls">
+        <input type="text" id="promptInput" placeholder="Ask something...">
+        <button onclick="sendPrompt()">Send</button>
+    </div>
+
+    <strong>Response:</strong>
+    <div id="output">AI reply will appear here...</div>
+
+    <script>
+    const BASE_URL = "https://2846-174-95-0-54.ngrok-free.app";
+
+function getFirstDefined(...values) {
+    return values.find(value => value !== undefined && value !== null && value !== "");
+}
+
+function extractParts(payload) {
+    return getFirstDefined(
+        payload.parts,
+        payload.data?.parts
+    );
+}
+
+function isVisibleAnswerPart(part) {
+    const type = String(part?.type || "").toLowerCase();
+
+    if (!type) return true;
+
+    return !(
+        type.includes("reason") ||
+        type.includes("think") ||
+        type.includes("summary") ||
+        type.includes("tool") ||
+        type.includes("step")
+    );
+}
+
+function cleanVisibleText(text) {
+    return String(text || "")
+        .replace(/<thinking>[\s\S]*?<\/thinking>/gi, "")
+        .replace(/<think>[\s\S]*?<\/think>/gi, "")
+        .replace(/<reasoning>[\s\S]*?<\/reasoning>/gi, "")
+        .trim();
+}
+
+async function parseJsonResponse(response, label) {
+    const payload = await response.json();
+
+    if (!response.ok || payload.success === false) {
+        const apiError = Array.isArray(payload.error)
+            ? payload.error.map(item => item.message || JSON.stringify(item)).join(", ")
+            : payload.error;
+
+        throw new Error(`${label} failed (${response.status}): ${apiError || "Unknown API error"}`);
+    }
+
+    return payload;
+}
+
+async function sendPrompt() {
+    const input = document.getElementById('promptInput');
+    const output = document.getElementById('output');
+    const prompt = input.value;
+
+    if (!prompt) return;
+    output.innerText = "Thinking...";
+
+    try {
+        // 1. Create Session
+        const sessionRes = await fetch(`${BASE_URL}/session`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ title: "Web Test" })
+        });
+        const sessionPayload = await parseJsonResponse(sessionRes, "Create session");
+        const sessionId = getFirstDefined(
+            sessionPayload.id,
+            sessionPayload.sessionID,
+            sessionPayload.data?.id,
+            sessionPayload.data?.sessionID
+        );
+
+        if (!sessionId) {
+            throw new Error("Create session failed: missing session ID in response.");
+        }
+        
+        // 2. Send Message
+        const messageRes = await fetch(`${BASE_URL}/session/${sessionId}/message`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                system: "Answer for the end user only. Do not include reasoning, thinking, chain-of-thought, or tool narration.",
+                parts: [{ type: "text", text: prompt }]
+            })
+        });
+        const messagePayload = await parseJsonResponse(messageRes, "Send message");
+        const messageId = getFirstDefined(
+            messagePayload.info?.id,
+            messagePayload.id,
+            messagePayload.messageID,
+            messagePayload.data?.info?.id,
+            messagePayload.data?.id,
+            messagePayload.data?.messageID
+        );
+
+        let fullMsg = messagePayload;
+
+        // Debug: Log the response to console so you can see the exact shape
+        console.log("Send Message Response:", messagePayload);
+
+        // OpenCode returns the assistant response directly from POST /message.
+        // Only fall back to GET /message/:id if the POST response did not include parts.
+        let parts = extractParts(fullMsg);
+        if ((!parts || parts.length === 0) && messageId) {
+            const finalRes = await fetch(`${BASE_URL}/session/${sessionId}/message/${messageId}`);
+            fullMsg = await parseJsonResponse(finalRes, "Fetch message");
+            console.log("Fetched Message Response:", fullMsg);
+            parts = extractParts(fullMsg);
+        }
+
+        if (parts && parts.length > 0) {
+            const reply = parts
+                .filter(isVisibleAnswerPart)
+                .map(part => part.text || part.content || "")
+                .map(cleanVisibleText)
+                .filter(Boolean)
+                .join("\n");
+
+            output.innerText = reply || "Error: OpenCode returned no visible answer text.";
+        } else {
+            output.innerText = "Error: OpenCode returned no message parts.";
+        }
+
+    } catch (error) {
+        output.innerText = "Error: " + error.message;
+        console.error("Detailed Error:", error);
+    }
+}
+    </script>
+</body>
+</html>
