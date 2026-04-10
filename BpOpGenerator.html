@@ -376,8 +376,16 @@
 <script>
     const BASE_URL = "https://2846-174-95-0-54.ngrok-free.app";
     const OPORD_MODELS = [
-        "opencode/minimax-m2.5-free",
-        "opencode/qwen3.6-plus-free"
+        {
+            providerID: "opencode",
+            modelID: "minimax-m2.5-free",
+            label: "opencode/minimax-m2.5-free"
+        },
+        {
+            providerID: "opencode",
+            modelID: "qwen3.6-plus-free",
+            label: "opencode/qwen3.6-plus-free"
+        }
     ];
 
     // COMPLETE DATABASE
@@ -655,7 +663,7 @@ USER DATA: ${selectedData.join(', ')}`;
     function formatModelLabel(model) {
         if (!model) return "Generated OPORD";
 
-        const shortName = String(model).split("/").pop() || model;
+        const shortName = model.modelID || model.label || String(model);
         return `Generated OPORD (${shortName})`;
     }
 
@@ -740,7 +748,10 @@ USER DATA: ${selectedData.join(', ')}`;
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    model: { id: selectedModel },
+                    model: {
+                        providerID: selectedModel.providerID,
+                        modelID: selectedModel.modelID
+                    },
                     system: "Answer for the end user only. Do not include reasoning, thinking, chain-of-thought, or tool narration.",
                     parts: [{ type: "text", text: prompt }]
                 })
@@ -783,7 +794,7 @@ USER DATA: ${selectedData.join(', ')}`;
             document.getElementById("opord-output-title").textContent = formatModelLabel(selectedModel);
             showOpordOutput(renderOpordText(reply));
             document.getElementById("copy-opord-btn").style.display = "inline-block";
-            setGeneratorMessage(`OPORD generated with ${selectedModel}.`, "success");
+            setGeneratorMessage(`OPORD generated with ${selectedModel.label}.`, "success");
         } catch (error) {
             lastGeneratedOpordText = "";
             showOpordOutput(`<p style="color:#ff8585;">Error: ${escapeHtml(error.message)}</p>`);
