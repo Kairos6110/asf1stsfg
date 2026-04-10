@@ -1,0 +1,8 @@
+{
+  "scripts": {
+    "build:tiles": "node scripts/generate-tiles.js"
+  },
+  "dependencies": {
+    "sharp": "^0.34.5"
+  }
+}

@@ -1,0 +1,1591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Breakpoint OPORD Generator</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%93%8B%3C/text%3E%3C/svg%3E">
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+    crossorigin=""
+  >
+  <style>
+    :root {
+      --bg: #0b130f;
+      --panel: rgba(15, 23, 18, 0.95);
+      --panel-2: rgba(23, 34, 27, 0.97);
+      --panel-3: rgba(10, 16, 12, 0.88);
+      --line: #2f4336;
+      --line-strong: #5e7a66;
+      --text: #edf4ee;
+      --muted: #9db0a0;
+      --accent: #c4db54;
+      --accent-2: #879d38;
+      --accent-soft: rgba(196, 219, 84, 0.16);
+      --danger: #d84d45;
+      --danger-soft: rgba(216, 77, 69, 0.14);
+      --danger-shadow: rgba(216, 77, 69, 0.26);
+      --shadow: rgba(0, 0, 0, 0.35);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    [hidden] {
+      display: none !important;
+    }
+
+    html,
+    body {
+      height: 100%;
+      margin: 0;
+      font-family: "Aptos", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top, rgba(118, 150, 82, 0.18), transparent 38%),
+        linear-gradient(135deg, #09100c, #111d16 55%, #0a100d);
+    }
+
+    body {
+      overflow: hidden;
+    }
+
+    .app-shell {
+      display: grid;
+      grid-template-columns: 420px 1fr;
+      grid-template-rows: minmax(0, 1fr);
+      height: 100vh;
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    .sidebar {
+      position: relative;
+      background: var(--panel);
+      border-right: 1px solid var(--line);
+      box-shadow: 12px 0 30px var(--shadow);
+      height: 100vh;
+      overflow-y: auto;
+      overflow-x: hidden;
+      overscroll-behavior: contain;
+      scrollbar-width: thin;
+      scrollbar-color: var(--line-strong) rgba(7, 11, 9, 0.65);
+      z-index: 1000;
+    }
+
+    .sidebar::-webkit-scrollbar {
+      width: 12px;
+    }
+
+    .sidebar::-webkit-scrollbar-track {
+      background: rgba(7, 11, 9, 0.65);
+    }
+
+    .sidebar::-webkit-scrollbar-thumb {
+      background: linear-gradient(180deg, rgba(135, 157, 56, 0.95), rgba(94, 122, 102, 0.95));
+      border-radius: 999px;
+      border: 2px solid rgba(7, 11, 9, 0.65);
+    }
+
+    .sidebar::before {
+      content: "";
+      position: absolute;
+      inset: 0 0 auto;
+      height: 260px;
+      background:
+        radial-gradient(circle at top left, rgba(196, 219, 84, 0.18), transparent 46%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.03), transparent);
+      pointer-events: none;
+    }
+
+    .sidebar-shell {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      min-height: 100%;
+      padding: 18px;
+    }
+
+    .sidebar-hero {
+      display: grid;
+      gap: 14px;
+      padding: 18px;
+      border: 1px solid rgba(196, 219, 84, 0.14);
+      border-radius: 22px;
+      background:
+        linear-gradient(145deg, rgba(30, 43, 34, 0.98), rgba(13, 20, 16, 0.98)),
+        var(--panel-2);
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.04),
+        0 16px 32px rgba(0, 0, 0, 0.18);
+    }
+
+    .section-kicker {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+
+    .title-block {
+      display: grid;
+      gap: 8px;
+      justify-items: center;
+      text-align: center;
+    }
+
+    .title-block h1 {
+      margin: 0;
+      font-size: 2rem;
+      line-height: 1.02;
+      letter-spacing: 0.03em;
+    }
+
+    .hint,
+    .empty-state,
+    .status,
+    .search-summary {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .hero-actions {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .hero-actions button,
+    .panel-actions button {
+      text-align: center;
+    }
+
+    .panel {
+      background:
+        linear-gradient(180deg, rgba(26, 38, 30, 0.98), rgba(12, 18, 14, 0.98)),
+        var(--panel-2);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 16px;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+    }
+
+    .sidebar-controls {
+      display: grid;
+      gap: 12px;
+    }
+
+    .section-heading {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .section-heading h2,
+    .section-heading h3 {
+      margin: 4px 0 0;
+      font-size: 1.04rem;
+      line-height: 1.15;
+      letter-spacing: 0.02em;
+    }
+
+    .section-toggle {
+      width: 100%;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      text-align: left;
+    }
+
+    .section-toggle:hover {
+      transform: none;
+      border-color: transparent;
+    }
+
+    .section-toggle-main {
+      min-width: 0;
+    }
+
+    .section-toggle-side {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+
+    .section-toggle-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      min-width: 32px;
+      height: 32px;
+      border-radius: 999px;
+      border: 1px solid rgba(196, 219, 84, 0.2);
+      background: rgba(196, 219, 84, 0.09);
+      color: var(--accent);
+      font-size: 0.95rem;
+      line-height: 1;
+      transition: transform 0.14s ease;
+    }
+
+    .section-toggle[aria-expanded="false"] .section-toggle-icon {
+      transform: rotate(-90deg);
+    }
+
+    .section-collapse-body {
+      margin-top: 12px;
+    }
+
+    .search-actions {
+      display: flex;
+      justify-content: center;
+    }
+
+    .search-input-wrap {
+      position: relative;
+      min-width: 0;
+      display: flex;
+      align-items: center;
+    }
+
+    .search-input-wrap::before {
+      content: "Search";
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 0.72rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgba(157, 176, 160, 0.68);
+      pointer-events: none;
+    }
+
+    label {
+      display: grid;
+      gap: 6px;
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    input {
+      width: 100%;
+      border: 1px solid var(--line-strong);
+      border-radius: 14px;
+      background: rgba(3, 7, 5, 0.78);
+      color: var(--text);
+      padding: 15px 14px 15px 84px;
+      font: inherit;
+      transition: border-color 0.14s ease, box-shadow 0.14s ease, background 0.14s ease;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: var(--accent);
+      background: rgba(4, 8, 6, 0.92);
+      box-shadow: 0 0 0 3px rgba(196, 219, 84, 0.12);
+    }
+
+    button {
+      border: 1px solid var(--line-strong);
+      border-radius: 14px;
+      padding: 11px 14px;
+      font: inherit;
+      cursor: pointer;
+      background: linear-gradient(180deg, rgba(47, 65, 51, 0.96), rgba(25, 36, 29, 0.96));
+      color: var(--text);
+      transition: transform 0.14s ease, border-color 0.14s ease, background 0.14s ease;
+      text-align: left;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+      border-color: var(--accent);
+    }
+
+    .ghost-button {
+      min-width: 74px;
+      padding: 8px 12px;
+      background: rgba(6, 10, 8, 0.44);
+      text-align: center;
+    }
+
+    .danger-button {
+      background: linear-gradient(180deg, rgba(122, 44, 39, 0.96), rgba(70, 22, 20, 0.98));
+      border-color: rgba(216, 77, 69, 0.5);
+    }
+
+    .sidebar-body {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      min-height: min-content;
+    }
+
+    .sidebar-panel {
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      gap: 12px;
+    }
+
+    .sidebar-panel--results {
+      flex: 0 1 auto;
+    }
+
+    .sidebar-panel--selected {
+      flex: 0 1 auto;
+    }
+
+    .count-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 40px;
+      min-height: 32px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(196, 219, 84, 0.2);
+      background: rgba(196, 219, 84, 0.09);
+      color: var(--text);
+      font-size: 0.88rem;
+      font-weight: 700;
+    }
+
+    .marker-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .marker-list-scroll {
+      max-height: min(36vh, 420px);
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: thin;
+      scrollbar-color: var(--line-strong) rgba(7, 11, 9, 0.65);
+      padding-right: 4px;
+      margin-right: -4px;
+    }
+
+    .marker-list-scroll::-webkit-scrollbar {
+      width: 10px;
+    }
+
+    .marker-list-scroll::-webkit-scrollbar-track {
+      background: rgba(7, 11, 9, 0.65);
+      border-radius: 999px;
+    }
+
+    .marker-list-scroll::-webkit-scrollbar-thumb {
+      background: linear-gradient(180deg, rgba(135, 157, 56, 0.95), rgba(94, 122, 102, 0.95));
+      border-radius: 999px;
+      border: 2px solid rgba(7, 11, 9, 0.65);
+    }
+
+    .marker-card {
+      width: 100%;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 14px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 14px;
+      background:
+        linear-gradient(180deg, rgba(16, 23, 18, 0.96), rgba(8, 12, 10, 0.96)),
+        rgba(7, 11, 9, 0.45);
+      cursor: pointer;
+      transition:
+        transform 0.14s ease,
+        border-color 0.14s ease,
+        box-shadow 0.14s ease,
+        background 0.14s ease;
+    }
+
+    .marker-card:hover {
+      border-color: var(--accent);
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.16);
+    }
+
+    .marker-card--selected {
+      border-color: var(--accent);
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.16);
+    }
+
+    .marker-card--search {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 8px;
+      padding: 12px 8px;
+      border: 0;
+      border-bottom: 1px solid rgba(94, 122, 102, 0.26);
+      border-radius: 0;
+      background: transparent;
+      box-shadow: none;
+    }
+
+    .marker-card--search:hover {
+      transform: none;
+      border-color: rgba(196, 219, 84, 0.36);
+      background: rgba(196, 219, 84, 0.05);
+      box-shadow: none;
+    }
+
+    .marker-card.active {
+      border-color: rgba(216, 77, 69, 0.6);
+      background:
+        linear-gradient(180deg, rgba(63, 20, 18, 0.98), rgba(26, 10, 9, 0.98)),
+        var(--danger-soft);
+      box-shadow:
+        inset 0 0 0 1px rgba(216, 77, 69, 0.2),
+        0 10px 24px rgba(0, 0, 0, 0.18);
+    }
+
+    .marker-card-main {
+      min-width: 0;
+      display: grid;
+      gap: 9px;
+    }
+
+    .marker-card-head {
+      display: grid;
+      gap: 4px;
+    }
+
+    .marker-kicker {
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+
+    .marker-title {
+      display: block;
+      font-weight: 700;
+      font-size: 1rem;
+      color: var(--text);
+      word-break: break-word;
+    }
+
+    .marker-meta {
+      font-size: 0.84rem;
+      color: var(--muted);
+      word-break: break-word;
+      line-height: 1.45;
+    }
+
+    .selected-pill {
+      align-self: center;
+      padding: 9px 12px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      color: var(--text);
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      white-space: nowrap;
+    }
+
+    .selected-pill--danger {
+      background: rgba(216, 77, 69, 0.12);
+      border-color: rgba(216, 77, 69, 0.2);
+      color: #ffd5d2;
+    }
+
+    .empty-state {
+      padding: 22px 18px;
+      border: 1px dashed rgba(157, 176, 160, 0.24);
+      border-radius: 16px;
+      background: rgba(6, 10, 8, 0.2);
+      text-align: center;
+    }
+
+    .panel-actions {
+      display: grid;
+      gap: 12px;
+    }
+
+    .status strong {
+      color: var(--text);
+    }
+
+    .map-wrap {
+      position: relative;
+      min-width: 0;
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    #map {
+      width: 100%;
+      height: 100%;
+      background: #050907;
+    }
+
+    .coord-readout {
+      position: absolute;
+      left: 50%;
+      bottom: 14px;
+      z-index: 900;
+      transform: translateX(-50%);
+      color: rgba(237, 244, 238, 0.78);
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-align: center;
+      text-transform: uppercase;
+      pointer-events: none;
+      text-shadow:
+        0 1px 2px rgba(0, 0, 0, 0.95),
+        0 0 8px rgba(0, 0, 0, 0.8);
+      opacity: 0.8;
+    }
+
+    .coord-readout.active {
+      color: var(--text);
+      opacity: 0.8;
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 2000;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      background: rgba(4, 8, 6, 0.72);
+      backdrop-filter: blur(6px);
+    }
+
+    .modal-card {
+      width: min(560px, 100%);
+      padding: 22px;
+      border: 1px solid var(--line-strong);
+      border-radius: 18px;
+      background: linear-gradient(180deg, rgba(24, 35, 28, 0.98), rgba(13, 20, 16, 0.98));
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+    }
+
+    .modal-card h2 {
+      margin: 0 0 12px;
+      font-size: 1.2rem;
+      letter-spacing: 0.04em;
+    }
+
+    .modal-title--center {
+      text-align: center;
+    }
+
+    .instruction-list {
+      margin: 0;
+      padding-left: 20px;
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    .modal-actions {
+      margin-top: 18px;
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    .modal-actions--center {
+      justify-content: center;
+    }
+
+    .modal-copy-text {
+      margin: 0;
+      color: var(--text);
+      line-height: 1.65;
+    }
+
+    .modal-link-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .modal-link-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 46px;
+      padding: 11px 14px;
+      border: 1px solid var(--line-strong);
+      border-radius: 14px;
+      background: linear-gradient(180deg, rgba(47, 65, 51, 0.96), rgba(25, 36, 29, 0.96));
+      color: var(--text);
+      text-decoration: none;
+      text-align: center;
+      transition: transform 0.14s ease, border-color 0.14s ease, background 0.14s ease;
+    }
+
+    .modal-link-button:hover {
+      transform: translateY(-1px);
+      border-color: var(--accent);
+    }
+
+    .discord-text-link {
+      width: fit-content;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin: 24px auto 0;
+      color: #ffffff;
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .discord-text-link:hover {
+      text-decoration: underline;
+    }
+
+    .discord-text-link svg {
+      width: 20px;
+      height: 20px;
+      flex: 0 0 auto;
+      fill: currentColor;
+    }
+
+    .leaflet-container {
+      font: inherit;
+    }
+
+    .leaflet-popup-content-wrapper,
+    .leaflet-popup-tip {
+      background: #132019;
+      color: var(--text);
+    }
+
+    .custom-pin {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      border: 2px solid #21301c;
+      transition: transform 0.14s ease, box-shadow 0.14s ease, background 0.14s ease;
+    }
+
+    .custom-pin.default {
+      background: var(--accent);
+      box-shadow: 0 0 0 3px rgba(196, 219, 84, 0.18);
+    }
+
+    .custom-pin.selected {
+      background: var(--danger);
+      box-shadow: 0 0 0 4px var(--danger-shadow);
+      transform: scale(1.08);
+    }
+
+    .erewhon-pin {
+      display: grid;
+      place-items: center;
+      width: 26px;
+      height: 26px;
+      border: 2px solid #21301c;
+      border-radius: 50%;
+      background: #4aa3ff;
+      box-shadow:
+        0 0 0 4px rgba(74, 163, 255, 0.2),
+        0 8px 18px rgba(0, 0, 0, 0.26);
+      color: #06131f;
+      font-size: 0.9rem;
+      font-weight: 900;
+      line-height: 1;
+    }
+
+    @media (max-width: 980px) {
+      body {
+        overflow: hidden;
+      }
+
+      .app-shell {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto minmax(50svh, 1fr);
+        min-height: 100svh;
+        height: 100svh;
+        overflow: hidden;
+      }
+
+      .sidebar {
+        border-right: 0;
+        border-bottom: 1px solid var(--line);
+        height: auto;
+        min-height: 0;
+        max-height: 50svh;
+        overflow-y: auto;
+        overflow-x: hidden;
+      }
+
+      .sidebar-shell {
+        height: auto;
+        min-height: auto;
+      }
+
+      .sidebar-panel--results,
+      .sidebar-panel--selected {
+        flex: 0 1 auto;
+      }
+
+      .marker-list-scroll {
+        max-height: min(22svh, 240px);
+      }
+
+      .map-wrap {
+        position: relative;
+        height: 100%;
+        min-height: 50svh;
+      }
+
+      #map {
+        height: 100%;
+        min-height: 100%;
+      }
+
+      .coord-readout {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-shell">
+        <header class="sidebar-hero">
+          <div class="title-block">
+            <h1>OPORD Generator</h1>
+          </div>
+          <div class="hero-actions">
+            <button id="instructionsBtn" type="button">Instructions</button>
+            <button id="fitMapBtn" type="button">Fit Map</button>
+          </div>
+        </header>
+
+        <section class="panel sidebar-controls">
+          <div class="search-input-wrap">
+            <input id="searchInput" type="text" placeholder="Depot, factory, residence...">
+          </div>
+          <div class="search-actions">
+            <button class="ghost-button" id="clearSearchBtn" type="button" hidden>Clear Search</button>
+          </div>
+        </section>
+
+        <div class="sidebar-body">
+          <section class="panel sidebar-panel sidebar-panel--results" id="searchResultsSection" hidden>
+            <button class="section-heading section-toggle" id="searchResultsToggle" type="button" aria-expanded="true" aria-controls="searchResultsBody">
+              <div class="section-toggle-main">
+                <h2>🔍 Search Results</h2>
+              </div>
+              <span class="section-toggle-side">
+                <span class="count-badge" id="searchResultsCount">0</span>
+                <span class="section-toggle-icon" aria-hidden="true">▾</span>
+              </span>
+            </button>
+            <div class="section-collapse-body" id="searchResultsBody">
+              <div class="marker-list-scroll">
+                <div class="marker-list" id="markerList"></div>
+              </div>
+            </div>
+          </section>
+
+          <section class="panel sidebar-panel sidebar-panel--selected" id="selectedSection" hidden>
+            <button class="section-heading section-toggle" id="selectedToggle" type="button" aria-expanded="true" aria-controls="selectedBody">
+              <div class="section-toggle-main">
+                <h2>✅ Selected Locations</h2>
+              </div>
+              <span class="section-toggle-side">
+                <span class="count-badge" id="selectedCountWrap" hidden><span id="selectedCount">0</span></span>
+                <span class="section-toggle-icon" aria-hidden="true">▾</span>
+              </span>
+            </button>
+            <div class="section-collapse-body" id="selectedBody">
+              <div class="marker-list-scroll">
+                <div class="marker-list" id="selectedList"></div>
+              </div>
+            </div>
+          </section>
+
+          <section class="panel panel-actions" id="actionsSection" hidden>
+            <button id="copyPromptBtn" type="button" hidden>Copy Prompt</button>
+          </section>
+        </div>
+      </div>
+    </aside>
+
+    <main class="map-wrap">
+      <div id="map" aria-label="Auroa and Golem Island map"></div>
+      <div class="coord-readout" id="coordReadout">Hover map for X/Y</div>
+    </main>
+  </div>
+
+  <div class="modal-backdrop" id="instructionsModal" hidden>
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="instructionsTitle">
+      <h2 class="modal-title--center" id="instructionsTitle">Instructions</h2>
+      <ol class="instruction-list">
+        <li>Zoom around and select 🟢 or search for the locations you want to target. The map displays all enemy bases, but not every single map item to maintain visual clarity.</li>
+        <li>Click 'Copy Prompt' and follow the instructions.</li>
+        <li>Enjoy playing your custom roleplay mission!</li>
+      </ol>
+      <a class="discord-text-link" href="https://discord.gg/BXvQFwBq8z" target="_blank" rel="noreferrer noopener">
+        <svg aria-hidden="true" viewBox="0 0 24 24" focusable="false">
+          <path d="M20.32 4.37A19.87 19.87 0 0 0 15.36 2.84a13.66 13.66 0 0 0-.63 1.3 18.45 18.45 0 0 0-5.46 0 13.66 13.66 0 0 0-.63-1.3A19.87 19.87 0 0 0 3.68 4.37C.54 9.02-.31 13.56.11 18.04a20.06 20.06 0 0 0 6.09 3.08c.49-.66.93-1.36 1.3-2.1a12.92 12.92 0 0 1-2.05-.98c.17-.13.34-.26.5-.4a14.24 14.24 0 0 0 12.1 0c.16.14.33.27.5.4-.65.39-1.34.72-2.05.98.37.74.81 1.44 1.3 2.1a20.06 20.06 0 0 0 6.09-3.08c.5-5.19-.84-9.69-3.57-13.67ZM8.02 15.28c-1.18 0-2.15-1.08-2.15-2.41 0-1.33.95-2.42 2.15-2.42 1.2 0 2.17 1.09 2.15 2.42 0 1.33-.95 2.41-2.15 2.41Zm7.96 0c-1.18 0-2.15-1.08-2.15-2.41 0-1.33.95-2.42 2.15-2.42 1.2 0 2.17 1.09 2.15 2.42 0 1.33-.95 2.41-2.15 2.41Z"/>
+        </svg>
+        Join the Discord Server
+      </a>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="copySuccessModal" hidden>
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="copySuccessTitle">
+      <h2 class="modal-title--center" id="copySuccessTitle">Prompt Copied in your Clipboard</h2>
+      <p class="modal-copy-text">
+        Go paste it into your AI tool of choice to generate the final OPORD. Try a few generations and use the one you prefer. You can also fine-tune it as needed. Enjoy running immersive operations with your teammates and good luck out there!
+      </p>
+      <div class="modal-link-grid" aria-label="AI tools">
+        <a class="modal-link-button" href="https://gemini.google.com/" target="_blank" rel="noreferrer noopener">Gemini</a>
+        <a class="modal-link-button" href="https://chatgpt.com/" target="_blank" rel="noreferrer noopener">ChatGPT</a>
+        <a class="modal-link-button" href="https://claude.ai/new" target="_blank" rel="noreferrer noopener">Claude</a>
+        <a class="modal-link-button" href="https://grok.com/" target="_blank" rel="noreferrer noopener">Grok</a>
+        <a class="modal-link-button" href="https://www.perplexity.ai/" target="_blank" rel="noreferrer noopener">Perplexity</a>
+        <a class="modal-link-button" href="https://chat.z.ai/" target="_blank" rel="noreferrer noopener">GLM</a>
+      </div>
+    </div>
+  </div>
+
+  <script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+    crossorigin=""
+  ></script>
+  <script>
+    const IMAGE_WIDTH = 12710;
+    const IMAGE_HEIGHT = 16000;
+    const GOLEM_IMAGE_WIDTH = 7729;
+    const GOLEM_IMAGE_HEIGHT = 7000;
+    const GOLEM_MAP_SOURCE = "golem.jpg";
+    const GOLEM_OFFSET_X = IMAGE_WIDTH;
+    const GOLEM_OFFSET_Y = 0;
+    const TILE_SIZE = 256;
+    const MAX_NATIVE_ZOOM = 6;
+    const SEARCH_RESULT_ZOOM = 5.5;
+    const INITIAL_VIEW_ZOOM = 3;
+    const INITIAL_VIEW_X = 6754;
+    const INITIAL_VIEW_Y = 6202;
+    const SHOW_EREWHON_MARKER = false;
+    const EREWHON_MARKER = {
+      name: "Erewhon",
+      x: 7153,
+      y: 5517
+    };
+    const EMBEDDED_MARKERS = [{"id":"1775828212952-dw0dog","name":"Windy Islands Port","notes":"","x":3351,"y":14142},{"id":"1775828882953-0jhsha","name":"Drone Station S01","notes":"","x":3738,"y":13984},{"id":"1775828894081-axwxqr","name":"Incineration Plant","notes":"","x":3923,"y":14043},{"id":"1775829109449-3036ng","name":"Auroa Recycling Factory","notes":"","x":3693,"y":13738},{"id":"1775829434073-vxn7yh","name":"Garbage Dump","notes":"","x":3237,"y":13616},{"id":"1775829512700-7ke15h","name":"Murmur Drones","notes":"","x":9112,"y":11140},{"id":"1775829519195-57p2p8","name":"Murmur Drones","notes":"","x":9056,"y":11887},{"id":"1775829521771-eivmll","name":"Murmur Drones","notes":"","x":9080,"y":11443},{"id":"1775829532864-raiq9z","name":"Aamon Drones","notes":"","x":8717,"y":11638},{"id":"1775829539422-vekla3","name":"Aamon Drones","notes":"","x":9193,"y":11655},{"id":"1775829545053-lqc326","name":"Aamon Drones","notes":"","x":9273,"y":11445},{"id":"1775829625484-hjdxg3","name":"Jace Skell Dam","notes":"","x":5003,"y":10295},{"id":"1775829636113-ha1z5y","name":"Auroa Solar Power Plant","notes":"","x":5029,"y":11035},{"id":"1775829682441-y0c7gk","name":"Detention Center","notes":"","x":4443,"y":11430},{"id":"1775829706353-8lq4vs","name":"Checkpoint Fox Foxtrot","notes":"","x":4490,"y":11715},{"id":"1775829876674-37ude2","name":"Murmur Drones","notes":"","x":3402,"y":13833},{"id":"1775829882561-5fcmi0","name":"Behemoth Drone","notes":"","x":2826,"y":13946},{"id":"1775829964041-vztpzn","name":"Sentinel Corp Naval Base","notes":"","x":4179,"y":12171},{"id":"1775829972178-xidip4","name":"Naval Base Auroa Airfield","notes":"","x":3784,"y":11984},{"id":"1775829991713-v67o4n","name":"Checkpoint Shark Alpha","notes":"","x":4115,"y":11624},{"id":"1775830019705-tbh0se","name":"Control Station Shark 01","notes":"","x":4035,"y":11528},{"id":"1775830080330-8t0jyf","name":"Shark Base","notes":"","x":3153,"y":11405},{"id":"1775830152073-kl5zs8","name":"Falcon SAM Site","notes":"","x":2922,"y":11622},{"id":"1775830165554-h250w3","name":"Camp Seal Cove","notes":"","x":2234,"y":11570},{"id":"1775830177489-ddungc","name":"Abandonned Barracks","notes":"","x":2059,"y":10882},{"id":"1775830197113-3veynb","name":"Anti Aircraft Battery","notes":"","x":2943,"y":10745},{"id":"1775830207874-h1xw9x","name":"Checkpoint Shark Bravo","notes":"","x":3196,"y":10676},{"id":"1775830218786-u6n4am","name":"Emelius Port","notes":"","x":3581,"y":10816},{"id":"1775830242762-o4e748","name":"Owl SAM Site","notes":"","x":3871,"y":11220},{"id":"1775830258626-fzzvo6","name":"Ammunition Storage","notes":"","x":3929,"y":10864},{"id":"1775830282529-te1ukt","name":"Condor SAM Site","notes":"","x":3712,"y":10605},{"id":"1775830312601-cztnmr","name":"Buzzard SAM Site","notes":"","x":3127,"y":10444},{"id":"1775830327473-cs2lu6","name":"West Radar Station","notes":"","x":3251,"y":10128},{"id":"1775830338250-9y10zf","name":"Fuel Storage","notes":"","x":2659,"y":10104},{"id":"1775830488850-nammhs","name":"Drone Station W191","notes":"","x":4993,"y":11400},{"id":"1775830495841-vfejmj","name":"Control Station Fox 01","notes":"","x":4833,"y":11505},{"id":"1775830570874-vwjqvv","name":"Thomas Jefferson Residences","notes":"","x":5038,"y":11604},{"id":"1775830581554-d0q9fa","name":"Adam Smith District","notes":"","x":5286,"y":11533},{"id":"1775830591922-qg0c4d","name":"Auroa Parliament","notes":"","x":5212,"y":11744},{"id":"1775830630329-mxm2nv","name":"Construction Site","notes":"","x":5506,"y":11616},{"id":"1775830648977-u5orro","name":"East Park","notes":"","x":5602,"y":11834},{"id":"1775831790322-mfosab","name":"Parliament Shopping Street","notes":"","x":4985,"y":11788},{"id":"1775831802699-ih0vje","name":"Liberty Airport","notes":"","x":5233,"y":12797},{"id":"1775831850394-axz679","name":"Frederic Bastiat Residences","notes":"","x":5285,"y":12397},{"id":"1775831870123-v4kfdk","name":"Maunga Nui Eco Park","notes":"","x":5082,"y":12143},{"id":"1775831885834-no3zo8","name":"Ayn Rand Residences","notes":"","x":5026,"y":12347},{"id":"1775831909242-zb6ukl","name":"John Dewey Residences","notes":"","x":4810,"y":12070},{"id":"1775831929835-hoyktx","name":"Autumn Lake District","notes":"","x":5281,"y":12203},{"id":"1775831938683-pve8lp","name":"Liberty Port","notes":"","x":5525,"y":12157},{"id":"1775831979419-q77r83","name":"Winter Park","notes":"","x":5535,"y":11971},{"id":"1775831992531-kcypvp","name":"Winter Lake Shopping Street","notes":"","x":5306,"y":11948},{"id":"1775832012770-93911l","name":"Benjamin Franklin Residences","notes":"","x":5759,"y":12017},{"id":"1775832070850-83n673","name":"Island District","notes":"","x":5764,"y":11860},{"id":"1775832080595-2gzpoc","name":"Control Station Fox 02","notes":"","x":5961,"y":11844},{"id":"1775832092531-8uwnuo","name":"Drone Station W192","notes":"","x":5745,"y":11690},{"id":"1775832119091-c8avkk","name":"Richard Cobden Residences","notes":"","x":6174,"y":12123},{"id":"1775832126234-x01fiu","name":"Jane Adams Residences","notes":"","x":6373,"y":11761},{"id":"1775832144850-aih9kq","name":"Construction Site","notes":"","x":6620,"y":11613},{"id":"1775832156210-daayjs","name":"Ancient Fort","notes":"","x":7096,"y":11711},{"id":"1775832174178-7862is","name":"Checkpoint Fox Bravo","notes":"","x":6602,"y":11361},{"id":"1775832197834-kbo9uw","name":"Cryohope","notes":"","x":6445,"y":11006},{"id":"1775832214643-fhhx0s","name":"Cryogenization Center","notes":"","x":6194,"y":11119},{"id":"1775832219667-og7wnj","name":"Eternity","notes":"","x":5998,"y":10911},{"id":"1775832227244-4z4bqs","name":"Auroa Hospital","notes":"","x":5810,"y":11252},{"id":"1775832314803-dtc5zd","name":"Checkpoint Viper India","notes":"","x":7186,"y":11247},{"id":"1775832323595-p1huus","name":"Ettrick Residences","notes":"","x":7376,"y":11099},{"id":"1775832339163-6sg4n3","name":"Checkpoint Viper Hotel","notes":"","x":7163,"y":10986},{"id":"1775832350987-g7q69b","name":"Glenfield Farm","notes":"","x":6953,"y":10769},{"id":"1775832366162-b9hkx9","name":"Drone Station W131","notes":"","x":7339,"y":10780},{"id":"1775832376739-7dkpfh","name":"Sutherland Vineyard","notes":"","x":7733,"y":10867},{"id":"1775832417898-f9zguj","name":"Glenorchy Orchard","notes":"","x":7467,"y":10617},{"id":"1775832429195-dq6bzb","name":"Ancient Village","notes":"","x":7653,"y":10273},{"id":"1775832440034-z4biad","name":"New Stirling Freight Yard","notes":"","x":7153,"y":10107},{"id":"1775832453203-4t6k1w","name":"Checkpoint Viper Bravo","notes":"","x":7249,"y":9970},{"id":"1775832466267-h0uxx9","name":"Agronomy Center","notes":"","x":7716,"y":9940},{"id":"1775832472874-h68520","name":"Mossburn Hopfield","notes":"","x":7964,"y":9707},{"id":"1775832483026-h4jybw","name":"Kelso Farm","notes":"","x":7530,"y":9795},{"id":"1775832490307-2rgrry","name":"Drone Station W132","notes":"","x":7633,"y":9546},{"id":"1775832541674-9ejspl","name":"Control Station Viper 03","notes":"","x":6955,"y":9698},{"id":"1775832562554-o5z1rw","name":"World Seedvault","notes":"","x":6930,"y":9437},{"id":"1775832574146-nq4l5h","name":"Kinloch Farm","notes":"","x":7545,"y":9357},{"id":"1775832586051-0qgxaq","name":"Control Station Viper 02","notes":"","x":8079,"y":9100},{"id":"1775832594763-b3k9ow","name":"Burnside Orchard","notes":"","x":7898,"y":8919},{"id":"1775832651515-n1n21i","name":"Forsyth Farm","notes":"","x":7694,"y":8725},{"id":"1775832657226-askc6k","name":"Blue Viper Outpost","notes":"","x":8044,"y":8763},{"id":"1775832676451-qd9te1","name":"Checkpoint Viper Foxtrot","notes":"","x":8280,"y":8665},{"id":"1775832750299-i8ns59","name":"Dunback Farm","notes":"","x":7344,"y":8622},{"id":"1775832816971-219suj","name":"Arrow Testing Zone","notes":"","x":3441,"y":9554},{"id":"1775832831564-dmsjrs","name":"Assembly Hall Omega 02","notes":"","x":3904,"y":9229},{"id":"1775832842548-zifojj","name":"Checkpoint Weasel Bravo","notes":"","x":3803,"y":8929},{"id":"1775832858355-r8udgb","name":"Outpost Red Ferret","notes":"","x":4357,"y":9195},{"id":"1775832881539-1l29ly","name":"Gold Trail Testing Zone","notes":"","x":4100,"y":9790},{"id":"1775832888299-kj3hau","name":"Nugget Cliff","notes":"","x":4448,"y":9881},{"id":"1775832906123-jvyhk0","name":"Checkpoint Ferret Bravo","notes":"","x":4184,"y":9568},{"id":"1775832958796-mgc6bb","name":"Omega Operations","notes":"","x":5141,"y":9517},{"id":"1775832964410-i368e9","name":"Camp Ferret","notes":"","x":4991,"y":9167},{"id":"1775832982131-5jzsvs","name":"Stony Creek Village","notes":"","x":5582,"y":10693},{"id":"1775833028931-3fixhz","name":"Checkpoint Fox Alpha","notes":"","x":5636,"y":8828},{"id":"1775833032996-z82ceb","name":"Construction Site","notes":"","x":5456,"y":8958},{"id":"1775833070876-inngmo","name":"Control Station Viper 01","notes":"","x":5484,"y":8746},{"id":"1775833084435-y9kyuc","name":"Grandview Mansion","notes":"","x":5666,"y":9096},{"id":"1775833097131-if91np","name":"Control Station Fox 01","notes":"","x":5810,"y":9377},{"id":"1775833112275-ztsvfc","name":"Checkpoint Fox Echo","notes":"","x":5391,"y":9906},{"id":"1775833118844-3jflqx","name":"Outpost Red Fox","notes":"","x":5576,"y":9782},{"id":"1775833125436-v6ty8f","name":"Training Center","notes":"","x":5621,"y":9991},{"id":"1775833160163-7bmxh8","name":"Devil Forest Gold Mine","notes":"","x":5522,"y":10448},{"id":"1775833180475-2tvuvf","name":"Omega R&D Center","notes":"","x":5870,"y":10372},{"id":"1775833194211-izxbbb","name":"Checkpoint Fox Delta","notes":"","x":6101,"y":10683},{"id":"1775833205028-l6ytdl","name":"Drone Station W161","notes":"","x":6554,"y":10588},{"id":"1775833215996-scll6n","name":"Assembly Hall Omega 01","notes":"","x":6472,"y":10436},{"id":"1775833225836-pd0ywc","name":"Freeman Residences","notes":"","x":6005,"y":9924},{"id":"1775833240875-7qpep9","name":"Camp Fox","notes":"","x":6103,"y":9435},{"id":"1775833248404-jxw80p","name":"Prototype Workshop","notes":"","x":6390,"y":9496},{"id":"1775833265676-fd8a9z","name":"Control Station Fox 02","notes":"","x":6553,"y":9609},{"id":"1775833283477-6eq0rj","name":"Maintenance Area","notes":"","x":6643,"y":9163},{"id":"1775833299772-f2eu75","name":"Checkpoint Fox Charlie","notes":"","x":7022,"y":9088},{"id":"1775833318987-rt3qnb","name":"Russel Gold Mine","notes":"","x":6436,"y":9988},{"id":"1775833428459-h32vjz","name":"Skell Security Assembly Hall","notes":"","x":6446,"y":8053},{"id":"1775833435027-fx2yqd","name":"Camp Viper","notes":"","x":5854,"y":8113},{"id":"1775833441748-v6owue","name":"Ancient Fort","notes":"","x":5838,"y":8381},{"id":"1775833450179-wbylgr","name":"Maintenance Area","notes":"","x":6054,"y":8684},{"id":"1775833459404-07ry6a","name":"Skell Security Operations","notes":"","x":6348,"y":8880},{"id":"1775833466636-06zlft","name":"Two Lakes Residences","notes":"","x":6380,"y":8522},{"id":"1775833477020-c247p3","name":"Skell Security R&D Center","notes":"","x":6857,"y":8293},{"id":"1775833505531-qb3vic","name":"Drone Station W121","notes":"","x":6117,"y":7787},{"id":"1775833515596-tmqo0o","name":"Checkpoint Viper Alpha","notes":"","x":6614,"y":7673},{"id":"1775833523243-zt90ts","name":"Ancient Village","notes":"","x":7026,"y":7465},{"id":"1775833532388-ht07wr","name":"Red Weasel Outpost","notes":"","x":7152,"y":7794},{"id":"1775833539092-607s43","name":"Prototype Workshop","notes":"","x":7002,"y":7748},{"id":"1775833596780-hmu34g","name":"Auroa Survival Shelter","notes":"","x":3901,"y":7805},{"id":"1775833610492-g7v2fb","name":"Drone Station W111","notes":"","x":3748,"y":8706},{"id":"1775833629828-s2ju6z","name":"Auroa Weather Station","notes":"","x":4484,"y":8758},{"id":"1775833647707-8qx7q3","name":"Checkpoint Weasel India","notes":"","x":4576,"y":8283},{"id":"1775833658923-t1d5rs","name":"Camp Weasel","notes":"","x":4749,"y":8143},{"id":"1775833671612-47ce4u","name":"Natural Hazards Control","notes":"","x":4308,"y":7906},{"id":"1775833694819-w95ots","name":"Checkpoint Weasel Golf","notes":"","x":3878,"y":7301},{"id":"1775833718364-ftmpat","name":"Checkpoint Weasel Hotel","notes":"","x":4843,"y":8026},{"id":"1775833725595-ky7d9b","name":"Bunker Edgehod South","notes":"","x":4754,"y":7916},{"id":"1775833738131-td8lfi","name":"Red Weasel Output","notes":"","x":5367,"y":8200},{"id":"1775833766612-gthhb3","name":"Checkpoint Weasel Alpha","notes":"","x":5648,"y":8029},{"id":"1775833885523-f3o1fz","name":"Auroa Power Plant","notes":"","x":1392,"y":10426},{"id":"1775833895956-93behk","name":"Main Pumping Station","notes":"","x":1096,"y":10187},{"id":"1775833911371-wk9mbh","name":"Checkpoint Shark Charlie","notes":"","x":2028,"y":10535},{"id":"1775833920859-g7mt3r","name":"Eagle SAM Site","notes":"","x":2076,"y":10216},{"id":"1775833927124-b8sbcb","name":"Step Up Startup","notes":"","x":1889,"y":10357},{"id":"1775833939843-csy7vv","name":"Cold War Ruins","notes":"","x":1690,"y":9852},{"id":"1775833945419-z27yu6","name":"Navy Fuelling Station","notes":"","x":1037,"y":9723},{"id":"1775833952235-x9mfxq","name":"Red Shark Outpost","notes":"","x":1218,"y":9565},{"id":"1775833961636-6wjg8v","name":"Channels Port","notes":"","x":1878,"y":9310},{"id":"1775833975612-b1byqz","name":"Electric Grid Control","notes":"","x":2944,"y":8548},{"id":"1775833984467-gniceb","name":"Channels R&D Center","notes":"","x":2495,"y":8907},{"id":"1775834037932-rm2mjj","name":"Vulture SAM Site","notes":"","x":2834,"y":9662},{"id":"1775834050147-6hgx6z","name":"Ancient Village","notes":"","x":2250,"y":7622},{"id":"1775834056099-r0xlfy","name":"Oceanic Power Plant","notes":"","x":2183,"y":7254},{"id":"1775834103964-pnnjpb","name":"Jace Skell Conference Hall","notes":"","x":8573,"y":8553},{"id":"1775834603939-fnwdhl","name":"Auroa Airport","notes":"","x":9075,"y":7571},{"id":"1775834612077-5cmu9p","name":"Skell Foundation Head Office","notes":"","x":8757,"y":7104},{"id":"1775834635028-tgny82","name":"Control Station Viper 04","notes":"","x":8381,"y":6998},{"id":"1775834642237-x87ls6","name":"Checkpoint Viper Golf","notes":"","x":8493,"y":7047},{"id":"1775834681380-eizme1","name":"Alpha Centauri Residences","notes":"","x":8018,"y":7177},{"id":"1775834692684-gn2roy","name":"Skell Security","notes":"","x":8088,"y":7480},{"id":"1775834710693-n5j5gz","name":"Checkpoint Viper Delta","notes":"","x":7693,"y":7610},{"id":"1775834720348-jpial1","name":"Skell Tech Head Office","notes":"","x":7493,"y":7657},{"id":"1775834729292-3brrns","name":"Polaris Residences","notes":"","x":7346,"y":8057},{"id":"1775834781244-xi5jzs","name":"Outpost Green Viper","notes":"","x":7995,"y":8072},{"id":"1775834796860-cudtkz","name":"Checkpoint Viper Charlie","notes":"","x":7720,"y":8371},{"id":"1775834801404-bwcxq3","name":"Vega Residences","notes":"","x":7885,"y":8386},{"id":"1775834812556-a8ukma","name":"Infinity Medical Center","notes":"","x":8056,"y":8414},{"id":"1775834841285-8y3057","name":"Checkpoint Viper Echo","notes":"","x":8010,"y":8563},{"id":"1775834851996-30raun","name":"Canopus District","notes":"","x":8202,"y":8442},{"id":"1775834862629-pubwhd","name":"Rigel Residences","notes":"","x":8488,"y":8272},{"id":"1775834866756-r8d882","name":"Sirius Residences","notes":"","x":8369,"y":8099},{"id":"1775834876421-bumc8u","name":"Antares District","notes":"","x":8385,"y":7860},{"id":"1775834883812-cskmju","name":"Infinity Transport Hub","notes":"","x":8679,"y":7681},{"id":"1775834947132-mco2wf","name":"Ancient Sacred Site","notes":"","x":7803,"y":5396},{"id":"1775834956348-gud159","name":"Control Station Tiger 04","notes":"","x":7736,"y":5595},{"id":"1775834964708-86qkau","name":"Fish Processing Center","notes":"","x":7661,"y":6271},{"id":"1775834969533-hoenia","name":"Ancient Fort","notes":"","x":7021,"y":6286},{"id":"1775834980212-hali0u","name":"Outpost Black Tiger","notes":"","x":6790,"y":6569},{"id":"1775834989236-thvblc","name":"Meal Packaging Center","notes":"","x":7729,"y":6575},{"id":"1775835001013-m9g6eo","name":"Cold Storage Center","notes":"","x":7535,"y":6835},{"id":"1775835005988-v7pocg","name":"New Argyll Winery","notes":"","x":7596,"y":7143},{"id":"1775835019221-134ffi","name":"Juice Processing","notes":"","x":7292,"y":7193},{"id":"1775835022532-6s60hl","name":"Brewery","notes":"","x":6862,"y":7207},{"id":"1775835030572-zw422p","name":"Long Valley Residences","notes":"","x":6573,"y":7269},{"id":"1775835034221-dh6man","name":"Skell Estate","notes":"","x":6439,"y":7368},{"id":"1775835079764-189sok","name":"Pumping Station","notes":"","x":5547,"y":6751},{"id":"1775835088965-h4god4","name":"Battery Farm","notes":"","x":6197,"y":7030},{"id":"1775835099476-lhvyrp","name":"Auroa Data Farm","notes":"","x":5775,"y":7239},{"id":"1775835149917-74yj8l","name":"Camp Black Widow","notes":"","x":5490,"y":7467},{"id":"1775835239084-w8g3xh","name":"Mathilda's Place","notes":"","x":4915,"y":7513},{"id":"1775835257612-vj6064","name":"O'Connors Mine","notes":"","x":4951,"y":7360},{"id":"1775835269093-0bjqh3","name":"Auroa Intranet Control","notes":"","x":4929,"y":6966},{"id":"1775835278581-5u1bmb","name":"Drone Station W071","notes":"","x":4298,"y":7203},{"id":"1775835311492-b1717z","name":"Submarine Cable Control","notes":"","x":4601,"y":6573},{"id":"1775835320541-coh2pf","name":"Hemlock Station","notes":"","x":4713,"y":6316},{"id":"1775835346844-yiz6bs","name":"Checkpoint Weasel Echo","notes":"","x":3349,"y":7649},{"id":"1775835354068-oc3vg2","name":"Construction Site","notes":"","x":3246,"y":7574},{"id":"1775835365141-twsjeg","name":"Ancient Harbor","notes":"","x":2697,"y":7337},{"id":"1775835370237-gfcdpu","name":"Air Chassis Factory","notes":"","x":3646,"y":7133},{"id":"1775835381044-oyrsqx","name":"Blue Cove Station","notes":"","x":2747,"y":6959},{"id":"1775835394852-ir4gbe","name":"Aconite Station","notes":"","x":3084,"y":6736},{"id":"1775835403861-uiidwz","name":"Drone Station W061","notes":"","x":3335,"y":6740},{"id":"1775835413655-4n2zom","name":"Wind Farm W02","notes":"","x":2625,"y":6313},{"id":"1775835421381-0h7ggw","name":"Fanny Bay Port","notes":"","x":3239,"y":5877},{"id":"1775835433277-092f2q","name":"Land Chassis Factory","notes":"","x":3592,"y":6335},{"id":"1775835456245-7lluam","name":"Storage Depot","notes":"","x":3906,"y":6129},{"id":"1775835464933-z24518","name":"Checkpoint Weasel Delta","notes":"","x":3858,"y":5991},{"id":"1775835473892-qtc9a3","name":"Checkpoint Weasel Charlie","notes":"","x":3991,"y":5841},{"id":"1775835479396-vadwcn","name":"Mechanical R&D Center","notes":"","x":3644,"y":5538},{"id":"1775835555486-lfw4i5","name":"Fen Bog Testing Zone","notes":"","x":7961,"y":6714},{"id":"1775835562013-8u3f65","name":"Photovoltaic Park W01","notes":"","x":8270,"y":6655},{"id":"1775835576221-q8gyn7","name":"Fen Bog Port","notes":"","x":9297,"y":6510},{"id":"1775835583093-buw41l","name":"Blue Corp Startup","notes":"","x":8227,"y":6048},{"id":"1775835592476-16vhuz","name":"Ancient Village","notes":"","x":9254,"y":6124},{"id":"1775835602692-vk512w","name":"Drone Station W051","notes":"","x":9630,"y":6101},{"id":"1775835612485-z3bz2l","name":"Control Station Tiger 02","notes":"","x":9768,"y":5832},{"id":"1775835627556-ns1a6g","name":"Drone Station W052","notes":"","x":9433,"y":5506},{"id":"1775835637325-tdrbdr","name":"Longford Farm","notes":"","x":9093,"y":5337},{"id":"1775835640685-njpk0s","name":"Whitestone Farm","notes":"","x":8688,"y":5121},{"id":"1775835648380-yf4zzy","name":"Andersons Farm","notes":"","x":8543,"y":5646},{"id":"1775835655469-jywslm","name":"Shipping Center","notes":"","x":8153,"y":5328},{"id":"1775835688309-0133v7","name":"Hogweed Station","notes":"","x":8839,"y":5745},{"id":"1775835705181-k3l6gt","name":"Airship Air Station","notes":"","x":8101,"y":4564},{"id":"1775835715540-q5r4bs","name":"Checkpoint Tiger Hotel","notes":"","x":7613,"y":4697},{"id":"1775835750676-4wnabp","name":"Checkpoint Tiger Bravo","notes":"","x":8237,"y":5839},{"id":"1775835759125-mz9d6q","name":"Control Station Tiger 03","notes":"","x":7986,"y":5846},{"id":"1775835820564-lihpbt","name":"Checkpoint Tiger Echo","notes":"","x":6241,"y":5892},{"id":"1775835833749-p1u0ju","name":"Drone Station W041","notes":"","x":6230,"y":5656},{"id":"1775835844196-md5sn6","name":"Silent Valley Mine","notes":"","x":6004,"y":5306},{"id":"1775835854006-25qh93","name":"Mining Control Center","notes":"","x":6044,"y":4528},{"id":"1775835862564-nv1y4u","name":"Chem-Extraction Complex","notes":"","x":6740,"y":4698},{"id":"1775835871540-ucjvrh","name":"Bald Peak Mine","notes":"","x":7460,"y":4895},{"id":"1775835894630-wmltp3","name":"Electric Engine Factory","notes":"","x":4524,"y":5540},{"id":"1775835904428-4r6m7k","name":"Outpost Blue Tiger","notes":"","x":4346,"y":5164},{"id":"1775835910597-06vk71","name":"Toxic Storage Depot","notes":"","x":3830,"y":5398},{"id":"1775835916876-o94ox5","name":"Anchor Point Station","notes":"","x":3164,"y":5364},{"id":"1775835925005-3mg2tq","name":"Drone Station W031","notes":"","x":3774,"y":5066},{"id":"1775835934965-hqui9f","name":"Engine R&D Center","notes":"","x":3902,"y":4710},{"id":"1775835951933-147w8r","name":"Wild Coast Freight Yard","notes":"","x":4842,"y":4464},{"id":"1775835955582-c4jby9","name":"Storage Depot","notes":"","x":4918,"y":4872},{"id":"1775835964348-6bfcet","name":"Checkpoint Tiger Foxtrot","notes":"","x":4551,"y":4834},{"id":"1775835978164-55oze8","name":"Ancient Harbor","notes":"","x":4188,"y":4388},{"id":"1775835987748-e0wqzr","name":"Control Station Tiger 01","notes":"","x":4546,"y":4085},{"id":"1775835997325-wab1ao","name":"Hybrid Engine Factory","notes":"","x":5483,"y":4506},{"id":"1775836008628-08mwbn","name":"Youth Spring","notes":"","x":4957,"y":3922},{"id":"1775836015934-tilyia","name":"Wind Farm W03","notes":"","x":4933,"y":3720},{"id":"1775836019893-wq2ms5","name":"Shark Bank Station","notes":"","x":4436,"y":3672},{"id":"1775836082894-vh89t0","name":"Howard Airfield","notes":"","x":9447,"y":3316},{"id":"1775836089541-ww0b24","name":"Ancient Harbor","notes":"","x":9043,"y":3239},{"id":"1775836100246-4n87v0","name":"Harrier SAM Site","notes":"","x":9328,"y":3615},{"id":"1775836125036-482r5u","name":"Checkpoint Tiger Golf","notes":"","x":9263,"y":3767},{"id":"1775836137541-u0cjnj","name":"Anti-Aircraft Ruins","notes":"","x":8422,"y":4023},{"id":"1775836162637-97gp7m","name":"Sentinel Corp Land Base","notes":"","x":8786,"y":4593},{"id":"1775836166901-29itfg","name":"Checkpoint Tiger Juliet","notes":"","x":8813,"y":4763},{"id":"1775836176036-ayuf21","name":"Checkpoint Tiger Kilo","notes":"","x":9591,"y":5052},{"id":"1775836179445-qcqzpo","name":"Equipment Depot","notes":"","x":9437,"y":4916},{"id":"1775836190598-hwdb2u","name":"Bunker Edgehod South","notes":"","x":10323,"y":5498},{"id":"1775836197660-tmicxp","name":"Camp Tiger","notes":"","x":10817,"y":4852},{"id":"1775836203789-7zhwfo","name":"Sparrowhawk SAM Site","notes":"","x":10763,"y":4598},{"id":"1775836212685-fpgaxx","name":"Bunker Edgehod North","notes":"","x":10881,"y":3939},{"id":"1775836219396-bsqdf5","name":"Howard Port","notes":"","x":10345,"y":4056},{"id":"1775836223462-ex0yam","name":"Radar Station North","notes":"","x":9997,"y":3653},{"id":"1775836237292-g8tts8","name":"Osprey SAM Site","notes":"","x":9659,"y":3710},{"id":"1775836249845-td6gkc","name":"Ammunition Depot","notes":"","x":9516,"y":4114},{"id":"1775836257508-0g5qrh","name":"Checkpoint Tiger India","notes":"","x":9277,"y":4292},{"id":"1775836281941-zpolcs","name":"Maunga Nui Port","notes":"","x":6572,"y":3061},{"id":"1775836288453-c9v6f3","name":"Spanish Fortress","notes":"","x":5688,"y":3078},{"id":"1775836294997-ez8dkm","name":"Smuggler Coves Freight Yard","notes":"","x":6250,"y":3273},{"id":"1775836311637-ocbrh3","name":"Drone Station W011","notes":"","x":5627,"y":3575},{"id":"1775836327574-2rsmu6","name":"Wind Farm W01","notes":"","x":5196,"y":3700},{"id":"1775836349646-c12x9d","name":"Foxglove Station","notes":"","x":5288,"y":3947},{"id":"1775836363109-tnce07","name":"Auroa Materials Deposit","notes":"","x":6091,"y":3838},{"id":"1775836370773-p9iu8j","name":"Outpost Red Tiger","notes":"","x":6919,"y":3744},{"id":"1775836383950-650jch","name":"Oleander Station","notes":"","x":7013,"y":4134},{"id":"1775836399166-b09wrx","name":"Polymorph Modeling","notes":"","x":7340,"y":3983},{"id":"1775836408573-uvjkj3","name":"Emergency Center","notes":"","x":7467,"y":4559},{"id":"1775836416644-85eh6n","name":"Ancient Harbor","notes":"","x":7916,"y":3466},{"id":"1775836421989-af47bp","name":"Composite Factory","notes":"","x":7319,"y":3372},{"id":"1775836450310-ohomyf","name":"Checkpoint Tiger Charlie","notes":"","x":7234,"y":3244},{"id":"1775836468533-r5jn6h","name":"Checkpoint Tiger Bravo","notes":"","x":6203,"y":3353},{"id":"1775836511157-ttl78v","name":"Camp Kodiak","notes":"","x":12067,"y":3482},{"id":"1775836526669-mrhvlf","name":"Ancient Cemetery","notes":"","x":11774,"y":3009},{"id":"1775836553998-wt1lsm","name":"Ancient Sanctuary","notes":"","x":11280,"y":2620},{"id":"1775836565830-r5gio9","name":"Dirftwood Islets Testing Zone","notes":"","x":11741,"y":1765},{"id":"1775836587445-gz1gun","name":"Underwater Cable Station","notes":"","x":8242,"y":2241},{"id":"1775836600501-gc697c","name":"AI Experimental Center","notes":"","x":10356,"y":1096},{"id":"1775836611917-a2qr6w","name":"Campus Data Farm","notes":"","x":9371,"y":2186},{"id":"1775836615436-u1cmuc","name":"Construction Site","notes":"","x":9068,"y":2492},{"id":"1775836622765-fyy9n3","name":"Skell Foundation Campus","notes":"","x":9643,"y":2550},{"id":"1775836674621-27mrfw","name":"Bat SAM Site","notes":"","x":9938,"y":3165},{"id":"1775836682333-xv05lb","name":"Darkwood Island Port","notes":"","x":10205,"y":2891},{"id":"1775836695998-9gnf45","name":"Sentinel Corp. Servers","notes":"","x":10155,"y":2333},{"id":"1775836707278-mjh26z","name":"Campus Relay Station","notes":"","x":10659,"y":2171}];
+
+    const ADDITIONAL_AUROA_MARKERS = [
+      {"id":"manchineel-station","name":"Manchineel Station","notes":"","x":6742,"y":9048}
+    ];
+
+    const GOLEM_MARKERS = [
+      {"id":"1775850654893-cykovm","name":"Chemical Pipeline","notes":"","x":2570,"y":1811},
+      {"id":"1775850663830-l4pj92","name":"Chemical Refinery","notes":"","x":2083,"y":3116},
+      {"id":"1775850675766-b6miqt","name":"Golem Island Satelitte Dish","notes":"","x":1847,"y":4746},
+      {"id":"1775850683661-4x648t","name":"Golem Island Heliport","notes":"","x":2607,"y":4014},
+      {"id":"1775850692165-usix5u","name":"Ancient Harbor","notes":"","x":1076,"y":5256},
+      {"id":"1775850702030-zi8aj8","name":"Golem Island Testing Zone","notes":"","x":2576,"y":5582},
+      {"id":"1775850712053-sm84ks","name":"Forgotten Sanctuary","notes":"","x":2710,"y":4811},
+      {"id":"1775850717333-lauck6","name":"Camp Pheonix","notes":"","x":3449,"y":4305},
+      {"id":"1775850722685-txdy9i","name":"Camp Salamander","notes":"","x":4135,"y":3915},
+      {"id":"1775850739477-all8wc","name":"Prototype Workshop","notes":"","x":3750,"y":1404},
+      {"id":"1775850745789-91gu6z","name":"Lavaduct","notes":"","x":4716,"y":2290},
+      {"id":"1775850750550-0719yz","name":"Lava Shield","notes":"","x":5122,"y":2628},
+      {"id":"1775850755509-0ljcfk","name":"Scandium Mine","notes":"","x":4816,"y":3098},
+      {"id":"1775850762173-fn1dxi","name":"No Man's Land","notes":"","x":6299,"y":3178},
+      {"id":"1775850775838-6npfyr","name":"Red Pheonix Outpost","notes":"","x":5461,"y":4000},
+      {"id":"1775850783974-ne949k","name":"Missile Site Ruins","notes":"","x":3990,"y":5754}
+    ];
+
+    const mappedCountValue = document.getElementById("mappedCountValue");
+    const selectedSummaryValue = document.getElementById("selectedSummaryValue");
+    const selectedCount = document.getElementById("selectedCount");
+    const sidebar = document.getElementById("sidebar");
+    const searchInput = document.getElementById("searchInput");
+    const clearSearchBtn = document.getElementById("clearSearchBtn");
+    const searchResultsSection = document.getElementById("searchResultsSection");
+    const searchResultsToggle = document.getElementById("searchResultsToggle");
+    const searchResultsCount = document.getElementById("searchResultsCount");
+    const searchResultsBody = document.getElementById("searchResultsBody");
+    const instructionsBtn = document.getElementById("instructionsBtn");
+    const instructionsModal = document.getElementById("instructionsModal");
+    const copySuccessModal = document.getElementById("copySuccessModal");
+    const markerList = document.getElementById("markerList");
+    const selectedSection = document.getElementById("selectedSection");
+    const selectedToggle = document.getElementById("selectedToggle");
+    const selectedList = document.getElementById("selectedList");
+    const selectedBody = document.getElementById("selectedBody");
+    const selectedCountWrap = document.getElementById("selectedCountWrap");
+    const actionsSection = document.getElementById("actionsSection");
+    const copyPromptBtn = document.getElementById("copyPromptBtn");
+    const fitMapBtn = document.getElementById("fitMapBtn");
+    const coordReadout = document.getElementById("coordReadout");
+
+    const map = L.map("map", {
+      crs: L.CRS.Simple,
+      attributionControl: false,
+      zoomControl: false,
+      preferCanvas: true,
+      minZoom: 0,
+      maxZoom: 8,
+      zoomSnap: 0.25,
+      wheelPxPerZoomLevel: 80,
+      zoomAnimation: false,
+      fadeAnimation: false,
+      markerZoomAnimation: false
+    });
+
+    function imagePointToLatLng(x, y) {
+      return map.unproject([x, y], MAX_NATIVE_ZOOM);
+    }
+
+    function latLngToImagePoint(latlng) {
+      const point = map.project(latlng, MAX_NATIVE_ZOOM);
+      return { x: point.x, y: point.y };
+    }
+
+    function tileMetricsForZoom(zoom) {
+      const effectiveZoom = Math.min(zoom, MAX_NATIVE_ZOOM);
+      const scaleDivisor = 2 ** (MAX_NATIVE_ZOOM - effectiveZoom);
+      const scaledWidth = IMAGE_WIDTH / scaleDivisor;
+      const scaledHeight = IMAGE_HEIGHT / scaleDivisor;
+      const tilesX = Math.ceil(scaledWidth / TILE_SIZE);
+      const tilesY = Math.ceil(scaledHeight / TILE_SIZE);
+      const edgeWidth = scaledWidth - ((tilesX - 1) * TILE_SIZE) || TILE_SIZE;
+      const edgeHeight = scaledHeight - ((tilesY - 1) * TILE_SIZE) || TILE_SIZE;
+
+      return { tilesX, tilesY, edgeWidth, edgeHeight };
+    }
+
+    function applyTileCrop(tile, coords) {
+      const { tilesX, tilesY, edgeWidth, edgeHeight } = tileMetricsForZoom(coords.z);
+      const rightCrop = coords.x === tilesX - 1 ? TILE_SIZE - edgeWidth : 0;
+      const bottomCrop = coords.y === tilesY - 1 ? TILE_SIZE - edgeHeight : 0;
+      const clipValue = rightCrop || bottomCrop ? `inset(0 ${rightCrop}px ${bottomCrop}px 0)` : "none";
+
+      tile.style.clipPath = clipValue;
+      tile.style.webkitClipPath = clipValue;
+      tile.style.backgroundColor = "transparent";
+    }
+
+    const auroaSouthWest = imagePointToLatLng(0, IMAGE_HEIGHT);
+    const auroaNorthEast = imagePointToLatLng(IMAGE_WIDTH, 0);
+    const auroaBounds = L.latLngBounds(auroaSouthWest, auroaNorthEast);
+    const golemSouthWest = imagePointToLatLng(GOLEM_OFFSET_X, GOLEM_OFFSET_Y + GOLEM_IMAGE_HEIGHT);
+    const golemNorthEast = imagePointToLatLng(GOLEM_OFFSET_X + GOLEM_IMAGE_WIDTH, GOLEM_OFFSET_Y);
+    const golemBounds = L.latLngBounds(golemSouthWest, golemNorthEast);
+    const mapBounds = L.latLngBounds([
+      auroaSouthWest,
+      auroaNorthEast,
+      golemSouthWest,
+      golemNorthEast
+    ]);
+    const tileLayer = L.tileLayer("tiles/{z}/{y}/{x}.png", {
+      tileSize: TILE_SIZE,
+      noWrap: true,
+      bounds: auroaBounds,
+      minZoom: 0,
+      maxZoom: 8,
+      maxNativeZoom: MAX_NATIVE_ZOOM,
+      keepBuffer: 2,
+      updateWhenZooming: false,
+      updateWhenIdle: true
+    });
+
+    tileLayer.on("tileload", (event) => {
+      applyTileCrop(event.tile, event.coords);
+    });
+
+    tileLayer.addTo(map);
+    L.imageOverlay(GOLEM_MAP_SOURCE, golemBounds).addTo(map);
+    if (SHOW_EREWHON_MARKER) {
+      L.marker(imagePointToLatLng(EREWHON_MARKER.x, EREWHON_MARKER.y), {
+        icon: buildErewhonIcon(),
+        keyboard: false,
+        zIndexOffset: 500
+      })
+        .addTo(map)
+        .bindPopup(`<strong>${escapeHtml(EREWHON_MARKER.name)}</strong>`);
+    }
+
+    function fitFullMap(options = {}) {
+      map.fitBounds(mapBounds, options);
+    }
+
+    map.setView(imagePointToLatLng(INITIAL_VIEW_X, INITIAL_VIEW_Y), INITIAL_VIEW_ZOOM, { animate: false });
+    map.setMaxBounds(mapBounds.pad(0.2));
+
+    function syncMapSize() {
+      map.invalidateSize(false);
+    }
+
+    window.addEventListener("load", syncMapSize);
+    window.addEventListener("resize", syncMapSize);
+    requestAnimationFrame(syncMapSize);
+
+    let markers = [];
+    let markerLayers = new Map();
+    let selectedIds = new Set();
+    let searchQuery = "";
+    let searchResultsCollapsed = false;
+    let selectedCollapsed = false;
+    let lastCoordReadoutLatLng = null;
+
+    function escapeHtml(value) {
+      return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function resetCoordReadout() {
+      lastCoordReadoutLatLng = null;
+      coordReadout.textContent = "Hover map for X/Y/Zoom";
+      coordReadout.classList.remove("active");
+    }
+
+    function pointIsWithinBounds(point, minX, minY, maxX, maxY) {
+      return point.x >= minX && point.x <= maxX && point.y >= minY && point.y <= maxY;
+    }
+
+    function updateCoordReadout(latlng) {
+      lastCoordReadoutLatLng = latlng;
+      const point = latLngToImagePoint(latlng);
+      const roundedX = Math.round(point.x);
+      const roundedY = Math.round(point.y);
+      const zoom = Number(map.getZoom().toFixed(2));
+      const zoomText = `Zoom ${zoom}`;
+
+      if (pointIsWithinBounds(point, 0, 0, IMAGE_WIDTH, IMAGE_HEIGHT)) {
+        coordReadout.textContent = `Auroa X ${roundedX} / Y ${roundedY} / ${zoomText}`;
+        coordReadout.classList.add("active");
+        return;
+      }
+
+      if (pointIsWithinBounds(
+        point,
+        GOLEM_OFFSET_X,
+        GOLEM_OFFSET_Y,
+        GOLEM_OFFSET_X + GOLEM_IMAGE_WIDTH,
+        GOLEM_OFFSET_Y + GOLEM_IMAGE_HEIGHT
+      )) {
+        coordReadout.textContent = `Golem X ${roundedX - GOLEM_OFFSET_X} / Y ${roundedY - GOLEM_OFFSET_Y} / ${zoomText}`;
+        coordReadout.classList.add("active");
+        return;
+      }
+
+      coordReadout.textContent = `Outside Map X ${roundedX} / Y ${roundedY} / ${zoomText}`;
+      coordReadout.classList.remove("active");
+    }
+
+    function popupHtml(marker) {
+      const selectedText = selectedIds.has(marker.id) ? "Selected" : "Click to select";
+      return `<strong>${escapeHtml(marker.name || "Untitled marker")}</strong><br>${selectedText}`;
+    }
+
+    function updateSidebarStats() {
+      if (mappedCountValue) {
+        mappedCountValue.textContent = markers.length;
+      }
+
+      if (selectedSummaryValue) {
+        selectedSummaryValue.textContent = selectedIds.size;
+      }
+    }
+
+    function syncCollapsibleSection(toggle, body, collapsed) {
+      toggle.setAttribute("aria-expanded", String(!collapsed));
+      body.hidden = collapsed;
+    }
+
+    function createMarkerCard(marker, mode) {
+      const selected = selectedIds.has(marker.id);
+      const notesText = marker.notes
+        ? `<div class="marker-meta">${escapeHtml(marker.notes)}</div>`
+        : "";
+
+      if (mode === "selected") {
+        const card = document.createElement("div");
+        const removeButton = document.createElement("button");
+
+        card.className = "marker-card marker-card--selected";
+        card.setAttribute("role", "button");
+        card.setAttribute("tabindex", "0");
+        card.setAttribute("aria-label", `Focus ${marker.name}`);
+        card.innerHTML = `
+          <div class="marker-card-main">
+            <div class="marker-card-head">
+              <span class="marker-title">${escapeHtml(marker.name)}</span>
+            </div>
+            ${notesText}
+          </div>
+        `;
+
+        removeButton.type = "button";
+        removeButton.className = "selected-pill selected-pill--danger";
+        removeButton.textContent = "Remove";
+        removeButton.setAttribute("aria-label", `Remove ${marker.name}`);
+        removeButton.addEventListener("click", (event) => {
+          event.stopPropagation();
+          deselectMarker(marker.id);
+        });
+
+        card.appendChild(removeButton);
+        card.addEventListener("click", () => {
+          focusMarker(marker.id);
+        });
+        card.addEventListener("keydown", (event) => {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            focusMarker(marker.id);
+          }
+        });
+
+        return card;
+      }
+
+      const card = document.createElement("button");
+
+      card.type = "button";
+      card.className = "marker-card marker-card--search";
+      card.setAttribute("aria-label", `Focus ${marker.name}`);
+      card.innerHTML = `
+        <div class="marker-card-main">
+          <div class="marker-card-head">
+            <span class="marker-title">${escapeHtml(marker.name)}</span>
+          </div>
+          ${notesText}
+        </div>
+      `;
+
+      card.addEventListener("click", () => {
+        handleSearchResultClick(marker.id);
+      });
+
+      return card;
+    }
+
+    function buildIcon(selected) {
+      return L.divIcon({
+        className: "",
+        html: `<div class="custom-pin ${selected ? "selected" : "default"}"></div>`,
+        iconSize: [18, 18],
+        iconAnchor: [9, 9],
+        popupAnchor: [0, -10]
+      });
+    }
+
+    function buildErewhonIcon() {
+      return L.divIcon({
+        className: "",
+        html: '<div class="erewhon-pin">E</div>',
+        iconSize: [26, 26],
+        iconAnchor: [13, 13],
+        popupAnchor: [0, -14]
+      });
+    }
+
+    function filteredMarkers() {
+      const query = searchQuery.trim().toLowerCase();
+      if (!query) {
+        return markers;
+      }
+
+      return markers.filter((marker) =>
+        marker.name.toLowerCase().includes(query) ||
+        marker.notes.toLowerCase().includes(query)
+      );
+    }
+
+    function selectedMarkers() {
+      return markers.filter((marker) => selectedIds.has(marker.id));
+    }
+
+    function normalizeMarkerData(sourceMarkers, { idPrefix, namePrefix = "Location", offsetX = 0, offsetY = 0 }) {
+      return sourceMarkers
+        .map((item, index) => ({
+          id: typeof item.id === "string" ? `${idPrefix}-${item.id}` : `${idPrefix}-marker-${index + 1}`,
+          name: typeof item.name === "string" && item.name.trim() ? item.name.trim() : `${namePrefix} ${index + 1}`,
+          notes: typeof item.notes === "string" ? item.notes : "",
+          x: Number(item.x) + offsetX,
+          y: Number(item.y) + offsetY
+        }))
+        .filter((item) => Number.isFinite(item.x) && Number.isFinite(item.y));
+    }
+
+    function loadMarkers() {
+      return [
+        ...normalizeMarkerData(EMBEDDED_MARKERS, { idPrefix: "auroa" }),
+        ...normalizeMarkerData(ADDITIONAL_AUROA_MARKERS, { idPrefix: "auroa" }),
+        ...normalizeMarkerData(GOLEM_MARKERS, {
+          idPrefix: "golem",
+          namePrefix: "Golem Location",
+          offsetX: GOLEM_OFFSET_X,
+          offsetY: GOLEM_OFFSET_Y
+        })
+      ];
+    }
+
+    function renderSearchList() {
+      const visibleMarkers = filteredMarkers();
+      const query = searchQuery.trim();
+      markerList.innerHTML = "";
+      searchResultsSection.hidden = !query;
+      searchResultsCount.textContent = String(visibleMarkers.length);
+      clearSearchBtn.hidden = !query;
+      syncCollapsibleSection(searchResultsToggle, searchResultsBody, searchResultsCollapsed);
+
+      if (!query) {
+        return;
+      }
+
+      if (!markers.length) {
+        markerList.innerHTML = '<p class="empty-state">No mapped locations are available.</p>';
+        return;
+      }
+
+      if (!visibleMarkers.length) {
+        markerList.innerHTML = '<p class="empty-state">No locations match this search.</p>';
+        return;
+      }
+
+      for (const marker of visibleMarkers) {
+        markerList.appendChild(createMarkerCard(marker, "search"));
+      }
+    }
+
+    function renderSelectedList() {
+      const chosenMarkers = selectedMarkers();
+      selectedList.innerHTML = "";
+      selectedCount.textContent = chosenMarkers.length;
+      selectedSection.hidden = chosenMarkers.length === 0;
+      selectedCountWrap.hidden = chosenMarkers.length === 0;
+      actionsSection.hidden = chosenMarkers.length === 0;
+      copyPromptBtn.hidden = chosenMarkers.length === 0;
+      syncCollapsibleSection(selectedToggle, selectedBody, selectedCollapsed);
+
+      if (!chosenMarkers.length) {
+        return;
+      }
+
+      for (const marker of chosenMarkers) {
+        selectedList.appendChild(createMarkerCard(marker, "selected"));
+      }
+    }
+
+    function redrawLayers() {
+      for (const layer of markerLayers.values()) {
+        map.removeLayer(layer);
+      }
+      markerLayers = new Map();
+
+      for (const marker of markers) {
+        const selected = selectedIds.has(marker.id);
+        const layer = L.marker(imagePointToLatLng(marker.x, marker.y), {
+          icon: buildIcon(selected),
+          keyboard: true
+        }).addTo(map);
+
+        layer.bindPopup(popupHtml(marker));
+        layer.on("click", () => {
+          toggleMarkerSelection(marker.id);
+        });
+        markerLayers.set(marker.id, layer);
+      }
+    }
+
+    function refreshLayerState(markerId) {
+      const marker = markers.find((entry) => entry.id === markerId);
+      const layer = markerLayers.get(markerId);
+      if (!marker || !layer) {
+        return;
+      }
+
+      layer.setIcon(buildIcon(selectedIds.has(marker.id)));
+      layer.setPopupContent(popupHtml(marker));
+    }
+
+    function renderAll() {
+      redrawLayers();
+      updateSidebarStats();
+      renderSearchList();
+      renderSelectedList();
+    }
+
+    function renderListsOnly() {
+      updateSidebarStats();
+      renderSearchList();
+      renderSelectedList();
+    }
+
+    function focusMarker(id) {
+      const marker = markers.find((entry) => entry.id === id);
+      if (!marker) {
+        return;
+      }
+
+      map.flyTo(imagePointToLatLng(marker.x, marker.y), SEARCH_RESULT_ZOOM, {
+        animate: true,
+        duration: 0.35
+      });
+
+      const layer = markerLayers.get(marker.id);
+      if (layer) {
+        layer.openPopup();
+      }
+    }
+
+    function revealSelectedSection(behavior = "smooth") {
+      if (selectedSection.hidden) {
+        return;
+      }
+
+      sidebar.scrollTo({
+        top: sidebar.scrollHeight,
+        behavior
+      });
+    }
+
+    function selectMarker(id, { focusAfter = false, revealAfter = false } = {}) {
+      if (selectedIds.has(id)) {
+        if (focusAfter) {
+          focusMarker(id);
+        }
+        return;
+      }
+
+      selectedIds.add(id);
+      refreshLayerState(id);
+      renderListsOnly();
+
+      if (revealAfter) {
+        revealSelectedSection();
+      }
+
+      if (focusAfter) {
+        focusMarker(id);
+      }
+    }
+
+    function deselectMarker(id, { focusAfter = false } = {}) {
+      if (!selectedIds.has(id)) {
+        if (focusAfter) {
+          focusMarker(id);
+        }
+        return;
+      }
+
+      selectedIds.delete(id);
+      refreshLayerState(id);
+      renderListsOnly();
+
+      if (focusAfter) {
+        focusMarker(id);
+      }
+    }
+
+    function toggleMarkerSelection(id, focusAfter = false) {
+      if (selectedIds.has(id)) {
+        deselectMarker(id, { focusAfter });
+        return;
+      }
+
+      selectMarker(id, { focusAfter, revealAfter: true });
+    }
+
+    function handleSearchResultClick(id) {
+      focusMarker(id);
+    }
+
+    function buildPromptText() {
+      const selectedLocationLines = selectedMarkers()
+        .map((marker) => `- ${marker.name}`)
+        .join("\n");
+
+      return `Act as a Military Operations Specialist. Your task is to generate a summarized (always below 1500 characters please to fit Discord maximum message length) tactical Operation Order (OPORD) based on a brief scenario description you need to make up yourself based on the locations the user selected and which are listed at the end of this prompt (USER DATA: section). Just refer to the team as a choice between 'Alpha Team','Bravo Team','Charlie Team', 'Delta Team' or a Random Military Sounding Callsign. Use the following structural logic for each section:
+
+Header: Create a unique Operation number (OPORD NO. *4 random digits*) 
+
+1. SITUATION AND MISSION Describe the incident, enemy activity, and the "hook" that justifies the mission, inspire yourself directly by the location names. Write a clear "Who, What, Where, and Why" statement (without making an actual Who What Where Why bullet list just a guideline) summarizing the primary objective and the units involved.
+
+3. EXECUTION: Break the mission into chronological Phases with objectives (Phase I, II, III). One phase per user data location. Make up a 'HVT' profile at one of the locations, few sentences that use a fictional english name and made up info about why capturing or neutralizing the enemy is important.
+
+4. SERVICE & SUPPORT: Make up info about which Close Air support, Exfil helicopter, Air or Ground vehicle assets are available. Close air support can only be helicopters ('OVERSEER', 'GYPS', 'DEINOS' or 'OPHEIS') though, never A-10 or never fighter jets. Ground vehicle can be 'Technical', 'Truck' or 'APC' and always only one.
+
+5. COMMAND & SIGNAL: Make up callsigns for command and the team, the radio frequency, and provide at least two unique codewords for mission milestones.
+
+Tone and Style: Use professional military jargon, be concise, and use bold headers with bullet points for readability.
+
+
+
+USER DATA:
+${selectedLocationLines}
+
+
+
+---`;
+    }
+
+    async function copyTextToClipboard(text) {
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(text);
+        return;
+      }
+
+      const textArea = document.createElement("textarea");
+      textArea.value = text;
+      textArea.setAttribute("readonly", "");
+      textArea.style.position = "fixed";
+      textArea.style.opacity = "0";
+      textArea.style.pointerEvents = "none";
+      document.body.appendChild(textArea);
+      textArea.select();
+
+      const copied = document.execCommand("copy");
+      document.body.removeChild(textArea);
+
+      if (!copied) {
+        throw new Error("Clipboard copy failed.");
+      }
+    }
+
+    async function copyPromptToClipboard() {
+      if (!selectedIds.size) {
+        return;
+      }
+
+      const originalLabel = copyPromptBtn.textContent;
+
+      try {
+        await copyTextToClipboard(buildPromptText());
+        copyPromptBtn.textContent = "Copied Prompt";
+        openCopySuccess();
+      } catch (error) {
+        console.error(error);
+        copyPromptBtn.textContent = "Copy Failed";
+      }
+
+      window.setTimeout(() => {
+        copyPromptBtn.textContent = originalLabel;
+      }, 1800);
+    }
+
+    function openInstructions() {
+      instructionsModal.hidden = false;
+    }
+
+    function closeInstructions() {
+      instructionsModal.hidden = true;
+    }
+
+    function openCopySuccess() {
+      copySuccessModal.hidden = false;
+    }
+
+    function closeCopySuccess() {
+      copySuccessModal.hidden = true;
+    }
+
+    searchInput.addEventListener("input", (event) => {
+      searchQuery = event.target.value;
+      renderSearchList();
+    });
+
+    clearSearchBtn.addEventListener("click", () => {
+      searchQuery = "";
+      searchInput.value = "";
+      renderSearchList();
+      searchInput.focus();
+    });
+
+    instructionsBtn.addEventListener("click", () => {
+      openInstructions();
+    });
+
+    fitMapBtn.addEventListener("click", () => {
+      fitFullMap();
+    });
+
+    copyPromptBtn.addEventListener("click", () => {
+      copyPromptToClipboard();
+    });
+
+    searchResultsToggle.addEventListener("click", () => {
+      searchResultsCollapsed = !searchResultsCollapsed;
+      syncCollapsibleSection(searchResultsToggle, searchResultsBody, searchResultsCollapsed);
+    });
+
+    selectedToggle.addEventListener("click", () => {
+      selectedCollapsed = !selectedCollapsed;
+      syncCollapsibleSection(selectedToggle, selectedBody, selectedCollapsed);
+    });
+
+    instructionsModal.addEventListener("click", () => {
+      closeInstructions();
+    });
+
+    copySuccessModal.addEventListener("click", (event) => {
+      if (event.target.closest("a")) {
+        return;
+      }
+
+      closeCopySuccess();
+    });
+
+    map.on("mousemove", (event) => {
+      updateCoordReadout(event.latlng);
+    });
+
+    map.on("zoomend", () => {
+      if (lastCoordReadoutLatLng) {
+        updateCoordReadout(lastCoordReadoutLatLng);
+      }
+    });
+
+    map.on("mouseout", () => {
+      resetCoordReadout();
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && !copySuccessModal.hidden) {
+        closeCopySuccess();
+      }
+
+      if (event.key === "Escape" && !instructionsModal.hidden) {
+        closeInstructions();
+      }
+    });
+
+    async function init() {
+      markers = loadMarkers();
+      renderAll();
+    }
+
+    void init();
+  </script>
+</body>
+</html>
