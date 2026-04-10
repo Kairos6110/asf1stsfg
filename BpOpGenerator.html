@@ -105,6 +105,104 @@
 
         .btn-generate:hover { filter: brightness(1.2); }
 
+        .generator-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            width: 100%;
+        }
+
+        .generator-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .action-message {
+            min-height: 20px;
+            font-size: 0.9rem;
+            color: #d7d7d7;
+            text-align: center;
+        }
+
+        .action-message.error { color: #ff8585; }
+        .action-message.success { color: #b7e27d; }
+
+        .opord-output {
+            display: none;
+            margin-top: 8px;
+            background: #0a0a0a;
+            border: 1px solid #2f4f2f;
+            border-radius: 6px;
+            padding: 18px;
+            text-align: left;
+        }
+
+        .opord-output.open { display: block; }
+
+        .opord-output-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 14px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #2d2d2d;
+        }
+
+        .opord-output-header h3 {
+            margin: 0;
+            color: white;
+            font-size: 1.05rem;
+        }
+
+        .opord-copy-btn {
+            background: transparent;
+            color: var(--accent);
+            border: 1px solid var(--accent);
+            padding: 8px 14px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .opord-copy-btn:hover {
+            background: rgba(107, 142, 35, 0.12);
+        }
+
+        .opord-content {
+            color: #e7e7e7;
+            line-height: 1.65;
+            white-space: normal;
+            word-break: break-word;
+        }
+
+        .opord-content p {
+            margin: 0 0 12px;
+        }
+
+        .opord-content ul {
+            margin: 0 0 12px 20px;
+            padding: 0;
+        }
+
+        .opord-content li { margin-bottom: 6px; }
+
+        @media (max-width: 640px) {
+            .generator-actions,
+            .opord-output-header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .btn-generate,
+            .opord-copy-btn {
+                width: 100%;
+            }
+        }
+
         /* Existing Overlays */
         #instructions-overlay {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -168,8 +266,20 @@
         <div id="selection-summary" style="margin-top:15px; padding:10px; background:#111; border:1px solid #333; border-radius:4px; font-size:0.85rem; color:#ccc; min-height:40px;">Selected: None</div>
 
         <div class="controls-row">
-			            <button class="btn-generate" onclick="copyAiPrompt()">📋 Copy OPORD Prompt</button>
-
+            <div class="generator-stack">
+                <div class="generator-actions">
+                    <button class="btn-generate" onclick="copyAiPrompt()">📋 Copy OPORD Prompt</button>
+                    <button class="btn-generate" id="generate-opord-btn" onclick="generateOpord()">✨ Generate OPORD</button>
+                </div>
+                <div id="generator-message" class="action-message"></div>
+                <div id="opord-output" class="opord-output">
+                    <div class="opord-output-header">
+                        <h3>Generated OPORD</h3>
+                        <button class="opord-copy-btn" id="copy-opord-btn" onclick="copyGeneratedOpord()" style="display:none;">📋 Copy OPORD</button>
+                    </div>
+                    <div id="opord-content" class="opord-content"></div>
+                </div>
+            </div>
         </div>
     </div>
     <br>
@@ -265,6 +375,8 @@
 </center>
 
 <script>
+    const BASE_URL = "https://2846-174-95-0-54.ngrok-free.app";
+
     // COMPLETE DATABASE
     const db = {
         "Cape North": ["A.I Experimental Center", "Bat SAM Site", "Campus Data Farm", "Campus Relay Station", "Construction Site", "Darkwood Island Port", "Sentinel Corp. Location", "Skell Foundation Campus", "Underwater Cable Station"],
@@ -356,6 +468,7 @@
 
     // Global array to store selected locations in order of selection
     let selectedLocationsInOrder = [];
+    let lastGeneratedOpordText = "";
 
     // Function to handle checkbox changes
     function handleCheckboxChange(checkbox) {
@@ -389,6 +502,9 @@
 
     function updateSummary() {
         const display = document.getElementById('selection-summary');
+        lastGeneratedOpordText = "";
+        hideOpordOutput();
+        setGeneratorMessage("");
         
         if(selectedLocationsInOrder.length === 0) {
             display.innerHTML = "Selected: <span style='color:#777'>None</span>";
@@ -429,9 +545,17 @@
             return; 
         }
 
+        const prompt = buildOpordPrompt();
+        
+        navigator.clipboard.writeText(prompt).then(() => {
+            document.getElementById("success-overlay").style.display = "flex";
+        });
+    }
+
+    function buildOpordPrompt() {
         const selectedData = selectedLocationsInOrder.map(item => `${item.province} - ${item.location}`);
 
-        const prompt = `Act as a Military Operations Specialist. Your task is to generate a summarized (always below 1500 characters please to fit Discord maximum message lengtht) tactical Operation Order (OPORD) based on a brief scenario description you need to make up yourself based on the locations the user selected and which are listed at the end of this prompt (USER DATA: section). Just refer to the team as a choice between 'Alpha Team','Bravo Team','Charlie Team' or 'Delta Team'. Use the following structural logic for each section:
+        return `Act as a Military Operations Specialist. Your task is to generate a summarized (always below 1500 characters please to fit Discord maximum message lengtht) tactical Operation Order (OPORD) based on a brief scenario description you need to make up yourself based on the locations the user selected and which are listed at the end of this prompt (USER DATA: section). Just refer to the team as a choice between 'Alpha Team','Bravo Team','Charlie Team' or 'Delta Team'. Use the following structural logic for each section:
 
 Header: Create a unique Operation number (OPORD NO. *4 random digits*) and list the area of operations (in the user data, areas are the first part of the string before the - character)
 
@@ -448,9 +572,220 @@ Tone and Style: Use professional military jargon, be concise, and use bold heade
 
 
 USER DATA: ${selectedData.join(', ')}`;
-        
-        navigator.clipboard.writeText(prompt).then(() => {
-            document.getElementById("success-overlay").style.display = "flex";
+    }
+
+    function setGeneratorMessage(message, type = "") {
+        const el = document.getElementById("generator-message");
+        el.className = `action-message${type ? ` ${type}` : ""}`;
+        el.textContent = message || "";
+    }
+
+    function showOpordOutput(html = "") {
+        const output = document.getElementById("opord-output");
+        const content = document.getElementById("opord-content");
+        content.innerHTML = html;
+        output.classList.add("open");
+    }
+
+    function hideOpordOutput() {
+        document.getElementById("opord-output").classList.remove("open");
+        document.getElementById("opord-content").innerHTML = "";
+        document.getElementById("copy-opord-btn").style.display = "none";
+    }
+
+    function escapeHtml(text) {
+        return String(text || "")
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#39;");
+    }
+
+    function renderOpordText(text) {
+        const lines = String(text || "").split(/\r?\n/);
+        const blocks = [];
+        let listItems = [];
+
+        function flushList() {
+            if (!listItems.length) return;
+            blocks.push(`<ul>${listItems.join("")}</ul>`);
+            listItems = [];
+        }
+
+        lines.forEach(line => {
+            const trimmed = line.trim();
+
+            if (!trimmed) {
+                flushList();
+                return;
+            }
+
+            const bulletMatch = trimmed.match(/^[-*•]\s+(.*)$/);
+            if (bulletMatch) {
+                listItems.push(`<li>${formatInlineMarkdown(bulletMatch[1])}</li>`);
+                return;
+            }
+
+            flushList();
+            blocks.push(`<p>${formatInlineMarkdown(trimmed)}</p>`);
+        });
+
+        flushList();
+        return blocks.join("");
+    }
+
+    function formatInlineMarkdown(text) {
+        return escapeHtml(text).replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
+    }
+
+    function getFirstDefined(...values) {
+        return values.find(value => value !== undefined && value !== null && value !== "");
+    }
+
+    function extractParts(payload) {
+        return getFirstDefined(
+            payload.parts,
+            payload.data?.parts
+        );
+    }
+
+    function isVisibleAnswerPart(part) {
+        const type = String(part?.type || "").toLowerCase();
+
+        if (!type) return true;
+
+        return !(
+            type.includes("reason") ||
+            type.includes("think") ||
+            type.includes("summary") ||
+            type.includes("tool") ||
+            type.includes("step")
+        );
+    }
+
+    function cleanVisibleText(text) {
+        return String(text || "")
+            .replace(/<thinking>[\s\S]*?<\/thinking>/gi, "")
+            .replace(/<think>[\s\S]*?<\/think>/gi, "")
+            .replace(/<reasoning>[\s\S]*?<\/reasoning>/gi, "")
+            .trim();
+    }
+
+    async function parseJsonResponse(response, label) {
+        const payload = await response.json();
+
+        if (!response.ok || payload.success === false) {
+            const apiError = Array.isArray(payload.error)
+                ? payload.error.map(item => item.message || JSON.stringify(item)).join(", ")
+                : payload.error;
+
+            throw new Error(`${label} failed (${response.status}): ${apiError || "Unknown API error"}`);
+        }
+
+        return payload;
+    }
+
+    async function generateOpord() {
+        if (selectedLocationsInOrder.length < 2) {
+            setGeneratorMessage("Select at least 2 locations to generate.", "error");
+            hideOpordOutput();
+            return;
+        }
+
+        const generateBtn = document.getElementById("generate-opord-btn");
+        generateBtn.disabled = true;
+        generateBtn.textContent = "Generating...";
+        setGeneratorMessage("Generating OPORD...", "");
+        showOpordOutput("<p>Generating OPORD...</p>");
+
+        try {
+            const prompt = buildOpordPrompt();
+
+            const sessionRes = await fetch(`${BASE_URL}/session`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ title: "Breakpoint OPORD Generator" })
+            });
+            const sessionPayload = await parseJsonResponse(sessionRes, "Create session");
+            const sessionId = getFirstDefined(
+                sessionPayload.id,
+                sessionPayload.sessionID,
+                sessionPayload.data?.id,
+                sessionPayload.data?.sessionID
+            );
+
+            if (!sessionId) {
+                throw new Error("Create session failed: missing session ID in response.");
+            }
+
+            const messageRes = await fetch(`${BASE_URL}/session/${sessionId}/message`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    system: "Answer for the end user only. Do not include reasoning, thinking, chain-of-thought, or tool narration.",
+                    parts: [{ type: "text", text: prompt }]
+                })
+            });
+            const messagePayload = await parseJsonResponse(messageRes, "Send message");
+            const messageId = getFirstDefined(
+                messagePayload.info?.id,
+                messagePayload.id,
+                messagePayload.messageID,
+                messagePayload.data?.info?.id,
+                messagePayload.data?.id,
+                messagePayload.data?.messageID
+            );
+
+            let fullMsg = messagePayload;
+            let parts = extractParts(fullMsg);
+
+            if ((!parts || parts.length === 0) && messageId) {
+                const finalRes = await fetch(`${BASE_URL}/session/${sessionId}/message/${messageId}`);
+                fullMsg = await parseJsonResponse(finalRes, "Fetch message");
+                parts = extractParts(fullMsg);
+            }
+
+            if (!parts || parts.length === 0) {
+                throw new Error("OpenCode returned no message parts.");
+            }
+
+            const reply = parts
+                .filter(isVisibleAnswerPart)
+                .map(part => part.text || part.content || "")
+                .map(cleanVisibleText)
+                .filter(Boolean)
+                .join("\n");
+
+            if (!reply) {
+                throw new Error("OpenCode returned no visible answer text.");
+            }
+
+            lastGeneratedOpordText = reply;
+            showOpordOutput(renderOpordText(reply));
+            document.getElementById("copy-opord-btn").style.display = "inline-block";
+            setGeneratorMessage("OPORD generated.", "success");
+        } catch (error) {
+            lastGeneratedOpordText = "";
+            showOpordOutput(`<p style="color:#ff8585;">Error: ${escapeHtml(error.message)}</p>`);
+            setGeneratorMessage(`Error: ${error.message}`, "error");
+            console.error("Detailed Error:", error);
+        } finally {
+            generateBtn.disabled = false;
+            generateBtn.textContent = "✨ Generate OPORD";
+        }
+    }
+
+    function copyGeneratedOpord() {
+        if (!lastGeneratedOpordText) {
+            setGeneratorMessage("Generate an OPORD before copying.", "error");
+            return;
+        }
+
+        navigator.clipboard.writeText(lastGeneratedOpordText).then(() => {
+            setGeneratorMessage("Generated OPORD copied to clipboard.", "success");
+        }).catch(error => {
+            setGeneratorMessage(`Copy failed: ${error.message}`, "error");
         });
     }
 </script>
