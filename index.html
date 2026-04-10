@@ -3,11 +3,19 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#05120a">
+  <meta name="theme-color" content="#05120a" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#05120a" media="(prefers-color-scheme: dark)">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>Ghost Recon Tactical Operations Center</title>
   <link rel="icon" type="image/png" href="patch.png">
   <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
   <style>
     :root {
+      color-scheme: dark;
+
       /* Base dark colors, now with a subtle green tint */
       --dark-bg: #0a170f; /* Changed from blue-ish to green-ish dark */
       --darker-bg: #05120a; /* Changed from blue-ish to green-ish darker */
@@ -45,6 +53,7 @@
     }
 
     body {
+      color-scheme: dark;
       background: var(--dark-bg);
       color: var(--text-light);
       min-height: 100vh;
