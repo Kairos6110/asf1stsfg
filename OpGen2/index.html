@@ -132,20 +132,6 @@
       color: var(--accent);
     }
 
-    .title-block {
-      display: grid;
-      gap: 8px;
-      justify-items: center;
-      text-align: center;
-    }
-
-    .title-block h1 {
-      margin: 0;
-      font-size: 2rem;
-      line-height: 1.02;
-      letter-spacing: 0.03em;
-    }
-
     .hint,
     .empty-state,
     .status,
@@ -769,9 +755,6 @@
     <aside class="sidebar" id="sidebar">
       <div class="sidebar-shell">
         <header class="sidebar-hero">
-          <div class="title-block">
-            <h1>OPORD Generator</h1>
-          </div>
           <div class="hero-actions">
             <button id="instructionsBtn" type="button">Instructions</button>
             <button id="fitMapBtn" type="button">Fit Map</button>
@@ -837,7 +820,7 @@
 
   <div class="modal-backdrop" id="instructionsModal" hidden>
     <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="instructionsTitle">
-      <h2 class="modal-title--center" id="instructionsTitle">Instructions</h2>
+      <h2 class="modal-title--center" id="instructionsTitle">Breakpoint Operation Generator</h2>
       <ol class="instruction-list">
         <li>Zoom around and select 🟢 or search for the locations you want to target. The map displays all enemy bases, but not every single map item to maintain visual clarity.</li>
         <li>Click 'Copy Prompt' and follow the instructions.</li>
