@@ -239,6 +239,12 @@
       transform: rotate(-90deg);
     }
 
+    .section-heading--selected .section-toggle {
+      width: auto;
+      flex: 1 1 auto;
+      min-width: 0;
+    }
+
     .section-collapse-body {
       margin-top: 12px;
     }
@@ -374,6 +380,26 @@
       color: var(--text);
       font-size: 0.88rem;
       font-weight: 700;
+    }
+
+    .clear-selected-button {
+      min-width: 32px;
+      min-height: 32px;
+      padding: 4px 11px;
+      border-radius: 999px;
+      background: rgba(216, 77, 69, 0.16);
+      border-color: rgba(216, 77, 69, 0.45);
+      color: #ffd5d2;
+      font-size: 0.88rem;
+      font-weight: 900;
+      line-height: 1;
+      text-align: center;
+    }
+
+    .clear-selected-button:hover {
+      transform: none;
+      border-color: rgba(216, 77, 69, 0.75);
+      background: rgba(216, 77, 69, 0.28);
     }
 
     .marker-list {
@@ -618,6 +644,12 @@
 
     .modal-actions--center {
       justify-content: center;
+    }
+
+    .modal-actions--split {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
     }
 
     .modal-copy-text {
@@ -881,15 +913,18 @@
           </section>
 
           <section class="panel sidebar-panel sidebar-panel--selected" id="selectedSection" hidden>
-            <button class="section-heading section-toggle" id="selectedToggle" type="button" aria-expanded="true" aria-controls="selectedBody">
-              <div class="section-toggle-main">
-                <h2>✅ Selected Locations</h2>
-              </div>
-              <span class="section-toggle-side">
-                <span class="count-badge" id="selectedCountWrap" hidden><span id="selectedCount">0</span></span>
+            <div class="section-heading section-heading--selected">
+              <button class="section-toggle" id="selectedToggle" type="button" aria-expanded="true" aria-controls="selectedBody">
+                <div class="section-toggle-main">
+                  <h2>✅ Selected Locations</h2>
+                </div>
                 <span class="section-toggle-icon" aria-hidden="true">▾</span>
+              </button>
+              <span class="section-toggle-side">
+                <button class="count-badge clear-selected-button" id="clearSelectedButton" type="button" aria-label="Clear all selected locations" hidden>X</button>
+                <span class="count-badge" id="selectedCountWrap" hidden><span id="selectedCount">0</span></span>
               </span>
-            </button>
+            </div>
             <div class="section-collapse-body" id="selectedBody">
               <div class="marker-list-scroll">
                 <div class="marker-list" id="selectedList"></div>
@@ -898,7 +933,7 @@
           </section>
 
           <section class="panel panel-actions" id="actionsSection" hidden>
-            <button id="copyPromptBtn" type="button" hidden>Copy Prompt</button>
+            <button id="copyPromptBtn" type="button" hidden>COPY PROMPT</button>
           </section>
         </div>
       </div>
@@ -918,7 +953,7 @@
       <h2 class="modal-title--center" id="instructionsTitle">Breakpoint Operation Generator</h2>
       <ol class="instruction-list">
         <li>Look around and select 🟢 or search for the locations you want to target. The map displays <strong>ALL</strong> enemy bases, but not every single map item to maintain visual clarity. Click ▲ / ▼ to hide or show the panel for a larger map view.</li>
-        <li>After selecting locations, click 'Copy Prompt' and follow the instructions.</li>
+        <li>After selecting locations, click 'COPY PROMPT' and follow the instructions.</li>
         <li>Enjoy playing your custom roleplay mission!</li>
       </ol>
       <a class="discord-text-link" href="https://discord.gg/BXvQFwBq8z" target="_blank" rel="noreferrer noopener">
@@ -943,6 +978,19 @@
         <a class="modal-link-button" href="https://grok.com/" target="_blank" rel="noreferrer noopener">Grok</a>
         <a class="modal-link-button" href="https://www.perplexity.ai/" target="_blank" rel="noreferrer noopener">Perplexity</a>
         <a class="modal-link-button" href="https://chat.z.ai/" target="_blank" rel="noreferrer noopener">GLM</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="clearSelectedConfirmModal" hidden>
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="clearSelectedConfirmTitle">
+      <h2 class="modal-title--center" id="clearSelectedConfirmTitle">Clear Selected Locations?</h2>
+      <p class="modal-copy-text">
+        This will remove every selected location from the current OPORD list.
+      </p>
+      <div class="modal-actions modal-actions--split">
+        <button id="cancelClearSelectedBtn" type="button">NO</button>
+        <button class="danger-button" id="confirmClearSelectedBtn" type="button">YES</button>
       </div>
     </div>
   </div>
@@ -1013,12 +1061,16 @@
     const instructionsBtn = document.getElementById("instructionsBtn");
     const instructionsModal = document.getElementById("instructionsModal");
     const copySuccessModal = document.getElementById("copySuccessModal");
+    const clearSelectedConfirmModal = document.getElementById("clearSelectedConfirmModal");
+    const cancelClearSelectedBtn = document.getElementById("cancelClearSelectedBtn");
+    const confirmClearSelectedBtn = document.getElementById("confirmClearSelectedBtn");
     const markerList = document.getElementById("markerList");
     const selectedSection = document.getElementById("selectedSection");
     const selectedToggle = document.getElementById("selectedToggle");
     const selectedList = document.getElementById("selectedList");
     const selectedBody = document.getElementById("selectedBody");
     const selectedCountWrap = document.getElementById("selectedCountWrap");
+    const clearSelectedButton = document.getElementById("clearSelectedButton");
     const actionsSection = document.getElementById("actionsSection");
     const copyPromptBtn = document.getElementById("copyPromptBtn");
     const fitMapBtn = document.getElementById("fitMapBtn");
@@ -1398,6 +1450,7 @@
       selectedCount.textContent = chosenMarkers.length;
       selectedSection.hidden = chosenMarkers.length === 0;
       selectedCountWrap.hidden = chosenMarkers.length === 0;
+      clearSelectedButton.hidden = chosenMarkers.length === 0;
       actionsSection.hidden = chosenMarkers.length === 0;
       copyPromptBtn.hidden = chosenMarkers.length === 0;
       syncCollapsibleSection(selectedToggle, selectedBody, selectedCollapsed);
@@ -1596,11 +1649,11 @@ ${selectedLocationLines}
 
       try {
         await copyTextToClipboard(buildPromptText());
-        copyPromptBtn.textContent = "Copied Prompt";
+        copyPromptBtn.textContent = "COPIED PROMPT";
         openCopySuccess();
       } catch (error) {
         console.error(error);
-        copyPromptBtn.textContent = "Copy Failed";
+        copyPromptBtn.textContent = "COPY FAILED";
       }
 
       window.setTimeout(() => {
@@ -1622,6 +1675,30 @@ ${selectedLocationLines}
 
     function closeCopySuccess() {
       copySuccessModal.hidden = true;
+    }
+
+    function openClearSelectedConfirm() {
+      if (!selectedIds.size) {
+        return;
+      }
+
+      clearSelectedConfirmModal.hidden = false;
+    }
+
+    function closeClearSelectedConfirm() {
+      clearSelectedConfirmModal.hidden = true;
+    }
+
+    function clearSelectedLocations() {
+      const idsToRefresh = Array.from(selectedIds);
+      selectedIds.clear();
+
+      for (const id of idsToRefresh) {
+        refreshLayerState(id);
+      }
+
+      closeClearSelectedConfirm();
+      renderListsOnly();
     }
 
     searchInput.addEventListener("input", (event) => {
@@ -1659,6 +1736,18 @@ ${selectedLocationLines}
       copyPromptToClipboard();
     });
 
+    clearSelectedButton.addEventListener("click", () => {
+      openClearSelectedConfirm();
+    });
+
+    cancelClearSelectedBtn.addEventListener("click", () => {
+      closeClearSelectedConfirm();
+    });
+
+    confirmClearSelectedBtn.addEventListener("click", () => {
+      clearSelectedLocations();
+    });
+
     searchResultsToggle.addEventListener("click", () => {
       searchResultsCollapsed = !searchResultsCollapsed;
       syncCollapsibleSection(searchResultsToggle, searchResultsBody, searchResultsCollapsed);
@@ -1681,6 +1770,14 @@ ${selectedLocationLines}
       closeCopySuccess();
     });
 
+    clearSelectedConfirmModal.addEventListener("click", (event) => {
+      if (event.target.closest(".modal-card")) {
+        return;
+      }
+
+      closeClearSelectedConfirm();
+    });
+
     map.on("mousemove", (event) => {
       updateCoordReadout(event.latlng);
     });
@@ -1698,6 +1795,10 @@ ${selectedLocationLines}
     document.addEventListener("keydown", (event) => {
       if (event.key === "Escape" && !copySuccessModal.hidden) {
         closeCopySuccess();
+      }
+
+      if (event.key === "Escape" && !clearSelectedConfirmModal.hidden) {
+        closeClearSelectedConfirm();
       }
 
       if (event.key === "Escape" && !instructionsModal.hidden) {
