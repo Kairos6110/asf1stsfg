@@ -291,6 +291,7 @@
       letter-spacing: 1px;
       align-items: center;
       flex-wrap: wrap; /* Allow items to wrap */
+      cursor: pointer;
     }
 
     .status-time {
@@ -448,6 +449,11 @@
         <h3>Breakpoint Operations Vault</h3>
       </div>
 
+      <div class="grid-item" data-href="https://kairos6110.github.io/asf1stsfg/OpGen2/index.html" data-external="true">
+        <span class="emoji">📝</span>
+        <h3>Breakpoint Operation Generator</h3>
+      </div>
+
       <div class="grid-item" data-href="https://github.com/Kairos6110/asf1stsfg/releases/download/v1.0/wildfire.pdf" data-external="true">
         <span class="emoji">🔥</span>
         <h3>OP Wildfire (Campaign)</h3>
@@ -456,11 +462,6 @@
       <div class="grid-item" data-href="https://github.com/Kairos6110/asf1stsfg/releases/download/v1.0/silverstone.pdf" data-external="true">
         <span class="emoji">⚔️</span>
         <h3>OP Silverstone (Campaign)</h3>
-      </div>
-
-      <div class="grid-item" data-href="https://kairos6110.github.io/asf1stsfg/OpGen2/index.html" data-external="true">
-        <span class="emoji">📝</span>
-        <h3>Breakpoint Operation Generator</h3>
       </div>
 
       <div class="grid-item" data-href="soundboard.html">
@@ -545,7 +546,7 @@
       </div>
   </div>
 
-  <div class="status-bar">
+  <div class="status-bar" id="timezoneStatusBar" role="link" tabindex="0" aria-label="Open Discord timestamp picker">
   <div id="timezone-clocks">
     <span class="status-time" id="pacific-time"></span>
     <span class="status-time" id="central-time"></span>
@@ -569,6 +570,8 @@
    const closeButton = document.getElementById('closeIframeButton');
    const iframeTitle = document.getElementById('iframeTitle');
    const iframeContentWrapper = document.getElementById('iframeContentWrapper'); // New reference for the wrapper
+   const timezoneStatusBar = document.getElementById('timezoneStatusBar');
+   const timezonePickerUrl = 'https://kairos6110.github.io/asf1stsfg/discordtspicker.html';
 
    // Update multiple timezone clocks
    function updateTimezones() {
@@ -782,6 +785,19 @@ document.getElementById('berlin-time').textContent = formattedTimeString;
         discordItem.addEventListener('click', function() {
           const url = this.getAttribute('data-href');
           window.open(url, '_blank');
+        });
+      }
+
+      if (timezoneStatusBar) {
+        timezoneStatusBar.addEventListener('click', function() {
+          window.open(timezonePickerUrl, '_blank');
+        });
+
+        timezoneStatusBar.addEventListener('keydown', function(event) {
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            window.open(timezonePickerUrl, '_blank');
+          }
         });
       }
 
