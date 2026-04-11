@@ -543,10 +543,6 @@
       overflow: hidden;
     }
 
-    .mobile-interface-toggle {
-      display: none;
-    }
-
     #map {
       width: 100%;
       height: 100%;
@@ -779,8 +775,49 @@
       }
     }
 
-    @media (max-width: 980px) and (orientation: portrait) {
+    .app-shell.interface-collapsed {
+      grid-template-columns: 0 minmax(0, 1fr);
+    }
+
+    .app-shell.interface-collapsed .sidebar {
+      width: 0;
+      min-width: 0;
+      border-right: 0;
+      overflow: hidden;
+    }
+
+    .mobile-interface-toggle {
+      position: absolute;
+      left: 0;
+      top: 0;
+      z-index: 1001;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 34px;
+      height: 100%;
+      padding: 0 12px;
+      transform: none;
+      border: 0;
+      border-right: 1px solid rgba(255, 178, 71, 0.42);
+      border-radius: 0;
+      background: rgba(12, 18, 14, 0.96);
+      color: var(--text);
+      font-size: 1.2rem;
+      font-weight: 900;
+      line-height: 1;
+      text-align: center;
+      box-shadow: 8px 0 18px rgba(0, 0, 0, 0.24);
+    }
+
+    .mobile-interface-toggle:hover {
+      transform: none;
+      background: rgba(26, 38, 30, 0.98);
+    }
+
+    @media (max-width: 980px) {
       .app-shell.interface-collapsed {
+        grid-template-columns: 1fr;
         grid-template-rows: 0 minmax(0, 1fr);
       }
 
@@ -791,39 +828,18 @@
       }
 
       .mobile-interface-toggle {
-        position: absolute;
-        left: 50%;
-        top: 2px;
-        z-index: 1001;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-        width: auto;
-        min-width: 132px;
-        height: 38px;
-        padding: 0 12px;
-        transform: translateX(-50%);
-        border: 1px solid rgba(255, 178, 71, 0.6);
-        border-radius: 8px;
-        background: rgba(12, 18, 14, 0.96);
-        color: var(--text);
-        font-size: 0.85rem;
-        font-weight: 600;
-        line-height: 1;
-        text-align: center;
-        box-shadow: 0 10px 24px rgba(0, 0, 0, 0.36);
-      }
-
-      .mobile-interface-toggle-arrow {
-        color: #ffffff;
-        font-size: 1.15rem;
-        font-weight: 900;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 28px;
+        transform: none;
+        border-right: 0;
+        border-bottom: 1px solid rgba(255, 178, 71, 0.42);
+        box-shadow: 0 8px 18px rgba(0, 0, 0, 0.24);
       }
 
       .mobile-interface-toggle:hover {
-        transform: translateX(-50%);
-        background: rgba(26, 38, 30, 0.98);
+        transform: none;
       }
     }
   </style>
@@ -890,8 +906,7 @@
 
     <main class="map-wrap">
       <button class="mobile-interface-toggle" id="mobileInterfaceToggle" type="button" aria-expanded="true" aria-controls="sidebar" aria-label="Hide panel">
-        <span class="mobile-interface-toggle-label" id="mobileInterfaceToggleLabel">Hide Panel</span>
-        <span class="mobile-interface-toggle-arrow" id="mobileInterfaceToggleArrow" aria-hidden="true">▲</span>
+        <span id="mobileInterfaceToggleArrow" aria-hidden="true">◀</span>
       </button>
       <div id="map" aria-label="Auroa and Golem Island map"></div>
       <div class="coord-readout" id="coordReadout" hidden></div>
@@ -988,7 +1003,6 @@
     const selectedCount = document.getElementById("selectedCount");
     const sidebar = document.getElementById("sidebar");
     const mobileInterfaceToggle = document.getElementById("mobileInterfaceToggle");
-    const mobileInterfaceToggleLabel = document.getElementById("mobileInterfaceToggleLabel");
     const mobileInterfaceToggleArrow = document.getElementById("mobileInterfaceToggleArrow");
     const searchInput = document.getElementById("searchInput");
     const searchClearButton = document.getElementById("searchClearButton");
@@ -1120,7 +1134,7 @@
     let searchResultsCollapsed = false;
     let selectedCollapsed = false;
     let lastCoordReadoutLatLng = null;
-    const mobilePortraitQuery = window.matchMedia("(max-width: 980px) and (orientation: portrait)");
+    const stackedPanelQuery = window.matchMedia("(max-width: 980px)");
 
     function refreshMapAfterLayoutChange() {
       requestAnimationFrame(() => {
@@ -1129,11 +1143,13 @@
     }
 
     function syncMobileInterfaceToggle() {
-      const collapseApplies = mobilePortraitQuery.matches && interfaceCollapsed;
+      const collapseApplies = interfaceCollapsed;
+      const stackedPanel = stackedPanelQuery.matches;
 
       appShell.classList.toggle("interface-collapsed", collapseApplies);
-      mobileInterfaceToggleLabel.textContent = collapseApplies ? "Show Panel" : "Hide Panel";
-      mobileInterfaceToggleArrow.textContent = collapseApplies ? "▼" : "▲";
+      mobileInterfaceToggleArrow.textContent = collapseApplies
+        ? (stackedPanel ? "▼" : "▶")
+        : (stackedPanel ? "▲" : "◀");
       mobileInterfaceToggle.setAttribute("aria-expanded", String(!collapseApplies));
       mobileInterfaceToggle.setAttribute("aria-label", collapseApplies ? "Show panel" : "Hide panel");
 
@@ -1625,10 +1641,10 @@ ${selectedLocationLines}
       syncMobileInterfaceToggle();
     });
 
-    if (typeof mobilePortraitQuery.addEventListener === "function") {
-      mobilePortraitQuery.addEventListener("change", syncMobileInterfaceToggle);
+    if (typeof stackedPanelQuery.addEventListener === "function") {
+      stackedPanelQuery.addEventListener("change", syncMobileInterfaceToggle);
     } else {
-      mobilePortraitQuery.addListener(syncMobileInterfaceToggle);
+      stackedPanelQuery.addListener(syncMobileInterfaceToggle);
     }
 
     instructionsBtn.addEventListener("click", () => {
