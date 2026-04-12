@@ -658,6 +658,23 @@
       line-height: 1.65;
     }
 
+    .opord-result-output {
+      max-height: min(58vh, 560px);
+      margin: 16px 0 0;
+      padding: 14px;
+      overflow: auto;
+      border: 1px solid rgba(94, 122, 102, 0.68);
+      border-radius: 8px;
+      background: rgba(3, 7, 5, 0.78);
+      color: var(--text);
+      font: 0.94rem/1.55 ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+      white-space: pre-wrap;
+    }
+
+    .modal-card--wide {
+      width: min(840px, 100%);
+    }
+
     .modal-link-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
@@ -933,7 +950,8 @@
           </section>
 
           <section class="panel panel-actions" id="actionsSection" hidden>
-            <button id="copyPromptBtn" type="button" hidden>COPY PROMPT</button>
+            <button id="copyPromptBtn" type="button" hidden>COPY PROMPT (MANUAL)</button>
+            <button id="generateOpordBtn" type="button" hidden>GENERATE OPORD (QUICK)</button>
           </section>
         </div>
       </div>
@@ -953,7 +971,7 @@
       <h2 class="modal-title--center" id="instructionsTitle">Breakpoint Operation Generator</h2>
       <ol class="instruction-list">
         <li>Look around and select 🟢 or search for the locations you want to target. The map displays <strong>ALL</strong> enemy bases, but not every single map item to maintain visual clarity. Click ▲ / ▼ to hide or show the panel for a larger map view.</li>
-        <li>After selecting locations, click 'COPY PROMPT' and follow the instructions.</li>
+        <li>After selecting locations, click 'COPY PROMPT' and follow the instructions. You can also try the new Generate OPORD button to receive an OPORD within seconds.</li>
         <li>Enjoy playing your custom roleplay mission!</li>
       </ol>
       <a class="discord-text-link" href="https://discord.gg/BXvQFwBq8z" target="_blank" rel="noreferrer noopener">
@@ -978,6 +996,17 @@
         <a class="modal-link-button" href="https://grok.com/" target="_blank" rel="noreferrer noopener">Grok</a>
         <a class="modal-link-button" href="https://www.perplexity.ai/" target="_blank" rel="noreferrer noopener">Perplexity</a>
         <a class="modal-link-button" href="https://chat.z.ai/" target="_blank" rel="noreferrer noopener">GLM</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="opordResultModal" hidden>
+    <div class="modal-card modal-card--wide" role="dialog" aria-modal="true" aria-labelledby="opordResultTitle">
+      <h2 class="modal-title--center" id="opordResultTitle">Generated OPORD</h2>
+      <pre class="opord-result-output" id="opordResultOutput">Waiting...</pre>
+      <div class="modal-actions modal-actions--split">
+        <button id="copyOpordResultBtn" type="button">COPY</button>
+        <button id="closeOpordResultBtn" type="button">CLOSE</button>
       </div>
     </div>
   </div>
@@ -1011,6 +1040,7 @@
     const TILE_SIZE = 256;
     const MAX_NATIVE_ZOOM = 6;
     const SEARCH_RESULT_ZOOM = 4.5;
+    const OPORD_ENDPOINT = "https://8b7f-174-95-0-54.ngrok-free.app/receive";
     const INITIAL_VIEW_ZOOM = 3;
     const INITIAL_VIEW_X = 6754;
     const INITIAL_VIEW_Y = 6202;
@@ -1061,6 +1091,10 @@
     const instructionsBtn = document.getElementById("instructionsBtn");
     const instructionsModal = document.getElementById("instructionsModal");
     const copySuccessModal = document.getElementById("copySuccessModal");
+    const opordResultModal = document.getElementById("opordResultModal");
+    const opordResultOutput = document.getElementById("opordResultOutput");
+    const copyOpordResultBtn = document.getElementById("copyOpordResultBtn");
+    const closeOpordResultBtn = document.getElementById("closeOpordResultBtn");
     const clearSelectedConfirmModal = document.getElementById("clearSelectedConfirmModal");
     const cancelClearSelectedBtn = document.getElementById("cancelClearSelectedBtn");
     const confirmClearSelectedBtn = document.getElementById("confirmClearSelectedBtn");
@@ -1073,6 +1107,7 @@
     const clearSelectedButton = document.getElementById("clearSelectedButton");
     const actionsSection = document.getElementById("actionsSection");
     const copyPromptBtn = document.getElementById("copyPromptBtn");
+    const generateOpordBtn = document.getElementById("generateOpordBtn");
     const fitMapBtn = document.getElementById("fitMapBtn");
     const coordReadout = document.getElementById("coordReadout");
 
@@ -1453,6 +1488,7 @@
       clearSelectedButton.hidden = chosenMarkers.length === 0;
       actionsSection.hidden = chosenMarkers.length === 0;
       copyPromptBtn.hidden = chosenMarkers.length === 0;
+      generateOpordBtn.hidden = chosenMarkers.length === 0;
       syncCollapsibleSection(selectedToggle, selectedBody, selectedCollapsed);
 
       if (!chosenMarkers.length) {
@@ -1593,7 +1629,7 @@
         .map((marker) => `- ${marker.name}`)
         .join("\n");
 
-      return `Act as a Military Operations Specialist. Your task is to generate a summarized (always below 1500 characters please to fit Discord maximum message length) tactical Operation Order (OPORD) based on a brief scenario description you need to make up yourself based on the locations the user selected and which are listed at the end of this prompt (USER DATA: section). Just refer to the team as a choice between 'Alpha Team','Bravo Team','Charlie Team', 'Delta Team' or a Random Military Sounding Callsign. Use the following structural logic for each section:
+      return `Act as a Military Operations Specialist for MILSIM GAMING. Your task is to generate a summarized (always below 2000 characters please to fit Discord maximum message length) tactical Operation Order (OPORD) based on a brief scenario description you need to make up yourself based on the locations the user selected and which are listed at the end of this prompt (USER DATA: section), respect the order they are in. Just refer to the team as a Random Military Sounding Callsign. Use the following structural logic for each section:
 
 Header: Create a unique Operation number (OPORD NO. *4 random digits*) 
 
@@ -1601,7 +1637,7 @@ Header: Create a unique Operation number (OPORD NO. *4 random digits*)
 
 3. EXECUTION: Break the mission into chronological Phases with objectives (Phase I, II, III). One phase per user data location. Make up a 'HVT' profile at one of the locations, few sentences that use a fictional english name and made up info about why capturing or neutralizing the enemy is important.
 
-4. SERVICE & SUPPORT: Make up info about which Close Air support, Exfil helicopter, Air or Ground vehicle assets are available. Close air support can only be helicopters ('OVERSEER', 'GYPS', 'DEINOS' or 'OPHEIS') though, never A-10 or never fighter jets. Ground vehicle can be 'Technical', 'Truck' or 'APC' and always only one.
+4. SERVICE & SUPPORT: Make up info about which Close Air support, Exfil helicopter or Ground vehicle assets are available. Close air support or Exfil helicopter can ONLY be the helicopters 'OVERSEER', 'GYPS', 'DEINOS' or 'OPHEIS' though, never A-10 or never fighter jets. Ground vehicle can either be 'Technical', 'Truck' or 'APC' and it's not always necessary to have one declared.
 
 5. COMMAND & SIGNAL: Make up callsigns for command and the team, the radio frequency, and provide at least two unique codewords for mission milestones.
 
@@ -1677,6 +1713,86 @@ ${selectedLocationLines}
       copySuccessModal.hidden = true;
     }
 
+    function openOpordResult() {
+      opordResultModal.hidden = false;
+    }
+
+    function closeOpordResult() {
+      opordResultModal.hidden = true;
+    }
+
+    async function copyOpordResultToClipboard() {
+      const resultText = opordResultOutput.textContent;
+      if (!resultText.trim()) {
+        return;
+      }
+
+      const originalLabel = copyOpordResultBtn.textContent;
+
+      try {
+        await copyTextToClipboard(resultText);
+        copyOpordResultBtn.textContent = "COPIED";
+      } catch (error) {
+        console.error(error);
+        copyOpordResultBtn.textContent = "COPY FAILED";
+      }
+
+      window.setTimeout(() => {
+        copyOpordResultBtn.textContent = originalLabel;
+      }, 1800);
+    }
+
+    async function generateOpord() {
+      if (!selectedIds.size) {
+        return;
+      }
+
+      const prompt = buildPromptText();
+      const originalLabel = generateOpordBtn.textContent;
+
+      generateOpordBtn.disabled = true;
+      generateOpordBtn.textContent = "GENERATING...";
+      copyOpordResultBtn.hidden = true;
+      opordResultOutput.textContent = "Receiving orders from HQ...";
+      openOpordResult();
+
+      try {
+        const response = await fetch(OPORD_ENDPOINT, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "ngrok-skip-browser-warning": "true"
+          },
+          body: JSON.stringify({ prompt })
+        });
+
+        const contentType = response.headers.get("Content-Type") || "";
+        const body = contentType.includes("application/json") ? await response.json() : null;
+
+        if (!response.ok) {
+          opordResultOutput.textContent = body && body.error
+            ? body.error
+            : `Request failed with status ${response.status}.`;
+          return;
+        }
+
+        if (body && body.answer) {
+          opordResultOutput.textContent = body.answer;
+          copyOpordResultBtn.hidden = false;
+          return;
+        }
+
+        opordResultOutput.textContent = "The server returned an empty answer.";
+      } catch (error) {
+        opordResultOutput.textContent =
+          "Request failed. Check that the ngrok URL is current and forwarding to the Flask server.\n\n" +
+          error;
+      } finally {
+        generateOpordBtn.disabled = false;
+        generateOpordBtn.textContent = originalLabel;
+      }
+    }
+
     function openClearSelectedConfirm() {
       if (!selectedIds.size) {
         return;
@@ -1736,6 +1852,18 @@ ${selectedLocationLines}
       copyPromptToClipboard();
     });
 
+    generateOpordBtn.addEventListener("click", () => {
+      generateOpord();
+    });
+
+    copyOpordResultBtn.addEventListener("click", () => {
+      copyOpordResultToClipboard();
+    });
+
+    closeOpordResultBtn.addEventListener("click", () => {
+      closeOpordResult();
+    });
+
     clearSelectedButton.addEventListener("click", () => {
       openClearSelectedConfirm();
     });
@@ -1770,6 +1898,14 @@ ${selectedLocationLines}
       closeCopySuccess();
     });
 
+    opordResultModal.addEventListener("click", (event) => {
+      if (event.target.closest(".modal-card")) {
+        return;
+      }
+
+      closeOpordResult();
+    });
+
     clearSelectedConfirmModal.addEventListener("click", (event) => {
       if (event.target.closest(".modal-card")) {
         return;
@@ -1795,6 +1931,10 @@ ${selectedLocationLines}
     document.addEventListener("keydown", (event) => {
       if (event.key === "Escape" && !copySuccessModal.hidden) {
         closeCopySuccess();
+      }
+
+      if (event.key === "Escape" && !opordResultModal.hidden) {
+        closeOpordResult();
       }
 
       if (event.key === "Escape" && !clearSelectedConfirmModal.hidden) {
