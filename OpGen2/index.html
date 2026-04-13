@@ -67,6 +67,7 @@
       grid-template-columns: 420px 1fr;
       grid-template-rows: minmax(0, 1fr);
       height: 100vh;
+      height: 100dvh;
       min-height: 0;
       overflow: hidden;
     }
@@ -77,6 +78,7 @@
       border-right: 1px solid var(--line);
       box-shadow: 12px 0 30px var(--shadow);
       height: 100vh;
+      height: 100dvh;
       overflow-y: auto;
       overflow-x: hidden;
       overscroll-behavior: contain;
@@ -116,7 +118,7 @@
       flex-direction: column;
       gap: 16px;
       min-height: 100%;
-      padding: 18px;
+      padding: 18px 18px calc(18px + env(safe-area-inset-bottom, 0px));
     }
 
     .sidebar-hero {
@@ -556,6 +558,10 @@
     .panel-actions {
       display: grid;
       gap: 12px;
+      position: sticky;
+      bottom: max(12px, env(safe-area-inset-bottom, 0px));
+      z-index: 2;
+      box-shadow: 0 -14px 28px rgba(0, 0, 0, 0.22);
     }
 
     .status strong {
@@ -781,6 +787,8 @@
         grid-template-rows: auto minmax(50svh, 1fr);
         min-height: 100svh;
         height: 100svh;
+        min-height: 100dvh;
+        height: 100dvh;
         overflow: hidden;
       }
 
@@ -790,6 +798,7 @@
         height: auto;
         min-height: 0;
         max-height: 50svh;
+        max-height: 50dvh;
         overflow-y: auto;
         overflow-x: hidden;
       }
@@ -806,12 +815,14 @@
 
       .marker-list-scroll {
         max-height: min(22svh, 240px);
+        max-height: min(22dvh, 240px);
       }
 
       .map-wrap {
         position: relative;
         height: 100%;
         min-height: 50svh;
+        min-height: 50dvh;
       }
 
       #map {
@@ -821,6 +832,34 @@
 
       .coord-readout {
         display: none;
+      }
+    }
+
+    @media (max-width: 1280px) and (orientation: landscape) and (max-height: 700px) {
+      .app-shell {
+        height: 100dvh;
+      }
+
+      .sidebar {
+        height: 100dvh;
+      }
+
+      .sidebar-shell {
+        gap: 10px;
+        padding: 12px 12px calc(12px + env(safe-area-inset-bottom, 0px));
+      }
+
+      .sidebar-hero,
+      .panel {
+        padding: 12px;
+      }
+
+      .marker-list-scroll {
+        max-height: min(26dvh, 170px);
+      }
+
+      .panel-actions {
+        bottom: max(8px, env(safe-area-inset-bottom, 0px));
       }
     }
 
@@ -1567,9 +1606,9 @@
         return;
       }
 
-      sidebar.scrollTo({
-        top: sidebar.scrollHeight,
-        behavior
+      actionsSection.scrollIntoView({
+        behavior,
+        block: "nearest"
       });
     }
 
