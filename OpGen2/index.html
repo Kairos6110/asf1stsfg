@@ -693,29 +693,8 @@
         rgba(8, 13, 10, 0.42);
     }
 
-    .opord-result-kicker {
-      color: var(--accent);
-      font-size: 0.72rem;
-      font-weight: 800;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-    }
-
-    .opord-result-title-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-    }
-
-    .opord-result-title-row h2 {
-      margin: 0;
-      font-size: clamp(1.25rem, 2.5vw, 1.7rem);
-      line-height: 1.1;
-      letter-spacing: 0.02em;
-    }
-
     .opord-result-status {
+      width: fit-content;
       flex: 0 0 auto;
       padding: 6px 9px;
       border: 1px solid rgba(196, 219, 84, 0.36);
@@ -913,12 +892,6 @@
 
       .opord-result-header {
         padding: 14px;
-      }
-
-      .opord-result-title-row {
-        align-items: flex-start;
-        flex-direction: column;
-        gap: 10px;
       }
 
       .opord-result-status {
@@ -1199,13 +1172,9 @@
   </div>
 
   <div class="modal-backdrop" id="opordResultModal" hidden>
-    <div class="modal-card modal-card--wide opord-result-card" role="dialog" aria-modal="true" aria-labelledby="opordResultTitle" aria-describedby="opordResultOutput">
+    <div class="modal-card modal-card--wide opord-result-card" role="dialog" aria-modal="true" aria-label="Assigned OPORD" aria-describedby="opordResultOutput">
       <header class="opord-result-header">
-        <div class="opord-result-kicker">Briefing</div>
-        <div class="opord-result-title-row">
-          <h2 id="opordResultTitle">Assigned OPORD</h2>
-          <span class="opord-result-status" id="opordResultStatus">Standby</span>
-        </div>
+        <span class="opord-result-status" id="opordResultStatus">Standby</span>
         <p class="opord-result-meta" id="opordResultMeta">Operation Authorized. Review, brief the team and deploy. Godspeed.</p>
       </header>
       <div class="opord-result-body">
