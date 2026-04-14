@@ -757,10 +757,23 @@
     }
 
     .opord-result-output.is-loading {
-      display: grid;
-      place-items: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
       color: var(--muted);
       text-align: center;
+    }
+
+    .opord-result-output.is-loading::before {
+      content: "";
+      width: 34px;
+      height: 34px;
+      border: 3px solid rgba(157, 176, 160, 0.28);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: opord-loading-spin 0.85s linear infinite;
     }
 
     .opord-result-output.is-error {
@@ -769,6 +782,18 @@
         linear-gradient(180deg, rgba(216, 77, 69, 0.12), rgba(216, 77, 69, 0.04)),
         #100908;
       color: #ffe9e7;
+    }
+
+    @keyframes opord-loading-spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .opord-result-output.is-loading::before {
+        animation-duration: 1.6s;
+      }
     }
 
     .opord-result-actions {
@@ -1178,7 +1203,7 @@
         <p class="opord-result-meta" id="opordResultMeta">Operation Authorized. Review and Execute.</p>
       </header>
       <div class="opord-result-body">
-        <pre class="opord-result-output" id="opordResultOutput">Waiting...</pre>
+        <pre class="opord-result-output" id="opordResultOutput" aria-live="polite">Waiting...</pre>
       </div>
       <div class="modal-actions modal-actions--split opord-result-actions">
         <button id="copyOpordResultBtn" type="button">COPY</button>
@@ -1908,6 +1933,7 @@ ${selectedLocationLines}
       opordResultMeta.textContent = meta;
       opordResultOutput.classList.toggle("is-loading", state === "loading");
       opordResultOutput.classList.toggle("is-error", state === "error");
+      opordResultOutput.setAttribute("aria-busy", state === "loading" ? "true" : "false");
       opordResultOutput.textContent = text;
     }
 
@@ -1945,7 +1971,7 @@ ${selectedLocationLines}
       copyOpordResultBtn.hidden = true;
       setOpordResultState(
         "loading",
-        "Receiving orders from HQ...",
+        "Receiving order from HQ...",
         ""
       );
       openOpordResult();
