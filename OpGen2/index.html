@@ -1203,10 +1203,10 @@
       <header class="opord-result-header">
         <div class="opord-result-kicker">Briefing</div>
         <div class="opord-result-title-row">
-          <h2 id="opordResultTitle">Generated OPORD</h2>
+          <h2 id="opordResultTitle">Assigned OPORD</h2>
           <span class="opord-result-status" id="opordResultStatus">Standby</span>
         </div>
-        <p class="opord-result-meta" id="opordResultMeta">Ready for Discord. Review, copy, and brief the team.</p>
+        <p class="opord-result-meta" id="opordResultMeta">Operation Authorized. Review, brief the team and deploy. Godspeed.</p>
       </header>
       <div class="opord-result-body">
         <pre class="opord-result-output" id="opordResultOutput">Waiting...</pre>
@@ -1977,7 +1977,7 @@ ${selectedLocationLines}
       setOpordResultState(
         "loading",
         "Receiving orders from HQ...",
-        "Generating a fresh brief from the selected route."
+        ""
       );
       openOpordResult();
 
@@ -2007,7 +2007,7 @@ ${selectedLocationLines}
           setOpordResultState(
             "ready",
             body.answer,
-            "Ready for Discord. Review, copy, and brief the team."
+            "Operation Authorized. Review, brief the team and deploy. Godspeed."
           );
           copyOpordResultBtn.hidden = false;
           return;
