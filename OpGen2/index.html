@@ -1300,6 +1300,8 @@
     const copySuccessModal = document.getElementById("copySuccessModal");
     const opordResultModal = document.getElementById("opordResultModal");
     const opordResultOutput = document.getElementById("opordResultOutput");
+    const opordResultStatus = document.getElementById("opordResultStatus");
+    const opordResultMeta = document.getElementById("opordResultMeta");
     const copyOpordResultBtn = document.getElementById("copyOpordResultBtn");
     const closeOpordResultBtn = document.getElementById("closeOpordResultBtn");
     const clearSelectedConfirmModal = document.getElementById("clearSelectedConfirmModal");
@@ -1928,6 +1930,18 @@ ${selectedLocationLines}
       opordResultModal.hidden = true;
     }
 
+    function setOpordResultState(state, text, meta) {
+      opordResultStatus.textContent = state === "ready"
+        ? "Ready"
+        : state === "error"
+          ? "Review"
+          : "Standby";
+      opordResultMeta.textContent = meta;
+      opordResultOutput.classList.toggle("is-loading", state === "loading");
+      opordResultOutput.classList.toggle("is-error", state === "error");
+      opordResultOutput.textContent = text;
+    }
+
     async function copyOpordResultToClipboard() {
       const resultText = opordResultOutput.textContent;
       if (!resultText.trim()) {
@@ -1960,7 +1974,11 @@ ${selectedLocationLines}
       generateOpordBtn.disabled = true;
       generateOpordBtn.textContent = "GENERATING...";
       copyOpordResultBtn.hidden = true;
-      opordResultOutput.textContent = "Receiving orders from HQ...";
+      setOpordResultState(
+        "loading",
+        "Receiving orders from HQ...",
+        "Generating a fresh brief from the selected route."
+      );
       openOpordResult();
 
       try {
@@ -1977,23 +1995,35 @@ ${selectedLocationLines}
         const body = contentType.includes("application/json") ? await response.json() : null;
 
         if (!response.ok) {
-          opordResultOutput.textContent = body && body.error
-            ? body.error
-            : `Request failed with status ${response.status}.`;
+          setOpordResultState(
+            "error",
+            body && body.error ? body.error : `Request failed with status ${response.status}.`,
+            "The request did not complete. Keep the modal open or close and try again."
+          );
           return;
         }
 
         if (body && body.answer) {
-          opordResultOutput.textContent = body.answer;
+          setOpordResultState(
+            "ready",
+            body.answer,
+            "Ready for Discord. Review, copy, and brief the team."
+          );
           copyOpordResultBtn.hidden = false;
           return;
         }
 
-        opordResultOutput.textContent = "The server returned an empty answer.";
+        setOpordResultState(
+          "error",
+          "The server returned an empty answer.",
+          "No OPORD text was returned. Close this and generate again."
+        );
       } catch (error) {
-        opordResultOutput.textContent =
-          "Request failed. Check that the ngrok URL is current and forwarding to the Flask server.\n\n" +
-          error;
+        setOpordResultState(
+          "error",
+          "Request failed. Check that the ngrok URL is current and forwarding to the Flask server.\n\n" + error,
+          "Connection failed before a briefing could be received."
+        );
       } finally {
         generateOpordBtn.disabled = false;
         generateOpordBtn.textContent = originalLabel;
