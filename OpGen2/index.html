@@ -677,6 +677,20 @@
       white-space: pre-wrap;
     }
 
+    .opord-result-image {
+      display: block;
+      width: 100%;
+      max-width: 900px;
+      height: auto;
+      margin-top: 24px;
+      border-radius: 8px;
+      object-fit: cover;
+    }
+
+    .opord-result-image[hidden] {
+      display: none;
+    }
+
     .modal-card--wide {
       width: min(840px, 100%);
     }
@@ -1043,6 +1057,7 @@
     <div class="modal-card modal-card--wide" role="dialog" aria-modal="true" aria-labelledby="opordResultTitle">
       <h2 class="modal-title--center" id="opordResultTitle">Generated OPORD</h2>
       <pre class="opord-result-output" id="opordResultOutput">Waiting...</pre>
+      <img class="opord-result-image" id="opordResultImage" alt="Generated operation illustration" hidden>
       <div class="modal-actions modal-actions--split">
         <button id="copyOpordResultBtn" type="button">COPY</button>
         <button id="closeOpordResultBtn" type="button">CLOSE</button>
@@ -1132,6 +1147,7 @@
     const copySuccessModal = document.getElementById("copySuccessModal");
     const opordResultModal = document.getElementById("opordResultModal");
     const opordResultOutput = document.getElementById("opordResultOutput");
+    const opordResultImage = document.getElementById("opordResultImage");
     const copyOpordResultBtn = document.getElementById("copyOpordResultBtn");
     const closeOpordResultBtn = document.getElementById("closeOpordResultBtn");
     const clearSelectedConfirmModal = document.getElementById("clearSelectedConfirmModal");
@@ -1760,6 +1776,21 @@ ${selectedLocationLines}
       opordResultModal.hidden = true;
     }
 
+    function hideOpordResultImage() {
+      opordResultImage.removeAttribute("src");
+      opordResultImage.hidden = true;
+    }
+
+    function renderOpordResultImage(image) {
+      if (image && image.data_url) {
+        opordResultImage.src = image.data_url;
+        opordResultImage.hidden = false;
+        return;
+      }
+
+      hideOpordResultImage();
+    }
+
     async function copyOpordResultToClipboard() {
       const resultText = opordResultOutput.textContent;
       if (!resultText.trim()) {
@@ -1793,6 +1824,7 @@ ${selectedLocationLines}
       generateOpordBtn.textContent = "GENERATING...";
       copyOpordResultBtn.hidden = true;
       opordResultOutput.textContent = "Receiving orders from HQ...";
+      hideOpordResultImage();
       openOpordResult();
 
       try {
@@ -1817,15 +1849,18 @@ ${selectedLocationLines}
 
         if (body && body.answer) {
           opordResultOutput.textContent = body.answer;
+          renderOpordResultImage(body.image);
           copyOpordResultBtn.hidden = false;
           return;
         }
 
         opordResultOutput.textContent = "The server returned an empty answer.";
+        hideOpordResultImage();
       } catch (error) {
         opordResultOutput.textContent =
           "Request failed. Check that the ngrok URL is current and forwarding to the Flask server.\n\n" +
           error;
+        hideOpordResultImage();
       } finally {
         generateOpordBtn.disabled = false;
         generateOpordBtn.textContent = originalLabel;
