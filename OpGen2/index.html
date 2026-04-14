@@ -1668,17 +1668,17 @@
         .map((marker) => `- ${marker.name}`)
         .join("\n");
 
-      return `Act as a Military Operations Specialist for MILSIM GAMING. Your task is to generate a summarized (always below 1800 characters please to fit Discord maximum message length) tactical Operation Order (OPORD) based on a brief scenario description you need to make up yourself based on the locations the user selected and which are listed at the end of this prompt (USER DATA: section), respect the order they are in. Just refer to the team as a Random Military Sounding Callsign. Use the following structural logic for each section:
+      return `Act as a Military Operations Specialist for MILSIM GAMING. Your task is to generate a summarized (always below 1800 characters to fit Discord maximum message length) tactical Operation Order (OPORD) based on a brief scenario description you need to make up yourself based on the locations the user selected and which are listed at the end of this prompt (the USER DATA: section), respect the order they are in. Just refer to the team as a Random Military Callsign (be creative and varied). Use the following structural logic for each section:
 
 Header: Create a unique Operation number (OPORD NO. *4 random digits*) 
 
-1. SITUATION AND MISSION Describe the incident, enemy activity, and the "hook" that justifies the mission, inspire yourself directly by the location names. Write a clear "Who, What, Where, and Why" statement (without making an actual Who What Where Why bullet list just a guideline) summarizing the primary objective and the units involved.
+1. SITUATION AND MISSION Describe the incident, enemy activity, and the "hook" that justifies the mission, inspire yourself directly by the location names. Write a clear "Who, What, Where, and Why" statement (without making an actual Who What Where Why bullet list, this is a guideline to help you write), summarizing the primary objective and the units involved.
 
-3. EXECUTION: Break the mission into chronological Phases with objectives (Phase I, II, III). One phase per user data location. Make up a 'HVT' profile at one of the locations, few sentences that use a fictional english name and made up info about why capturing or neutralizing the enemy is important.
+3. EXECUTION: Break the mission into chronological Phases with objectives (Phase I, II, III). One phase per user data location. Make up a 'HVT' profile at one of the locations at random, few sentences that use a fictional name and made up info about why capturing or neutralizing the enemy is important.
 
-4. SERVICE & SUPPORT: Make up info about which Close Air support, Exfil helicopter or Ground vehicle assets are available. Close air support or Exfil helicopter can ONLY be the helicopters 'OVERSEER', 'GYPS', 'DEINOS' or 'OPHEIS' though, never A-10 or never fighter jets. Ground vehicle can either be 'Technical', 'Truck' or 'APC' and it's not always necessary to have one declared.
+4. SERVICE & SUPPORT: Make up info about which Close Air support, Exfil helicopter or Ground vehicle assets are available. Close air support helicopter can ONLY be the precise helicopter names: 'OVERSEER', 'GYPS' 'DEINOS' or 'OPHEIS'. EXFIL helicopter can only be 'OVERSEER' or 'GYPS' never an others, also never mention A-10 or never fighter jets. Ground vehicle can either be 'Technical', 'Truck' or 'APC' and it's not always necessary to have one declared.
 
-5. COMMAND & SIGNAL: Make up callsigns for command and the team, the radio frequency, and provide at least two unique codewords for mission milestones.
+5. COMMAND & SIGNAL: Make up callsigns for command, the radio frequency, and provide at least two unique codewords for mission milestones.
 
 Tone and Style: Use professional military jargon, be concise, and use bold headers with bullet points for readability.
 
