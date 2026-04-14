@@ -1432,7 +1432,15 @@
     let searchResultsCollapsed = false;
     let selectedCollapsed = false;
     let lastCoordReadoutLatLng = null;
+    let opordWakeLock = null;
+    let opordWakeLockActive = false;
     const stackedPanelQuery = window.matchMedia("(max-width: 980px)");
+
+    document.addEventListener("visibilitychange", () => {
+      if (opordWakeLockActive && document.visibilityState === "visible") {
+        requestOpordWakeLock();
+      }
+    });
 
     function refreshMapAfterLayoutChange() {
       requestAnimationFrame(() => {
@@ -1945,6 +1953,43 @@ ${selectedLocationLines}
       opordResultOutput.textContent = text;
     }
 
+    async function requestOpordWakeLock() {
+      if (!navigator.wakeLock || document.visibilityState !== "visible" || opordWakeLock) {
+        return;
+      }
+
+      try {
+        opordWakeLock = await navigator.wakeLock.request("screen");
+        opordWakeLock.addEventListener("release", () => {
+          opordWakeLock = null;
+        }, { once: true });
+      } catch (error) {
+        console.warn("Screen wake lock is unavailable while generating the OPORD.", error);
+      }
+    }
+
+    async function startOpordWakeLock() {
+      opordWakeLockActive = true;
+      await requestOpordWakeLock();
+    }
+
+    async function stopOpordWakeLock() {
+      opordWakeLockActive = false;
+
+      if (!opordWakeLock) {
+        return;
+      }
+
+      const wakeLock = opordWakeLock;
+      opordWakeLock = null;
+
+      try {
+        await wakeLock.release();
+      } catch (error) {
+        console.warn("Screen wake lock could not be released.", error);
+      }
+    }
+
     async function copyOpordResultToClipboard() {
       const resultText = opordResultOutput.textContent;
       if (!resultText.trim()) {
@@ -1985,6 +2030,8 @@ ${selectedLocationLines}
       openOpordResult();
 
       try {
+        await startOpordWakeLock();
+
         const response = await fetch(OPORD_ENDPOINT, {
           method: "POST",
           headers: {
@@ -2029,6 +2076,7 @@ ${selectedLocationLines}
           "Close this window and try again in a moment."
         );
       } finally {
+        await stopOpordWakeLock();
         generateOpordBtn.disabled = false;
         generateOpordBtn.textContent = originalLabel;
       }
