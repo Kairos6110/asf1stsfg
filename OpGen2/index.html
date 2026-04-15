@@ -1128,7 +1128,7 @@
               </span>
             </div>
             <div class="section-collapse-body" id="selectedBody">
-              <div class="marker-list-scroll">
+              <div class="marker-list-scroll" id="selectedListScroll">
                 <div class="marker-list" id="selectedList"></div>
               </div>
             </div>
@@ -1291,6 +1291,7 @@
     const selectedSection = document.getElementById("selectedSection");
     const selectedToggle = document.getElementById("selectedToggle");
     const selectedList = document.getElementById("selectedList");
+    const selectedListScroll = document.getElementById("selectedListScroll");
     const selectedBody = document.getElementById("selectedBody");
     const selectedCountWrap = document.getElementById("selectedCountWrap");
     const clearSelectedButton = document.getElementById("clearSelectedButton");
@@ -1772,9 +1773,23 @@
         return;
       }
 
-      actionsSection.scrollIntoView({
+      if (selectedCollapsed) {
+        selectedCollapsed = false;
+        syncCollapsibleSection(selectedToggle, selectedBody, selectedCollapsed);
+      }
+
+      selectedSection.scrollIntoView({
         behavior,
-        block: "nearest"
+        block: "start"
+      });
+    }
+
+    function revealLatestSelectedLocation(behavior = "smooth") {
+      window.requestAnimationFrame(() => {
+        selectedListScroll.scrollTo({
+          top: selectedListScroll.scrollHeight,
+          behavior
+        });
       });
     }
 
@@ -1792,6 +1807,7 @@
 
       if (revealAfter) {
         revealSelectedSection();
+        revealLatestSelectedLocation();
       }
 
       if (focusAfter) {
