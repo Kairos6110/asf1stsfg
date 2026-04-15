@@ -1411,14 +1411,21 @@
     let selectedCollapsed = false;
     let lastCoordReadoutLatLng = null;
     let opordWakeLock = null;
-    let opordWakeLockActive = false;
     let opordCipherInterval = null;
     const stackedPanelQuery = window.matchMedia("(max-width: 980px)");
 
     document.addEventListener("visibilitychange", () => {
-      if (opordWakeLockActive && document.visibilityState === "visible") {
+      if (document.visibilityState === "visible") {
         requestOpordWakeLock();
       }
+    });
+
+    window.addEventListener("load", () => {
+      requestOpordWakeLock();
+    });
+
+    window.addEventListener("pageshow", () => {
+      requestOpordWakeLock();
     });
 
     function refreshMapAfterLayoutChange() {
@@ -1992,31 +1999,12 @@ ${selectedLocationLines}
         opordWakeLock = await navigator.wakeLock.request("screen");
         opordWakeLock.addEventListener("release", () => {
           opordWakeLock = null;
+          if (document.visibilityState === "visible") {
+            window.setTimeout(requestOpordWakeLock, 250);
+          }
         }, { once: true });
       } catch (error) {
-        console.warn("Screen wake lock is unavailable while generating the OPORD.", error);
-      }
-    }
-
-    async function startOpordWakeLock() {
-      opordWakeLockActive = true;
-      await requestOpordWakeLock();
-    }
-
-    async function stopOpordWakeLock() {
-      opordWakeLockActive = false;
-
-      if (!opordWakeLock) {
-        return;
-      }
-
-      const wakeLock = opordWakeLock;
-      opordWakeLock = null;
-
-      try {
-        await wakeLock.release();
-      } catch (error) {
-        console.warn("Screen wake lock could not be released.", error);
+        console.warn("Screen wake lock is unavailable for this page.", error);
       }
     }
 
@@ -2059,7 +2047,7 @@ ${selectedLocationLines}
       openOpordResult();
 
       try {
-        await startOpordWakeLock();
+        await requestOpordWakeLock();
 
         const response = await fetch(OPORD_ENDPOINT, {
           method: "POST",
@@ -2101,7 +2089,6 @@ ${selectedLocationLines}
           OPORD_ERROR_MESSAGE
         );
       } finally {
-        await stopOpordWakeLock();
         generateOpordBtn.disabled = false;
         generateOpordBtn.textContent = originalLabel;
       }
