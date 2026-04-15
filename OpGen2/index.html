@@ -673,7 +673,7 @@
       max-height: min(88vh, 860px);
       max-height: min(88dvh, 860px);
       display: grid;
-      grid-template-rows: auto minmax(0, 1fr) auto;
+      grid-template-rows: minmax(0, 1fr) auto;
       gap: 0;
       padding: 0;
       overflow: hidden;
@@ -682,38 +682,6 @@
       background:
         linear-gradient(180deg, rgba(29, 40, 32, 0.98), rgba(9, 14, 11, 0.99)),
         var(--panel);
-    }
-
-    .opord-result-header {
-      display: grid;
-      justify-items: center;
-      gap: 10px;
-      padding: 18px 20px 16px;
-      border-bottom: 1px solid rgba(196, 219, 84, 0.18);
-      background:
-        linear-gradient(90deg, rgba(196, 219, 84, 0.14), transparent 42%),
-        rgba(8, 13, 10, 0.42);
-    }
-
-    .opord-result-status {
-      width: fit-content;
-      flex: 0 0 auto;
-      padding: 6px 9px;
-      border: 1px solid rgba(196, 219, 84, 0.36);
-      border-radius: 8px;
-      background: rgba(196, 219, 84, 0.12);
-      color: var(--text);
-      font-size: 0.7rem;
-      font-weight: 800;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-    }
-
-    .opord-result-meta {
-      margin: 0;
-      color: var(--muted);
-      font-size: 0.86rem;
-      line-height: 1.45;
     }
 
     .opord-result-body {
@@ -777,6 +745,23 @@
       border-top-color: var(--accent);
       border-radius: 50%;
       animation: opord-loading-spin 0.85s linear infinite;
+    }
+
+    .opord-loading-lines {
+      display: grid;
+      gap: 4px;
+      justify-items: center;
+      font-family: "Cascadia Mono", "Consolas", "Courier New", monospace;
+    }
+
+    .opord-loading-message {
+      color: var(--text);
+    }
+
+    .opord-loading-cipher {
+      color: var(--accent);
+      opacity: 0.82;
+      letter-spacing: 0;
     }
 
     .opord-result-output.is-error {
@@ -925,10 +910,6 @@
 
       .opord-result-card {
         max-height: calc(100dvh - 20px);
-      }
-
-      .opord-result-header {
-        padding: 14px;
       }
 
       .opord-result-body {
@@ -1154,7 +1135,7 @@
           </section>
 
           <section class="panel panel-actions" id="actionsSection" hidden>
-            <button id="copyPromptBtn" type="button" hidden>COPY PROMPT (CUSTOM)</button>
+            <button id="copyPromptBtn" type="button" hidden>COPY PROMPT (IDEAL)</button>
             <button id="generateOpordBtn" type="button" hidden>GENERATE OPORD (QUICK)</button>
           </section>
         </div>
@@ -1206,10 +1187,6 @@
 
   <div class="modal-backdrop" id="opordResultModal" hidden>
     <div class="modal-card modal-card--wide opord-result-card" role="dialog" aria-modal="true" aria-label="Assigned OPORD" aria-describedby="opordResultOutput">
-      <header class="opord-result-header">
-        <span class="opord-result-status" id="opordResultStatus">Standby</span>
-        <p class="opord-result-meta" id="opordResultMeta">Operation Authorized. Review and Execute.</p>
-      </header>
       <div class="opord-result-body">
         <pre class="opord-result-output" id="opordResultOutput" aria-live="polite">Waiting...</pre>
       </div>
@@ -1250,6 +1227,9 @@
     const MAX_NATIVE_ZOOM = 6;
     const SEARCH_RESULT_ZOOM = 4.5;
     const OPORD_ENDPOINT = "https://0279-174-95-0-54.ngrok-free.app/receive";
+    const OPORD_LOADING_MESSAGE = "Decrypting Target Package...";
+    const OPORD_ERROR_MESSAGE = "The backend service seems offline. Please use the Copy Prompt button instead as we fix this soon!";
+    const OPORD_CIPHER_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#%&*+-/=?@[]{}";
     const INITIAL_VIEW_ZOOM = 3;
     const INITIAL_VIEW_X = 6754;
     const INITIAL_VIEW_Y = 6202;
@@ -1302,8 +1282,6 @@
     const copySuccessModal = document.getElementById("copySuccessModal");
     const opordResultModal = document.getElementById("opordResultModal");
     const opordResultOutput = document.getElementById("opordResultOutput");
-    const opordResultStatus = document.getElementById("opordResultStatus");
-    const opordResultMeta = document.getElementById("opordResultMeta");
     const copyOpordResultBtn = document.getElementById("copyOpordResultBtn");
     const closeOpordResultBtn = document.getElementById("closeOpordResultBtn");
     const clearSelectedConfirmModal = document.getElementById("clearSelectedConfirmModal");
@@ -1434,6 +1412,7 @@
     let lastCoordReadoutLatLng = null;
     let opordWakeLock = null;
     let opordWakeLockActive = false;
+    let opordCipherInterval = null;
     const stackedPanelQuery = window.matchMedia("(max-width: 980px)");
 
     document.addEventListener("visibilitychange", () => {
@@ -1937,19 +1916,70 @@ ${selectedLocationLines}
     }
 
     function closeOpordResult() {
+      stopOpordCipher();
       opordResultModal.hidden = true;
     }
 
-    function setOpordResultState(state, text, meta) {
-      opordResultStatus.textContent = state === "ready"
-        ? "Ready"
-        : state === "error"
-          ? "Review"
-          : "Standby";
-      opordResultMeta.textContent = meta;
+    function buildOpordCipherText(length) {
+      let text = "";
+
+      for (let index = 0; index < length; index += 1) {
+        const charIndex = Math.floor(Math.random() * OPORD_CIPHER_CHARS.length);
+        text += OPORD_CIPHER_CHARS[charIndex];
+      }
+
+      return text;
+    }
+
+    function stopOpordCipher() {
+      if (!opordCipherInterval) {
+        return;
+      }
+
+      window.clearInterval(opordCipherInterval);
+      opordCipherInterval = null;
+    }
+
+    function startOpordCipher(cipherElement, length) {
+      const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      const updateDelay = prefersReducedMotion ? 360 : 55;
+
+      stopOpordCipher();
+      cipherElement.textContent = buildOpordCipherText(length);
+      opordCipherInterval = window.setInterval(() => {
+        cipherElement.textContent = buildOpordCipherText(length);
+      }, updateDelay);
+    }
+
+    function renderOpordLoadingState(text) {
+      const loadingLines = document.createElement("span");
+      const loadingMessage = document.createElement("span");
+      const loadingCipher = document.createElement("span");
+
+      loadingLines.className = "opord-loading-lines";
+      loadingMessage.className = "opord-loading-message";
+      loadingCipher.className = "opord-loading-cipher";
+      loadingMessage.textContent = text;
+      loadingCipher.setAttribute("aria-hidden", "true");
+      loadingLines.append(loadingMessage, loadingCipher);
+      opordResultOutput.replaceChildren(loadingLines);
+      startOpordCipher(loadingCipher, text.length);
+    }
+
+    function setOpordResultState(state, text) {
+      if (state !== "loading") {
+        stopOpordCipher();
+      }
+
       opordResultOutput.classList.toggle("is-loading", state === "loading");
       opordResultOutput.classList.toggle("is-error", state === "error");
       opordResultOutput.setAttribute("aria-busy", state === "loading" ? "true" : "false");
+
+      if (state === "loading") {
+        renderOpordLoadingState(text);
+        return;
+      }
+
       opordResultOutput.textContent = text;
     }
 
@@ -2024,8 +2054,7 @@ ${selectedLocationLines}
       copyOpordResultBtn.hidden = true;
       setOpordResultState(
         "loading",
-        "Decrypting Target Package...",
-        ""
+        OPORD_LOADING_MESSAGE
       );
       openOpordResult();
 
@@ -2047,8 +2076,7 @@ ${selectedLocationLines}
         if (!response.ok) {
           setOpordResultState(
             "error",
-            body && body.error ? body.error : "The backend service seems offline.",
-            "Close this window and try again in a moment."
+            OPORD_ERROR_MESSAGE
           );
           return;
         }
@@ -2056,8 +2084,7 @@ ${selectedLocationLines}
         if (body && body.answer) {
           setOpordResultState(
             "ready",
-            body.answer,
-            "Operation Authorized. Review and Execute."
+            body.answer
           );
           copyOpordResultBtn.hidden = false;
           return;
@@ -2065,15 +2092,13 @@ ${selectedLocationLines}
 
         setOpordResultState(
           "error",
-          "The backend service did not return an OPORD.",
-          "Close this window and try again in a moment."
+          OPORD_ERROR_MESSAGE
         );
       } catch (error) {
         console.error(error);
         setOpordResultState(
           "error",
-          "The backend service seems offline.",
-          "Close this window and try again in a moment."
+          OPORD_ERROR_MESSAGE
         );
       } finally {
         await stopOpordWakeLock();
