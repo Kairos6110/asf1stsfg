@@ -2806,7 +2806,7 @@ ${selectedLocationLines}
     });
 
     opordResultModal.addEventListener("click", (event) => {
-      if (event.target.closest(".modal-card")) {
+      if (event.target !== opordResultModal) {
         return;
       }
 
@@ -2814,7 +2814,7 @@ ${selectedLocationLines}
     });
 
     communityOpordsModal.addEventListener("click", (event) => {
-      if (event.target.closest(".modal-card")) {
+      if (event.target !== communityOpordsModal) {
         return;
       }
 
@@ -2822,7 +2822,7 @@ ${selectedLocationLines}
     });
 
     clearSelectedConfirmModal.addEventListener("click", (event) => {
-      if (event.target.closest(".modal-card")) {
+      if (event.target !== clearSelectedConfirmModal) {
         return;
       }
 
