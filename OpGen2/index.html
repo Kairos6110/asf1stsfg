@@ -158,6 +158,11 @@
       gap: 10px;
     }
 
+    .hero-actions .community-opords-button {
+      grid-column: 1 / -1;
+      border-radius: 8px;
+    }
+
     .hero-actions button,
     .panel-actions button {
       text-align: center;
@@ -935,6 +940,113 @@
       text-align: center;
     }
 
+    .community-opords-card {
+      width: min(960px, 100%);
+      max-height: min(90vh, 880px);
+      max-height: min(90dvh, 880px);
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr) auto;
+      gap: 14px;
+      padding: 16px;
+      overflow: hidden;
+      border-radius: 8px;
+    }
+
+    .community-opords-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .community-opords-header h2 {
+      margin: 0;
+    }
+
+    .community-opords-count {
+      margin: 4px 0 0;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+
+    .community-opords-body {
+      min-height: 0;
+      display: grid;
+      grid-template-columns: minmax(220px, 0.72fr) minmax(0, 1.28fr);
+      gap: 12px;
+    }
+
+    .community-opords-list,
+    .community-opords-preview {
+      min-height: 0;
+      overflow: auto;
+      border: 1px solid rgba(94, 122, 102, 0.72);
+      border-radius: 8px;
+      background: rgba(3, 7, 5, 0.58);
+      scrollbar-width: thin;
+      scrollbar-color: rgba(196, 219, 84, 0.62) rgba(4, 8, 6, 0.72);
+    }
+
+    .community-opords-list {
+      display: grid;
+      align-content: start;
+      gap: 8px;
+      padding: 10px;
+    }
+
+    .community-opord-option {
+      width: 100%;
+      display: grid;
+      gap: 6px;
+      border-radius: 8px;
+      padding: 12px;
+      text-align: left;
+      background: rgba(13, 20, 16, 0.92);
+    }
+
+    .community-opord-option.is-active {
+      border-color: var(--accent);
+      background: rgba(47, 65, 51, 0.96);
+    }
+
+    .community-opord-title {
+      font-weight: 800;
+      line-height: 1.25;
+      overflow-wrap: anywhere;
+    }
+
+    .community-opord-meta {
+      color: var(--muted);
+      font-size: 0.84rem;
+      line-height: 1.35;
+      overflow-wrap: anywhere;
+    }
+
+    .community-opords-preview {
+      padding: 14px;
+    }
+
+    .community-opords-preview .opord-result-output {
+      min-height: 100%;
+      box-shadow: none;
+    }
+
+    .community-opords-empty {
+      margin: 0;
+      padding: 18px;
+      color: var(--muted);
+      line-height: 1.5;
+      text-align: center;
+    }
+
+    .community-opords-close-button {
+      width: 38px;
+      height: 38px;
+      padding: 0;
+      border-radius: 8px;
+      text-align: center;
+    }
+
     .modal-link-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
@@ -1090,6 +1202,29 @@
       .opord-result-actions {
         grid-template-columns: 1fr;
         padding: 12px;
+      }
+
+      .community-opords-card {
+        width: 100%;
+        max-height: calc(100dvh - 20px);
+        padding: 12px;
+      }
+
+      .community-opords-header {
+        align-items: center;
+      }
+
+      .community-opords-body {
+        grid-template-columns: 1fr;
+        grid-template-rows: minmax(150px, 34dvh) minmax(0, 1fr);
+      }
+
+      .community-opords-list {
+        grid-auto-rows: min-content;
+      }
+
+      .community-opords-preview {
+        padding: 10px;
       }
 
       .app-shell {
@@ -1250,6 +1385,7 @@
           <div class="hero-actions">
             <button id="instructionsBtn" type="button">ℹ️ Instructions</button>
             <button id="fitMapBtn" type="button">🗺️ Fit Map</button>
+            <button class="community-opords-button" id="communityOpordsBtn" type="button">🗃️ Community Generated</button>
           </div>
         </header>
 
@@ -1361,6 +1497,28 @@
     </div>
   </div>
 
+  <div class="modal-backdrop" id="communityOpordsModal" hidden>
+    <div class="modal-card modal-card--wide community-opords-card" role="dialog" aria-modal="true" aria-labelledby="communityOpordsTitle">
+      <div class="community-opords-header">
+        <div>
+          <h2 id="communityOpordsTitle">Community Generated</h2>
+          <p class="community-opords-count" id="communityOpordsCount">Loading OPORDs...</p>
+        </div>
+        <button class="community-opords-close-button" id="closeCommunityOpordsBtn" type="button" aria-label="Close community OPORDs">X</button>
+      </div>
+      <div class="community-opords-body">
+        <div class="community-opords-list" id="communityOpordsList" aria-label="Community OPORD list"></div>
+        <div class="community-opords-preview">
+          <div class="opord-result-output" id="communityOpordsPreview" aria-live="polite">Select an OPORD.</div>
+        </div>
+      </div>
+      <div class="modal-actions modal-actions--split">
+        <button id="refreshCommunityOpordsBtn" type="button">REFRESH</button>
+        <button id="copyCommunityOpordBtn" type="button" hidden>COPY SELECTED</button>
+      </div>
+    </div>
+  </div>
+
   <div class="modal-backdrop" id="clearSelectedConfirmModal" hidden>
     <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="clearSelectedConfirmTitle">
       <h2 class="modal-title--center" id="clearSelectedConfirmTitle">Clear Selected Locations?</h2>
@@ -1393,6 +1551,7 @@
     const MAX_NATIVE_ZOOM = 6;
     const SEARCH_RESULT_ZOOM = 4.5;
     const OPORD_ENDPOINT = "https://unvascular-malachi-isolatedly.ngrok-free.dev";
+    const COMMUNITY_OPORDS_ENDPOINT = `${OPORD_ENDPOINT}/community-opords`;
     const OPORD_LOADING_MESSAGE = "Decrypting Target Package...";
     const OPORD_ERROR_MESSAGE = "The backend service appears to be temporarily unavailable. Please use the 'Craft OPORD' button while we resolve the issue.";
     const OPORD_CIPHER_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#%&*+-/=?@[]{}";
@@ -1447,12 +1606,20 @@
     const searchResultsCount = document.getElementById("searchResultsCount");
     const searchResultsBody = document.getElementById("searchResultsBody");
     const instructionsBtn = document.getElementById("instructionsBtn");
+    const communityOpordsBtn = document.getElementById("communityOpordsBtn");
     const instructionsModal = document.getElementById("instructionsModal");
     const copySuccessModal = document.getElementById("copySuccessModal");
     const opordResultModal = document.getElementById("opordResultModal");
     const opordResultOutput = document.getElementById("opordResultOutput");
     const copyOpordResultBtn = document.getElementById("copyOpordResultBtn");
     const closeOpordResultBtn = document.getElementById("closeOpordResultBtn");
+    const communityOpordsModal = document.getElementById("communityOpordsModal");
+    const communityOpordsCount = document.getElementById("communityOpordsCount");
+    const communityOpordsList = document.getElementById("communityOpordsList");
+    const communityOpordsPreview = document.getElementById("communityOpordsPreview");
+    const closeCommunityOpordsBtn = document.getElementById("closeCommunityOpordsBtn");
+    const refreshCommunityOpordsBtn = document.getElementById("refreshCommunityOpordsBtn");
+    const copyCommunityOpordBtn = document.getElementById("copyCommunityOpordBtn");
     const clearSelectedConfirmModal = document.getElementById("clearSelectedConfirmModal");
     const cancelClearSelectedBtn = document.getElementById("cancelClearSelectedBtn");
     const confirmClearSelectedBtn = document.getElementById("confirmClearSelectedBtn");
@@ -1584,6 +1751,8 @@
     let opordWakeLock = null;
     let opordCipherInterval = null;
     let opordRawResultText = "";
+    let communityOpords = [];
+    let selectedCommunityOpordId = null;
     const SELECTION_POPUP_AUTO_CLOSE_MS = 2000;
     const stackedPanelQuery = window.matchMedia("(max-width: 980px)");
 
@@ -2169,6 +2338,146 @@ ${selectedLocationLines}
       opordResultModal.hidden = true;
     }
 
+    function openCommunityOpords() {
+      communityOpordsModal.hidden = false;
+      loadCommunityOpords();
+    }
+
+    function closeCommunityOpords() {
+      communityOpordsModal.hidden = true;
+    }
+
+    function formatCommunityDate(value) {
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) {
+        return "Recent";
+      }
+
+      return date.toLocaleDateString(undefined, {
+        month: "short",
+        day: "numeric",
+        year: "numeric"
+      });
+    }
+
+    function communityLocationSummary(opord) {
+      const locations = Array.isArray(opord.locations) ? opord.locations.filter(Boolean) : [];
+      if (!locations.length) {
+        return "No locations listed";
+      }
+
+      if (locations.length <= 2) {
+        return locations.join(" / ");
+      }
+
+      return `${locations.slice(0, 2).join(" / ")} +${locations.length - 2}`;
+    }
+
+    function selectedCommunityOpord() {
+      return communityOpords.find((opord) => opord.id === selectedCommunityOpordId) || null;
+    }
+
+    function selectCommunityOpord(id) {
+      selectedCommunityOpordId = id;
+      renderCommunityOpords();
+    }
+
+    function setCommunityOpordsMessage(message, isError = false) {
+      communityOpordsCount.textContent = message;
+      communityOpordsList.innerHTML = "";
+      communityOpordsPreview.classList.toggle("is-error", isError);
+      communityOpordsPreview.textContent = message;
+      copyCommunityOpordBtn.hidden = true;
+    }
+
+    function renderCommunityOpords() {
+      communityOpordsList.innerHTML = "";
+      communityOpordsPreview.classList.remove("is-error");
+
+      if (!communityOpords.length) {
+        communityOpordsCount.textContent = "No public OPORDs yet.";
+        communityOpordsList.innerHTML = '<p class="community-opords-empty">Instant OPORDs generated from now on will appear here.</p>';
+        communityOpordsPreview.textContent = "No OPORD selected.";
+        copyCommunityOpordBtn.hidden = true;
+        return;
+      }
+
+      if (!selectedCommunityOpordId || !selectedCommunityOpord()) {
+        selectedCommunityOpordId = communityOpords[0].id;
+      }
+
+      communityOpordsCount.textContent = `${communityOpords.length} OPORD${communityOpords.length === 1 ? "" : "s"} available`;
+
+      for (const opord of communityOpords) {
+        const option = document.createElement("button");
+        option.type = "button";
+        option.className = `community-opord-option${opord.id === selectedCommunityOpordId ? " is-active" : ""}`;
+        option.innerHTML = `
+          <span class="community-opord-title">${escapeHtml(opord.title || "Community OPORD")}</span>
+          <span class="community-opord-meta">${escapeHtml(formatCommunityDate(opord.created_at_utc))}</span>
+          <span class="community-opord-meta">${escapeHtml(communityLocationSummary(opord))}</span>
+        `;
+        option.addEventListener("click", () => {
+          selectCommunityOpord(opord.id);
+        });
+        communityOpordsList.appendChild(option);
+      }
+
+      const opord = selectedCommunityOpord();
+      renderMarkdownIntoElement(communityOpordsPreview, opord ? opord.answer || "" : "Select an OPORD.");
+      copyCommunityOpordBtn.hidden = !opord || !opord.answer;
+    }
+
+    async function loadCommunityOpords() {
+      setCommunityOpordsMessage("Loading OPORDs...");
+      refreshCommunityOpordsBtn.disabled = true;
+
+      try {
+        const response = await fetch(COMMUNITY_OPORDS_ENDPOINT, {
+          method: "GET",
+          headers: {
+            "ngrok-skip-browser-warning": "true"
+          }
+        });
+        const body = await response.json();
+
+        if (!response.ok || !body || !Array.isArray(body.opords)) {
+          setCommunityOpordsMessage("Community OPORDs are temporarily unavailable.", true);
+          return;
+        }
+
+        communityOpords = body.opords;
+        selectedCommunityOpordId = communityOpords[0] ? communityOpords[0].id : null;
+        renderCommunityOpords();
+      } catch (error) {
+        console.error(error);
+        setCommunityOpordsMessage("Community OPORDs are temporarily unavailable.", true);
+      } finally {
+        refreshCommunityOpordsBtn.disabled = false;
+      }
+    }
+
+    async function copyCommunityOpordToClipboard() {
+      const opord = selectedCommunityOpord();
+      if (!opord || !opord.answer) {
+        return;
+      }
+
+      const originalLabel = copyCommunityOpordBtn.textContent;
+
+      try {
+        await copyTextToClipboard(opord.answer);
+        copyCommunityOpordBtn.textContent = "COPIED";
+      } catch (error) {
+        console.error(error);
+        copyCommunityOpordBtn.textContent = "COPY FAILED";
+      }
+
+      window.setTimeout(() => {
+        copyCommunityOpordBtn.textContent = originalLabel;
+      }, 1800);
+    }
+
     function buildOpordCipherText(length) {
       let text = "";
 
@@ -2215,25 +2524,31 @@ ${selectedLocationLines}
       startOpordCipher(loadingCipher, text.length);
     }
 
-    function renderOpordMarkdown(rawText) {
+    function renderMarkdownIntoElement(element, rawText) {
+      const markdownText = typeof rawText === "string" ? rawText : "";
+
       if (!window.marked || !window.DOMPurify) {
-        opordResultOutput.textContent = rawText;
+        element.textContent = markdownText;
         return;
       }
 
-      const renderedHtml = window.marked.parse(rawText, {
+      const renderedHtml = window.marked.parse(markdownText, {
         breaks: true,
         gfm: true
       });
 
-      opordResultOutput.innerHTML = window.DOMPurify.sanitize(renderedHtml, {
+      element.innerHTML = window.DOMPurify.sanitize(renderedHtml, {
         ADD_ATTR: ["target"]
       });
 
-      opordResultOutput.querySelectorAll("a[href]").forEach((link) => {
+      element.querySelectorAll("a[href]").forEach((link) => {
         link.setAttribute("target", "_blank");
         link.setAttribute("rel", "noreferrer noopener");
       });
+    }
+
+    function renderOpordMarkdown(rawText) {
+      renderMarkdownIntoElement(opordResultOutput, rawText);
     }
 
     function setOpordResultState(state, text) {
@@ -2327,7 +2642,10 @@ ${selectedLocationLines}
             "Content-Type": "application/json",
             "ngrok-skip-browser-warning": "true"
           },
-          body: JSON.stringify({ prompt })
+          body: JSON.stringify({
+            prompt,
+            selected_locations: selectedMarkers().map((marker) => marker.name)
+          })
         });
 
         const contentType = response.headers.get("Content-Type") || "";
@@ -2417,6 +2735,10 @@ ${selectedLocationLines}
       openInstructions();
     });
 
+    communityOpordsBtn.addEventListener("click", () => {
+      openCommunityOpords();
+    });
+
     fitMapBtn.addEventListener("click", () => {
       fitFullMap();
     });
@@ -2435,6 +2757,18 @@ ${selectedLocationLines}
 
     closeOpordResultBtn.addEventListener("click", () => {
       closeOpordResult();
+    });
+
+    closeCommunityOpordsBtn.addEventListener("click", () => {
+      closeCommunityOpords();
+    });
+
+    refreshCommunityOpordsBtn.addEventListener("click", () => {
+      loadCommunityOpords();
+    });
+
+    copyCommunityOpordBtn.addEventListener("click", () => {
+      copyCommunityOpordToClipboard();
     });
 
     clearSelectedButton.addEventListener("click", () => {
@@ -2479,6 +2813,14 @@ ${selectedLocationLines}
       closeOpordResult();
     });
 
+    communityOpordsModal.addEventListener("click", (event) => {
+      if (event.target.closest(".modal-card")) {
+        return;
+      }
+
+      closeCommunityOpords();
+    });
+
     clearSelectedConfirmModal.addEventListener("click", (event) => {
       if (event.target.closest(".modal-card")) {
         return;
@@ -2508,6 +2850,10 @@ ${selectedLocationLines}
 
       if (event.key === "Escape" && !opordResultModal.hidden) {
         closeOpordResult();
+      }
+
+      if (event.key === "Escape" && !communityOpordsModal.hidden) {
+        closeCommunityOpords();
       }
 
       if (event.key === "Escape" && !clearSelectedConfirmModal.hidden) {
