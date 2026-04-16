@@ -724,7 +724,139 @@
       color: #f4f8f1;
       font: 0.98rem/1.72 "Aptos", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
       text-align: left;
-      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      white-space: normal;
+    }
+
+    .opord-result-output > :first-child {
+      margin-top: 0;
+    }
+
+    .opord-result-output > :last-child {
+      margin-bottom: 0;
+    }
+
+    .opord-result-output h1,
+    .opord-result-output h2,
+    .opord-result-output h3,
+    .opord-result-output h4,
+    .opord-result-output h5,
+    .opord-result-output h6 {
+      margin: 1.25em 0 0.45em;
+      color: var(--accent);
+      line-height: 1.18;
+      letter-spacing: 0;
+    }
+
+    .opord-result-output h1 {
+      font-size: 1.55rem;
+    }
+
+    .opord-result-output h2 {
+      font-size: 1.32rem;
+    }
+
+    .opord-result-output h3 {
+      font-size: 1.14rem;
+    }
+
+    .opord-result-output p,
+    .opord-result-output ul,
+    .opord-result-output ol,
+    .opord-result-output blockquote,
+    .opord-result-output pre,
+    .opord-result-output table,
+    .opord-result-output hr {
+      margin: 0 0 1em;
+    }
+
+    .opord-result-output ul,
+    .opord-result-output ol {
+      padding-left: 1.35rem;
+    }
+
+    .opord-result-output li {
+      margin: 0.25em 0;
+    }
+
+    .opord-result-output li > p {
+      margin: 0.35em 0;
+    }
+
+    .opord-result-output input[type="checkbox"] {
+      accent-color: var(--accent);
+      margin-right: 0.45em;
+    }
+
+    .opord-result-output blockquote {
+      padding: 0.15rem 0 0.15rem 1rem;
+      border-left: 3px solid var(--accent-2);
+      color: #dce8dc;
+    }
+
+    .opord-result-output a {
+      color: var(--accent);
+      text-decoration-thickness: 1px;
+      text-underline-offset: 0.18em;
+    }
+
+    .opord-result-output code {
+      padding: 0.1em 0.35em;
+      border: 1px solid rgba(94, 122, 102, 0.48);
+      border-radius: 5px;
+      background: rgba(0, 0, 0, 0.28);
+      color: #f8fbd2;
+      font-family: "Cascadia Mono", "Consolas", "Courier New", monospace;
+      font-size: 0.93em;
+    }
+
+    .opord-result-output pre {
+      overflow: auto;
+      padding: 14px;
+      border: 1px solid rgba(94, 122, 102, 0.52);
+      border-radius: 8px;
+      background: rgba(0, 0, 0, 0.32);
+      scrollbar-width: thin;
+    }
+
+    .opord-result-output pre code {
+      display: block;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      color: #f4f8f1;
+      white-space: pre;
+      overflow-wrap: normal;
+    }
+
+    .opord-result-output table {
+      display: block;
+      width: 100%;
+      overflow-x: auto;
+      border-collapse: collapse;
+    }
+
+    .opord-result-output th,
+    .opord-result-output td {
+      padding: 0.55rem 0.7rem;
+      border: 1px solid rgba(94, 122, 102, 0.62);
+      vertical-align: top;
+    }
+
+    .opord-result-output th {
+      background: rgba(196, 219, 84, 0.13);
+      color: var(--accent);
+      text-align: left;
+    }
+
+    .opord-result-output tr:nth-child(even) td {
+      background: rgba(255, 255, 255, 0.025);
+    }
+
+    .opord-result-output hr {
+      height: 1px;
+      border: 0;
+      background: rgba(196, 219, 84, 0.26);
     }
 
     .opord-result-output.is-loading {
@@ -869,6 +1001,38 @@
       border-radius: 50%;
       border: 2px solid #21301c;
       transition: transform 0.14s ease, box-shadow 0.14s ease, background 0.14s ease;
+    }
+
+    .custom-pin-wrap {
+      position: relative;
+      width: 30px;
+      height: 38px;
+    }
+
+    .custom-pin-wrap .custom-pin {
+      position: absolute;
+      left: 6px;
+      top: 20px;
+    }
+
+    .selection-order-badge {
+      position: absolute;
+      left: 50%;
+      top: 0;
+      display: block;
+      color: #ffffff;
+      font-size: 0.95rem;
+      font-weight: 900;
+      line-height: 1;
+      transform: translateX(-50%);
+      -webkit-text-stroke: 3px #000000;
+      paint-order: stroke fill;
+      text-shadow:
+        0 2px 3px rgba(0, 0, 0, 0.7),
+        1px 0 0 #000000,
+        -1px 0 0 #000000,
+        0 1px 0 #000000,
+        0 -1px 0 #000000;
     }
 
     .custom-pin.default {
@@ -1156,7 +1320,7 @@
       <h2 class="modal-title--center" id="instructionsTitle">Breakpoint Operation Generator</h2>
       <ol class="instruction-list">
         <li>Look around and select 🟢 or search for the locations you want to target. The map displays <strong>ALL</strong> enemy bases, but not every single map item to maintain visual clarity. Click ▲ / ▼ to hide or show the panel for a larger map view.</li>
-        <li>After selecting locations, click 'COPY PROMPT' and follow the instructions. You can also try the new Generate OPORD button to receive an OPORD within seconds.</li>
+        <li>After selecting locations, click 'Craft OPORD (Ideal)' and follow the instructions. You can also try 'Instant OPORD (Quick)' to receive an OPORD within seconds.</li>
         <li>Enjoy playing your custom roleplay mission!</li>
       </ol>
       <a class="discord-text-link" href="https://discord.gg/BXvQFwBq8z" target="_blank" rel="noreferrer noopener">
@@ -1188,7 +1352,7 @@
   <div class="modal-backdrop" id="opordResultModal" hidden>
     <div class="modal-card modal-card--wide opord-result-card" role="dialog" aria-modal="true" aria-label="Assigned OPORD" aria-describedby="opordResultOutput">
       <div class="opord-result-body">
-        <pre class="opord-result-output" id="opordResultOutput" aria-live="polite">Waiting...</pre>
+        <div class="opord-result-output" id="opordResultOutput" aria-live="polite">Waiting...</div>
       </div>
       <div class="modal-actions modal-actions--split opord-result-actions">
         <button id="copyOpordResultBtn" type="button">COPY</button>
@@ -1215,6 +1379,8 @@
     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
     crossorigin=""
   ></script>
+  <script src="https://cdn.jsdelivr.net/npm/dompurify@3.2.6/dist/purify.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked@15.0.12/marked.min.js"></script>
   <script>
     const IMAGE_WIDTH = 12710;
     const IMAGE_HEIGHT = 16000;
@@ -1409,6 +1575,7 @@
     let markers = [];
     let markerLayers = new Map();
     let selectedIds = new Set();
+    let selectionPopupCloseTimers = new Map();
     let searchQuery = "";
     let interfaceCollapsed = false;
     let searchResultsCollapsed = false;
@@ -1416,6 +1583,8 @@
     let lastCoordReadoutLatLng = null;
     let opordWakeLock = null;
     let opordCipherInterval = null;
+    let opordRawResultText = "";
+    const SELECTION_POPUP_AUTO_CLOSE_MS = 2000;
     const stackedPanelQuery = window.matchMedia("(max-width: 980px)");
 
     document.addEventListener("visibilitychange", () => {
@@ -1597,10 +1766,30 @@
       return card;
     }
 
-    function buildIcon(selected) {
+    function selectedOrder(markerId) {
+      const index = Array.from(selectedIds).indexOf(markerId);
+      return index === -1 ? null : index + 1;
+    }
+
+    function buildIcon(selected, order = null) {
+      if (selected && order !== null) {
+        return L.divIcon({
+          className: "",
+          html: `
+            <div class="custom-pin-wrap">
+              <span class="selection-order-badge">${order}</span>
+              <div class="custom-pin selected"></div>
+            </div>
+          `,
+          iconSize: [30, 38],
+          iconAnchor: [15, 29],
+          popupAnchor: [0, -30]
+        });
+      }
+
       return L.divIcon({
         className: "",
-        html: `<div class="custom-pin ${selected ? "selected" : "default"}"></div>`,
+        html: '<div class="custom-pin default"></div>',
         iconSize: [18, 18],
         iconAnchor: [9, 9],
         popupAnchor: [0, -10]
@@ -1718,7 +1907,7 @@
       for (const marker of markers) {
         const selected = selectedIds.has(marker.id);
         const layer = L.marker(imagePointToLatLng(marker.x, marker.y), {
-          icon: buildIcon(selected),
+          icon: buildIcon(selected, selectedOrder(marker.id)),
           keyboard: true
         }).addTo(map);
 
@@ -1737,8 +1926,39 @@
         return;
       }
 
-      layer.setIcon(buildIcon(selectedIds.has(marker.id)));
+      layer.setIcon(buildIcon(selectedIds.has(marker.id), selectedOrder(marker.id)));
       layer.setPopupContent(popupHtml(marker));
+    }
+
+    function refreshSelectedLayerStates() {
+      for (const id of selectedIds) {
+        refreshLayerState(id);
+      }
+    }
+
+    function clearSelectionPopupCloseTimer(markerId) {
+      const timer = selectionPopupCloseTimers.get(markerId);
+      if (!timer) {
+        return;
+      }
+
+      window.clearTimeout(timer);
+      selectionPopupCloseTimers.delete(markerId);
+    }
+
+    function scheduleSelectionPopupClose(markerId) {
+      clearSelectionPopupCloseTimer(markerId);
+
+      const timer = window.setTimeout(() => {
+        selectionPopupCloseTimers.delete(markerId);
+
+        const layer = markerLayers.get(markerId);
+        if (layer && layer.isPopupOpen && layer.isPopupOpen() && selectedIds.has(markerId)) {
+          layer.closePopup();
+        }
+      }, SELECTION_POPUP_AUTO_CLOSE_MS);
+
+      selectionPopupCloseTimers.set(markerId, timer);
     }
 
     function renderAll() {
@@ -1806,6 +2026,7 @@
 
       selectedIds.add(id);
       refreshLayerState(id);
+      scheduleSelectionPopupClose(id);
       renderListsOnly();
 
       if (revealAfter) {
@@ -1827,7 +2048,9 @@
       }
 
       selectedIds.delete(id);
+      clearSelectionPopupCloseTimer(id);
       refreshLayerState(id);
+      refreshSelectedLayerStates();
       renderListsOnly();
 
       if (focusAfter) {
@@ -1992,7 +2215,30 @@ ${selectedLocationLines}
       startOpordCipher(loadingCipher, text.length);
     }
 
+    function renderOpordMarkdown(rawText) {
+      if (!window.marked || !window.DOMPurify) {
+        opordResultOutput.textContent = rawText;
+        return;
+      }
+
+      const renderedHtml = window.marked.parse(rawText, {
+        breaks: true,
+        gfm: true
+      });
+
+      opordResultOutput.innerHTML = window.DOMPurify.sanitize(renderedHtml, {
+        ADD_ATTR: ["target"]
+      });
+
+      opordResultOutput.querySelectorAll("a[href]").forEach((link) => {
+        link.setAttribute("target", "_blank");
+        link.setAttribute("rel", "noreferrer noopener");
+      });
+    }
+
     function setOpordResultState(state, text) {
+      const resultText = typeof text === "string" ? text : "";
+
       if (state !== "loading") {
         stopOpordCipher();
       }
@@ -2002,11 +2248,19 @@ ${selectedLocationLines}
       opordResultOutput.setAttribute("aria-busy", state === "loading" ? "true" : "false");
 
       if (state === "loading") {
-        renderOpordLoadingState(text);
+        opordRawResultText = "";
+        renderOpordLoadingState(resultText);
         return;
       }
 
-      opordResultOutput.textContent = text;
+      if (state === "ready") {
+        opordRawResultText = resultText;
+        renderOpordMarkdown(opordRawResultText);
+        return;
+      }
+
+      opordRawResultText = "";
+      opordResultOutput.textContent = resultText;
     }
 
     async function requestOpordWakeLock() {
@@ -2028,15 +2282,14 @@ ${selectedLocationLines}
     }
 
     async function copyOpordResultToClipboard() {
-      const resultText = opordResultOutput.textContent;
-      if (!resultText.trim()) {
+      if (!opordRawResultText.length) {
         return;
       }
 
       const originalLabel = copyOpordResultBtn.textContent;
 
       try {
-        await copyTextToClipboard(resultText);
+        await copyTextToClipboard(opordRawResultText);
         copyOpordResultBtn.textContent = "COPIED";
       } catch (error) {
         console.error(error);
