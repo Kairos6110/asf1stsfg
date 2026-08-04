@@ -2125,19 +2125,6 @@
       sbButtonsContainer.appendChild(btn);
     });
 
-    const havocBtn = document.createElement('a');
-    havocBtn.className = 'soundboard-btn';
-    havocBtn.href = 'https://kairos6110.github.io/gbtf/ws/havoctoc/';
-    havocBtn.target = '_blank';
-    havocBtn.rel = 'noopener noreferrer';
-    havocBtn.title = 'Open HAVOC';
-    havocBtn.setAttribute('aria-label', 'Open HAVOC in a new window');
-    havocBtn.innerHTML = `
-      <span>HAVOC</span>
-      <span class="bi bi-box-arrow-up-right" aria-hidden="true"></span>
-    `;
-    sbButtonsContainer.prepend(havocBtn);
-
     // Toggle menu visibility
     sbTrigger.addEventListener('click', (e) => {
       e.stopPropagation();
