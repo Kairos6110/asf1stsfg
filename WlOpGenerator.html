@@ -1232,6 +1232,11 @@
       }
     ];
 
+    // Alphabetically sort locations in each province
+    PROVINCES_DATA.forEach(prov => {
+      prov.locations.sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' }));
+    });
+
     const CODENAMES = [
       'WIDOW','SPIDER','MAMBA','ADDER','APOLLO','AVALANCHE','BADGER','BANSHEE','GRIZZLY','BISHOP',
       'BOOMER','BOAR','BERSERKER','BLACK KNIGHT','BREAKER','BUFFALO','CANARY','CORAL','COPPER','CRIMSON',
