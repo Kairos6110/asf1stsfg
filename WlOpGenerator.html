@@ -1,1653 +1,1634 @@
 <!DOCTYPE html>
-
-<html>
-
+<html lang="en">
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<script src="https://js.puter.com/v2/"></script>
-<style>
-img {
-    max-width: 100%;
-}
-</style>
-<style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ghost Recon Wildlands Operation Generator</title>
 
-.locationsoverlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.9);
-            z-index: 1000;
-            overflow-y: auto;
-        }
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
 
-        .locationsoverlay-content {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
+  <style>
+    :root {
+      --bg-dark: #070a0f;
+      --bg-card: rgba(15, 23, 38, 0.75);
+      --bg-card-hover: rgba(23, 34, 54, 0.85);
+      --border-color: rgba(255, 255, 255, 0.08);
+      --border-highlight: rgba(245, 158, 11, 0.4);
+      --accent-gold: #f59e0b;
+      --accent-gold-glow: rgba(245, 158, 11, 0.25);
+      --accent-cyan: #06b6d4;
+      --accent-emerald: #10b981;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 16px;
+      --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.6);
+    }
 
-        .locationsoverlay-content img {
-            max-width: 150px;
-            max-height: 150px;
-            border: 1px solid rgb(0, 0, 0);
-           
-            cursor: pointer;
-        }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-        .locationsoverlay-content img:hover {
-            transform: scale(1.1);
-            transition: transform 0.3s;
-        }
-        
-#overlay {
-  position: fixed;
-  display: none;
-  width: 100%;
-  height: 100%;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0,0,0,0.5);
-  z-index: 2;
-  cursor: pointer;
-}
+    body {
+      background-color: var(--bg-dark);
+      background-image: 
+        radial-gradient(circle at 50% 0%, rgba(30, 41, 59, 0.5) 0%, rgba(7, 10, 15, 1) 70%),
+        linear-gradient(to bottom, rgba(7, 10, 15, 0.8), rgba(7, 10, 15, 0.95));
+      background-attachment: fixed;
+      color: var(--text-main);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      min-height: 100vh;
+      padding-bottom: 90px;
+      line-height: 1.5;
+    }
 
-#instructions-overlay {
-  display: none;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5);
-  justify-content: center;
-  align-items: center;
-}
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: var(--bg-dark);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #1e293b;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--accent-gold);
+    }
 
-#instructions-box {
- background:black;
-  border: 2px solid black;
-  border-radius: 5px;
-  padding: 20px;
-  max-width: 400px;
-  text-align: center;
-}
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 20px 16px;
+    }
 
-#instructions-box span {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  cursor: pointer;
-}
+    /* Header & Hero */
+    header {
+      text-align: center;
+      margin-bottom: 24px;
+      position: relative;
+    }
+
+    .title-banner {
+      width: 100%;
+      max-width: 320px;
+      height: auto;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-highlight);
+      box-shadow: 0 0 20px rgba(245, 158, 11, 0.15);
+      margin-bottom: 12px;
+      transition: transform 0.3s ease;
+    }
+    .title-banner:hover {
+      transform: scale(1.02);
+    }
+
+    .world-map-banner {
+      width: 100%;
+      max-width: 380px;
+      height: auto;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-highlight);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: block;
+      margin: 0 auto;
+    }
+    .world-map-banner:hover {
+      transform: scale(1.02);
+      border-color: var(--accent-gold);
+      box-shadow: 0 0 25px var(--accent-gold-glow);
+    }
+
+    h1 {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 1.8rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--text-main);
+      margin-bottom: 4px;
+      background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .subtitle {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      font-weight: 500;
+    }
+
+    /* Header Action Buttons */
+    .header-actions {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .btn-secondary {
+      background: rgba(30, 41, 59, 0.7);
+      color: var(--text-main);
+      border: 1px solid var(--border-color);
+      padding: 8px 16px;
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 600;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+      backdrop-filter: blur(8px);
+      text-decoration: none;
+    }
+    .btn-secondary:hover {
+      background: rgba(51, 65, 85, 0.8);
+      border-color: rgba(255, 255, 255, 0.2);
+      color: #fff;
+      transform: translateY(-1px);
+    }
+
+    /* Sticky Control & Action Bar */
+    .sticky-bar {
+      position: sticky;
+      top: 12px;
+      z-index: 100;
+      background: rgba(15, 23, 42, 0.92);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--border-highlight);
+      border-radius: var(--radius-md);
+      padding: 12px 18px;
+      margin-bottom: 24px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), 0 0 15px var(--accent-gold-glow);
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .stats-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .stats-badge {
+      background: rgba(245, 158, 11, 0.15);
+      color: var(--accent-gold);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      padding: 4px 10px;
+      border-radius: var(--radius-sm);
+      font-family: 'Rajdhani', sans-serif;
+      font-weight: 700;
+      font-size: 1rem;
+    }
+
+    .stats-label {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+      color: #000;
+      border: none;
+      padding: 10px 24px;
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 14px rgba(245, 158, 11, 0.4);
+      transition: all 0.2s ease;
+    }
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+      box-shadow: 0 6px 20px rgba(245, 158, 11, 0.6);
+      transform: translateY(-1px);
+    }
+    .btn-primary:active {
+      transform: translateY(0);
+    }
+
+    /* Global Controls & Filter */
+    .controls-panel {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 14px 18px;
+      margin-bottom: 20px;
+      backdrop-filter: blur(12px);
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .quick-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .btn-xs {
+      background: rgba(30, 41, 59, 0.6);
+      color: var(--text-muted);
+      border: 1px solid var(--border-color);
+      padding: 6px 12px;
+      font-size: 0.8rem;
+      font-family: 'Rajdhani', sans-serif;
+      font-weight: 600;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-xs:hover {
+      background: rgba(51, 65, 85, 0.8);
+      color: var(--text-main);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .search-box {
+      position: relative;
+      flex: 1;
+      min-width: 220px;
+      max-width: 320px;
+    }
+    .search-input {
+      width: 100%;
+      background: rgba(10, 15, 25, 0.8);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      padding: 8px 12px 8px 34px;
+      border-radius: var(--radius-sm);
+      font-size: 0.85rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .search-input:focus {
+      border-color: var(--accent-gold);
+    }
+    .search-icon {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-dim);
+      pointer-events: none;
+      font-size: 0.85rem;
+    }
+
+    /* Accordion Container */
+    .accordion-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .province-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      backdrop-filter: blur(12px);
+    }
+    .province-card.has-selections {
+      border-color: rgba(245, 158, 11, 0.35);
+      background: rgba(20, 30, 48, 0.75);
+    }
+
+    .province-header {
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      user-select: none;
+      background: rgba(15, 23, 42, 0.4);
+      transition: background 0.2s;
+    }
+    .province-header:hover {
+      background: rgba(30, 41, 59, 0.5);
+    }
+
+    .province-title-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .province-name {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 1.15rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      color: var(--text-main);
+    }
+
+    .count-badge {
+      background: rgba(30, 41, 59, 0.8);
+      color: var(--text-muted);
+      border: 1px solid var(--border-color);
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-family: 'Rajdhani', sans-serif;
+      font-weight: 600;
+    }
+    .count-badge.active {
+      background: rgba(245, 158, 11, 0.2);
+      color: var(--accent-gold);
+      border-color: rgba(245, 158, 11, 0.4);
+    }
+
+    .province-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .chevron-icon {
+      width: 20px;
+      height: 20px;
+      color: var(--text-muted);
+      transition: transform 0.3s ease;
+    }
+    .province-card.open .chevron-icon {
+      transform: rotate(180deg);
+      color: var(--accent-gold);
+    }
+
+    /* Accordion Body */
+    .province-body {
+      display: none;
+      padding: 16px 18px;
+      border-top: 1px solid var(--border-color);
+      background: rgba(10, 14, 23, 0.6);
+    }
+    .province-card.open .province-body {
+      display: block;
+    }
+
+    .province-map-preview {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 14px;
+      padding-bottom: 12px;
+      border-bottom: 1px dashed var(--border-color);
+    }
+
+    .map-thumb {
+      width: 100px;
+      height: 60px;
+      object-fit: cover;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-color);
+      cursor: pointer;
+      transition: transform 0.2s, border-color 0.2s;
+    }
+    .map-thumb:hover {
+      transform: scale(1.05);
+      border-color: var(--accent-gold);
+    }
+
+    .map-hint {
+      font-size: 0.8rem;
+      color: var(--text-dim);
+    }
+
+    /* Locations Grid */
+    .locations-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 8px;
+    }
+
+    .location-checkbox-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(15, 23, 42, 0.5);
+      border: 1px solid var(--border-color);
+      padding: 8px 12px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: all 0.15s ease;
+      user-select: none;
+    }
+    .location-checkbox-item:hover {
+      background: rgba(30, 41, 59, 0.7);
+      border-color: rgba(255, 255, 255, 0.15);
+    }
+    .location-checkbox-item.checked {
+      background: rgba(245, 158, 11, 0.12);
+      border-color: rgba(245, 158, 11, 0.4);
+    }
+
+    .custom-checkbox {
+      width: 16px;
+      height: 16px;
+      border: 1px solid var(--text-dim);
+      border-radius: 3px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s;
+      flex-shrink: 0;
+    }
+    .location-checkbox-item.checked .custom-checkbox {
+      background: var(--accent-gold);
+      border-color: var(--accent-gold);
+      color: #000;
+    }
+
+    .location-name {
+      font-size: 0.85rem;
+      color: var(--text-main);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .location-checkbox-item.checked .location-name {
+      color: #fff;
+      font-weight: 500;
+    }
+
+    /* Generated OPORD Output Card */
+    .opord-card {
+      margin-top: 30px;
+      background: rgba(10, 14, 23, 0.9);
+      border: 1px solid var(--border-highlight);
+      border-radius: var(--radius-md);
+      padding: 24px;
+      box-shadow: var(--shadow-lg);
+      display: none;
+    }
+    .opord-card.active {
+      display: block;
+    }
+
+    .opord-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 12px;
+      margin-bottom: 16px;
+    }
+
+    .opord-title {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 1.4rem;
+      color: var(--accent-gold);
+      font-weight: 700;
+    }
+
+    .opord-details {
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 0.9rem;
+      color: #cbd5e1;
+      line-height: 1.6;
+      white-space: pre-wrap;
+      margin-bottom: 20px;
+    }
+
+    .opord-maps-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+      margin-top: 16px;
+    }
+
+    .opord-map-item {
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      padding: 8px;
+      text-align: center;
+    }
+    .opord-map-item img {
+      width: 100%;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .opord-map-item p {
+      font-family: 'Rajdhani', sans-serif;
+      font-weight: 700;
+      font-size: 0.9rem;
+      margin-top: 6px;
+      color: var(--accent-gold);
+    }
+
+    /* Modal Overlay Base */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(3, 7, 18, 0.85);
+      backdrop-filter: blur(10px);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+      padding: 16px;
+      overflow-y: auto;
+    }
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal-box {
+      background: rgba(15, 23, 42, 0.95);
+      border: 1px solid var(--border-highlight);
+      border-radius: var(--radius-lg);
+      padding: 28px;
+      max-width: 520px;
+      width: 100%;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 25px var(--accent-gold-glow);
+      position: relative;
+      text-align: center;
+      animation: modalSlideUp 0.25s ease-out;
+    }
+
+    @keyframes modalSlideUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      background: none;
+      border: none;
+      color: var(--text-dim);
+      font-size: 1.2rem;
+      cursor: pointer;
+      padding: 4px 8px;
+      border-radius: 4px;
+      transition: color 0.2s;
+    }
+    .modal-close:hover {
+      color: #fff;
+    }
+
+    .modal-icon {
+      width: 54px;
+      height: 54px;
+      background: rgba(245, 158, 11, 0.15);
+      color: var(--accent-gold);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 16px;
+    }
+
+    .modal-title {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 8px;
+    }
+
+    .modal-desc {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin-bottom: 20px;
+      line-height: 1.5;
+    }
+
+    /* AI Launchers Grid inside Modal */
+    .ai-launchers-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .ai-launch-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 14px 10px;
+      background: rgba(30, 41, 59, 0.6);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      color: var(--text-main);
+      text-decoration: none;
+      font-family: 'Rajdhani', sans-serif;
+      font-weight: 700;
+      font-size: 1rem;
+      transition: all 0.2s ease;
+    }
+    .ai-launch-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+    }
+
+    /* Brand Accents */
+    .ai-btn-gemini:hover {
+      border-color: #8ab4f8;
+      background: rgba(66, 133, 244, 0.15);
+      color: #8ab4f8;
+    }
+    .ai-btn-chatgpt:hover {
+      border-color: #10a37f;
+      background: rgba(16, 163, 127, 0.15);
+      color: #10a37f;
+    }
+    .ai-btn-claude:hover {
+      border-color: #d97757;
+      background: rgba(217, 119, 87, 0.15);
+      color: #d97757;
+    }
+    .ai-btn-grok:hover {
+      border-color: #38bdf8;
+      background: rgba(56, 189, 248, 0.15);
+      color: #38bdf8;
+    }
+
+    .prompt-preview-box {
+      background: rgba(7, 10, 15, 0.9);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      padding: 10px;
+      font-family: monospace;
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      max-height: 80px;
+      overflow-y: auto;
+      text-align: left;
+      margin-bottom: 16px;
+      white-space: pre-wrap;
+    }
 
 
-</style>
+    /* HIGH-Z-INDEX MAP LIGHTBOX SYSTEM */
+    .map-lightbox-overlay {
+      z-index: 2500 !important;
+      background: rgba(2, 6, 23, 0.93) !important;
+      backdrop-filter: blur(14px);
+    }
+    .map-lightbox-card {
+      max-width: 1200px;
+      width: 95vw;
+      max-height: 94vh;
+      display: flex;
+      flex-direction: column;
+      background: rgba(15, 23, 42, 0.96);
+      border: 1px solid var(--border-highlight);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9), 0 0 35px var(--accent-gold-glow);
+      position: relative;
+      animation: modalSlideUp 0.25s ease-out;
+    }
+    .lightbox-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 20px;
+      background: rgba(7, 10, 15, 0.85);
+      border-bottom: 1px solid var(--border-color);
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .lightbox-title-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .lightbox-badge {
+      background: rgba(245, 158, 11, 0.2);
+      border: 1px solid var(--accent-gold);
+      color: var(--accent-gold);
+      font-family: 'Rajdhani', sans-serif;
+      font-weight: 700;
+      font-size: 0.85rem;
+      padding: 3px 10px;
+      border-radius: var(--radius-sm);
+      letter-spacing: 0.5px;
+    }
+    .lightbox-title {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #ffffff;
+      letter-spacing: 0.5px;
+    }
+    .lightbox-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .lightbox-body {
+      position: relative;
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #030712;
+      padding: 16px;
+      min-height: 320px;
+      overflow: hidden;
+    }
+    .lightbox-img-wrapper {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 100%;
+    }
+    .lightbox-img-wrapper img {
+      max-width: 100%;
+      max-height: 68vh;
+      object-fit: contain;
+      border-radius: 6px;
+      border: 1px solid rgba(245, 158, 11, 0.35);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+    }
+    .lightbox-nav-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid var(--border-highlight);
+      color: var(--accent-gold);
+      border-radius: 50%;
+      width: 48px;
+      height: 48px;
+      font-size: 1.4rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      z-index: 10;
+      backdrop-filter: blur(4px);
+    }
+    .lightbox-nav-btn:hover {
+      background: var(--accent-gold);
+      color: #000000;
+      box-shadow: 0 0 15px var(--accent-gold-glow);
+      transform: translateY(-50%) scale(1.1);
+    }
+    .lightbox-nav-btn.nav-prev {
+      left: 16px;
+    }
+    .lightbox-nav-btn.nav-next {
+      right: 16px;
+    }
+    .lightbox-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 20px;
+      background: rgba(7, 10, 15, 0.85);
+      border-top: 1px solid var(--border-color);
+      font-size: 0.85rem;
+      color: var(--text-dim);
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 640px) {
+      h1 {
+        font-size: 1.4rem;
+      }
+      .sticky-bar {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .btn-primary {
+        justify-content: center;
+      }
+      .controls-panel {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .search-box {
+        max-width: 100%;
+      }
+      .ai-launchers-grid {
+        grid-template-columns: 1fr;
+      }
+      .locations-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
 </head>
 
-<title>Ghost Recon Wildlands Operation Generator </title>
+<body>
 
-<body style="background-color: #3a2118;" text="ffffff" link="ffffff" vlink="ffffff" alink="ffffff">
+  <div class="container">
+    <!-- Header / Hero Section -->
+    <header>
+      <img src="./images/titlewl.png" alt="Ghost Recon Wildlands" class="title-banner">
 
-<center> 
+      <div style="margin: 12px 0 16px;">
+        <img src="./images/wlprovs.png" alt="Tactical World Map" class="world-map-banner" onclick="showWorldMap()" title="Click to enlarge Tactical World Map">
+      </div>
 
+      <div class="header-actions">
+        <button type="button" class="btn-secondary" onclick="showInstructions()">
+          📝 Instructions
+        </button>
+        <a href="https://discord.gg/BXvQFwBq8z" target="_blank" rel="noopener noreferrer" class="btn-secondary">
+          <svg width="18" height="18" viewBox="0 0 127.14 96.36" fill="#ffffff">
+            <path d="M107.7,8.07A105.15,105.15,0,0,0,81.47,0a72.06,72.06,0,0,0-3.36,6.83A97.68,97.68,0,0,0,49,6.83,72.37,72.37,0,0,0,45.64,0,105.89,105.89,0,0,0,19.39,8.09C2.79,32.65-1.71,56.6.54,80.21h0A105.73,105.73,0,0,0,32.71,96.36,77.7,77.7,0,0,0,39.6,85.25a68.42,68.42,0,0,1-10.85-5.18c.91-.66,1.8-1.34,2.66-2a75.57,75.57,0,0,0,64.32,0c.87.71,1.76,1.39,2.66,2a68.68,68.68,0,0,1-10.87,5.19,77,77,0,0,0,6.89,11.1A105.25,105.25,0,0,0,126.6,80.22c2.72-27.42-4.63-51.17-18.9-72.15ZM42.45,65.69C36.18,65.69,31,60,31,53s5-12.74,11.43-12.74c6.49,0,11.66,5.77,11.43,12.74C53.88,60,48.77,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.25,60,73.25,53s5-12.74,11.44-12.74c6.48,0,11.65,5.77,11.43,12.74C96.12,60,91.07,65.69,84.69,65.69Z"/>
+          </svg>
+          Join Discord
+        </a>
+      </div>
+    </header>
 
+    <!-- Sticky Main Action Bar -->
+    <div class="sticky-bar">
+      <div class="stats-info">
+        <div class="stats-badge" id="globalLocCount">0 Selected</div>
+        <div class="stats-label" id="globalProvCount">in 0 Provinces</div>
+      </div>
+      <button type="button" class="btn-primary" onclick="generateAndCopyPrompt()">
+        Copy Prompt 📋
+      </button>
+    </div>
 
-<img src='./images/titlewl.png' alt="Ghost Recon Wildlands Operation Generator" style="width:300px;border:1px solid rgb(63, 63, 63)">
-<br><br>
-<button type="button" style="width:300px;height:30px;font-family: arial; font-size: 100%; background-color: black; color: white; border: 1px solid rgb(90, 90, 90); border-radius: 1px;" onclick="showInstructions()">📝 Instructions</button>
-<br><br>
-<img src='./images/wlprovs.png' alt="fullmapover" style="width:300px;border:1px solid rgb(63, 63, 63)">
-<br><br>
+    <!-- Controls & Quick Filters -->
+    <div class="controls-panel">
+      <div class="search-box" style="max-width: 100%;">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="searchInput" class="search-input" placeholder="Search location or province..." oninput="filterLocations()">
+      </div>
+    </div>
 
-<div id="instructions-overlay" onclick="hideInstructions()">
-  <div id="instructions-box">
-    
-<p style="font-family:arial;color:white"><u>Instructions (click again to close):</u></p>
-<p style="font-family:arial;color:white">
+    <!-- Province Accordions Container -->
+    <div class="accordion-list" id="accordionList">
+      <!-- Populated via JavaScript -->
+    </div>
 
-1. Use the map images to locate provinces. Click <b>Preview all locations</b> to view full maps and zoom in/out as needed.
-<br><br>
-2. Select one or more provinces, choose how many locations/objectives to randomize, then click <b>Generate Random Operation</b>.
-<br><br>
-3. A random operation and maps will appear below to help you find objectives and nearby locations.
-<br><br>
-4. Click <b>Copy AI Prompt 📋</b> to paste the prompt into your preferred AI tool (ChatGPT, Gemini, Claude, etc.) and refine it if needed.
-<br><br>
-5. Or click <b>Generate Op (AI) ✨</b> to generate the operation directly using Gemini and Puter.
-<br><br>
-The result is a unique, custom operation you can roleplay and play in-game. Enjoy!
-<br><br>
-Feel free to share this tool—it was made for the Ghost Recon Wildlands community.
-<br><br>
-– Kairos
-
-</p>
-
+    <!-- Generated OPORD Display -->
+    <div class="opord-card" id="opordCard">
+      <div class="opord-header">
+        <div class="opord-title" id="opordTitle">OPORD 0000 - CODENAME</div>
+        <button type="button" class="btn-xs" onclick="generateAndCopyPrompt()">📋 Copy Prompt Again</button>
+      </div>
+      <div class="opord-details" id="opordText"></div>
+      <h4 style="font-family: 'Rajdhani', sans-serif; color: var(--accent-gold); margin-top: 20px; font-size: 1.1rem;">PROVINCE MAP REFERENCES</h4>
+      <div class="opord-maps-grid" id="opordMapsGrid"></div>
+    </div>
   </div>
-</div>
 
+  <!-- COPY PROMPT SUCCESS OVERLAY MODAL -->
+  <div class="modal-overlay" id="copyPromptOverlay">
+    <div class="modal-box">
+      <button type="button" class="modal-close" onclick="closeModal('copyPromptOverlay')">✕</button>
+      <div class="modal-icon">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12"></polyline>
+        </svg>
+      </div>
+      <div class="modal-title">Customized Prompt Copied!</div>
+      <div class="modal-desc" id="copyOverlayDesc">
+        Your tailored mission prompt is on your clipboard. Choose an AI generator below to open it in a new window, paste your prompt, and execute mission generation!<br><br>
+        <span style="display:block; margin-top: 8px; color: #94a3b8; font-size: 0.85rem;">Use the generated operation details & province map references below to execute your mission in Ghost Recon Wildlands. Be creative and add roleplay for things in the world that aren't maybe exactly as written. Make it realistic!</span>
+      </div>
 
-<button type="button" style="width:300px;height:30px;font-family: arial; font-size: 100%; background-color: black; color: white; border: 1px solid rgb(63, 63, 63); border-radius: 1px;" onclick="previewlocs()">🔎 Preview all locations</button>
+      <div class="ai-launchers-grid">
+        <a href="https://gemini.google.com" target="_blank" rel="noopener noreferrer" class="ai-launch-btn ai-btn-gemini">
+          Google Gemini
+        </a>
+        <a href="https://chatgpt.com" target="_blank" rel="noopener noreferrer" class="ai-launch-btn ai-btn-chatgpt">
+          ChatGPT
+        </a>
+        <a href="https://claude.ai" target="_blank" rel="noopener noreferrer" class="ai-launch-btn ai-btn-claude">
+          Claude
+        </a>
+        <a href="https://grok.com" target="_blank" rel="noopener noreferrer" class="ai-launch-btn ai-btn-grok">
+          Grok
+        </a>
+      </div>
 
-<h3 style="font-family:arial">Select one or more provinces</h3> 
-
-
-
-<div id="overlay" onclick="off()">
-<br><br><br>
-<img hidden id='provincesMap' src='./images/wlprovs.png' alt="provincesMap" style="width:600px;border:5px solid black">
-</div>
-
-<div id="locationsoverlay" class="locationsoverlay" onclick="closeLocationsoverlay()">
-  <div class="locationsoverlay-content">
-      <div>
-          <img src="./images/BARVECHOS.png" alt="Barvechos">
-          <br>
-          <span style="font-family: Arial;">BARVECHOS</span>
-      </div>
-      <div>
-          <img src="./images/CAIMANES.png" alt="Caimanes">
-          <br>
-          <span style="font-family: Arial;">CAIMANES</span>
-      </div>
-      <div>
-          <img src="./images/ESPIRITUSANTO.png" alt="Espiritu Santo">
-          <br>
-          <span style="font-family: Arial;">ESPIRITU SANTO</span>
-      </div>
-      <div>
-          <img src="./images/FLORDELORO.png" alt="Flor del Oro">
-          <br>
-          <span style="font-family: Arial;">FLOR DEL ORO</span>
-      </div>
-      <div>
-          <img src="./images/INCACAMINA.png" alt="Inca Camina">
-          <br>
-          <span style="font-family: Arial;">INCA CAMINA</span>
-      </div>
-      <div>
-          <img src="./images/ITACUA.png" alt="Itacua">
-          <br>
-          <span style="font-family: Arial;">ITACUA</span>
-      </div>
-      <div>
-          <img src="./images/KOANI.png" alt="KOANI">
-          <br>
-          <span style="font-family: Arial;">KOANI</span>
-      </div>
-      <div>
-          <img src="./images/LACRUZ.png" alt="La Cruz">
-          <br>
-          <span style="font-family: Arial;">LA CRUZ</span>
-      </div>
-      <div>
-          <img src="./images/LIBERTAD.png" alt="Libertad">
-          <br>
-          <span style="font-family: Arial;">LIBERTAD</span>
-      </div>
-      <div>
-          <img src="./images/MALCA.png" alt="Malca">
-          <br>
-          <span style="font-family: Arial;">MALCA</span>
-      </div>
-      <div>
-          <img src="./images/MEDIALUNA.png" alt="Media Luna">
-          <br>
-          <span style="font-family: Arial;">MEDIA LUNA</span>
-      </div>
-      <div>
-          <img src="./images/MOJOCOYO.png" alt="Mojocoyo">
-          <br>
-          <span style="font-family: Arial;">MOJOCOYO</span>
-      </div>
-      <div>
-          <img src="./images/MONTEPUNCU.png" alt="Monte Puncu">
-          <br>
-          <span style="font-family: Arial;">MONTE PUNCU</span>
-      </div>
-      <div>
-          <img src="./images/MONTUYOC.png" alt="Montuyoc">
-          <br>
-          <span style="font-family: Arial;">MONTUYOC</span>
-      </div>
-      <div>
-          <img src="./images/OCORO.png" alt="Ocor">
-          <br>
-          <span style="font-family: Arial;">OCORO</span>
-      </div>
-      <div>
-          <img src="./images/PNAGUA.png" alt="PNA Gua">
-          <br>
-          <span style="font-family: Arial;">PN AGUA VERDE</span>
-      </div>
-      <div>
-          <img src="./images/PUCARA.png" alt="Pucara">
-          <br>
-          <span style="font-family: Arial;">PUCARA</span>
-      </div>
-      <div>
-          <img src="./images/REMANZO.png" alt="Remanzo">
-          <br>
-          <span style="font-family: Arial;">REMANZO</span>
-      </div>
-      <div>
-          <img src="./images/SANMATEO.png" alt="San Mateo">
-          <br>
-          <span style="font-family: Arial;">SAN MATEO</span>
-      </div>
-      <div>
-          <img src="./images/TABACAL.png" alt="Tabacal">
-          <br>
-          <span style="font-family: Arial;">TABACAL</span>
-      </div>
-      <div>
-          <img src="./images/VILLAVERDE.png" alt="Villa Verde">
-          <br>
-          <span style="font-family: Arial;">VILLA VERDE</span>
-      </div>
+      <button type="button" class="btn-secondary" style="width: 100%; justify-content: center;" onclick="closeModal('copyPromptOverlay')">
+        Close Window
+      </button>
+    </div>
   </div>
-</div>
+
+  <!-- INSTRUCTIONS MODAL -->
+  <div class="modal-overlay" id="instructionsOverlay">
+    <div class="modal-box" style="max-width: 580px; text-align: left;">
+      <button type="button" class="modal-close" onclick="closeModal('instructionsOverlay')">✕</button>
+      <div class="modal-title" style="text-align: center;">Instructions</div>
+      <div class="modal-desc" style="color: #cbd5e1; font-size: 0.9rem; line-height: 1.7; margin-top: 16px;">
+        <p><strong>1. Select Locations:</strong> Expand any province accordion to select specific locations. You have 100% control over target objectives.</p>
+        <br>
+        <p><strong>2. Copy Prompt:</strong> Click <strong>Copy Prompt 📋</strong> on the sticky bar. Your tailored tactical prompt will instantly copy to your clipboard.</p>
+        <br>
+        <p><strong>3. Generate via AI:</strong> In the popup overlay, choose your preferred AI generator (Gemini, ChatGPT, Claude, or Grok). Paste the prompt and generate your detailed storyline & objectives.</p>
+        <br>
+        <p><strong>4. Execute:</strong> Use the generated operation details & province map references below to execute your mission in Ghost Recon Wildlands. Be creative and add roleplay for things in the world that aren't maybe exactly as written. Make it realistic!</p>
+        <br>
+        <p style="text-align: center; color: var(--accent-gold); font-weight: 700; font-family: 'Rajdhani', sans-serif; font-size: 1.15rem; letter-spacing: 0.5px;">Good luck, Ghost.</p>
+      </div>
+      <button type="button" class="btn-secondary" style="width: 100%; justify-content: center; margin-top: 16px;" onclick="closeModal('instructionsOverlay')">
+        Understood
+      </button>
+    </div>
+  </div>
 
 
+  <!-- MAP LIGHTBOX OVERLAY (JUST THE IMAGE) -->
+  <div class="modal-overlay map-lightbox-overlay" id="mapLightboxOverlay" onclick="closeMapLightbox()">
+    <div style="max-width: 90%; max-height: 90%; display: flex; align-items: center; justify-content: center;">
+      <img src="" id="lightboxImg" alt="Tactical Map" style="max-width: 100%; max-height: 88vh; width: auto; height: auto; border-radius: var(--radius-md); border: 2px solid var(--accent-gold); box-shadow: var(--shadow-lg);">
+    </div>
+  </div>
 
+  <!-- LEGACY WORLD MAP OVERLAY ALIAS (Kept for compatibility) -->
+  <div class="modal-overlay map-lightbox-overlay" id="worldMapOverlay" onclick="closeModal('worldMapOverlay')">
+    <div style="max-width: 90%; max-height: 90%;">
+      <img src="./images/wlprovs.png" alt="Ghost Recon Wildlands World Map" style="width: 100%; height: auto; border-radius: var(--radius-md); border: 2px solid var(--accent-gold); box-shadow: var(--shadow-lg);">
+    </div>
+  </div>
 
+  <script>
+    // PROVINCE DATA MATRIX
+    const PROVINCES_DATA = [
+      {
+        id: "BARVECHOS",
+        name: "BARVECHOS",
+        mapImg: "images/BARVECHOS.png",
+        locations: [
+          "Bartolome Farm", "Checkpoint", "Matico", "La Leproserna", "Barvechos Mine Quarry",
+          "Gas Station Via-B Gas", "Outpost", "Nidia Flores' Hacienda", "Barvechos Base",
+          "Makeshift Runway", "Barvechos", "Macoya Cooperative", "Barvechos Mine", "Lieutenant House",
+          "Pucamayu", "Los Fisgones", "Santa Maria Farm", "Carretera 3", "Nueva Plata Site"
+        ]
+      },
+      {
+        id: "CAIMANES",
+        name: "CAIMANES",
+        mapImg: "images/CAIMANES.png",
+        locations: [
+          "Malpaso Farm", "Gas Station", "La Frontera", "Riverine Checkpoint", "Makeshift Hospital",
+          "Rebel Campsite", "Outpost", "Ingani", "Camargo Campsite", "Caimanes Base",
+          "San Miguel Ruins", "Puerto Chico", "Combat Outpost", "River Market", "Los Hombres Jaguares",
+          "Gas Station Via-B Gas", "Frontera", "Buchon House", "Las Anguila Wreck", "Child Hunt"
+        ]
+      },
+      {
+        id: "ESPIRITUSANTO",
+        name: "ESPIRITU SANTO",
+        mapImg: "images/ESPIRITUSANTO.png",
+        locations: [
+          "Buchone Chapel", "Outpost", "Alta Garcia Mine", "Alta Gracia", "Pilgrim House",
+          "Shrine of Truth", "Santa Muerte Sanctuary", "Espiritu Santo Base", "Observation Post",
+          "Experimental Farm 03", "Lajosa Farm", "Guari", "Guari Mine", "Los Humildes Peregrinos",
+          "Huanca Farm", "Miski Secure Barn", "Miski Farm", "Shrine of Purity", "Coca Warehouse",
+          "Bahia Floresta", "Huayani Farm", "Buchon House", "Shrine of Loyalty"
+        ]
+      },
+      {
+        id: "FLORDELORO",
+        name: "FLOR DEL ORO",
+        mapImg: "images/FLORDELORO.png",
+        locations: [
+          "Hoalaca Ruins", "Nupucu", "Combat Outpost", "Los Tramperos", "Train Freight Yard",
+          "Rocha", "Rocha Sawmill", "Checkpoint", "Halcone House", "Armadillo Hunting Lodge",
+          "Gas Station Via-B Gas", "M.O.B. Jaguar", "Unidad Train Freight Yard", "Unidad Military Hospital",
+          "Huma Chua Sawmill", "La Fortaleza", "Huma Chua", "Observation Post", "Makeshift Runway",
+          "Chorrilos Wood Storage", "Chorrillos", "F.O.B. Serpiente"
+        ]
+      },
+      {
+        id: "INCACAMINA",
+        name: "INCA CAMINA",
+        mapImg: "images/INCACAMINA.png",
+        locations: [
+          "Outpost", "Inca Camina Base", "Inca Chaca", "Refugio de Pastores", "Crash Site",
+          "Inca Ruins", "Inca Road", "Nevado Llamiru", "San Martin Mountain Hut", "Trecking Campsite",
+          "Nuevo Mondo", "Cable Car Station", "Lookout", "Train Wrecks", "La Cabaña de Pesca",
+          "Gas Station Via-B Gas", "Inca Camina Freight Yard", "Checkpoint", "Julpe Alto", "Improvised Runway",
+          "Archaeological Site", "Santa Catalina Chapel", "Nevado Llamiru Garage", "Ancient Cemetery of Miners", "Sicario House"
+        ]
+      },
+      {
+        id: "ITACUA",
+        name: "ITACUA",
+        mapImg: "images/ITACUA.png",
+        locations: [
+          "Buena Vida", "Cotani", "Checkpoint", "Yopil", "Santa Maria", "Culta", "Hunt Lodge",
+          "Santa Catalina Chapel", "Outpost", "Vieja Granja", "F.O.B. Armadillo", "Baurecito Ruins",
+          "Campo de Futbol el Yayo", "Colque Ranch", "Atollo Farm", "Mendez Farm", "Sicario House",
+          "Pantoja", "Observation Post", "Bocca Farm", "La Casa Del Mexicano", "Itacua Base", "Khochi"
+        ]
+      },
+      {
+        id: "KOANI",
+        name: "KOANI",
+        mapImg: "images/KOANI.png",
+        locations: [
+          "Narco-Slaughter", "Huertas Mine", "Koani Railway Camp", "Santa Blanca Living District", "Huertas",
+          "Truck Depot", "Crashed Plane", "Checkpoint", "Combat Outpost", "Outpost", "Locotal Mine",
+          "A Prehistoric Site", "Koani Lithium Mine", "Truck Stop Mamani", "Gas Station Via-B Gas",
+          "Salt Hotel", "El Arbol de Piedra", "Improvised Runway", "Salt Miner's House", "Sacani Salt Mines",
+          "Mina de Sal", "El Albergue", "Sacani", "Unidad Campsite", "Shamanic Site", "Train Cemetery",
+          "El Buen Sal", "Makeshift Runway", "Salt Mine Condori", "Koani Air Base"
+        ]
+      },
+      {
+        id: "LACRUZ",
+        name: "LA CRUZ",
+        mapImg: "images/LACRUZ.png",
+        locations: [
+          "Hoyito", "F.O.B. Vibora", "Rioja Ranch", "Combat Outpost", "San Rodrigo Monastery",
+          "Outpost", "Buchon House", "Makeshift Runway", "Santa Elena", "La Cruz Freight Yard",
+          "La Hacha Buena", "Rebel Campsite", "Cemetery El Bosque Quemado", "Isque", "La Cruz Base",
+          "Burned Forest", "Luluni Ruins", "Carrasco Farm", "El Pequeño Lago"
+        ]
+      },
+      {
+        id: "LIBERTAD",
+        name: "LIBERTAD",
+        mapImg: "images/LIBERTAD.png",
+        locations: [
+          "Forestry Site", "Checkpoint", "Observation Post", "Pa Kollu", "La Guarida de Tres Brujas",
+          "Outpost", "Shrine of Wealth", "Bolivar Square", "Libertad", "F.O.B. Oso Hormiguero",
+          "Los Cuatros Hermanos", "Los Viejos Pinos", "Viloma Tres Gas Field", "Oso", "Viloma Dos Oil Field",
+          "Viloma Uno Oil Field", "Viloma Refinery", "Chem Precursors Storage", "Viloma", "Libertad Airport",
+          "Road Market", "Narco-Slaughter", "Chemical Institute Via-B Gas", "Libertad Base", "Gas Station Via-B Gas",
+          "Viloma Cuatro Gas Field", "Combat Outpost", "El Escondite del Cazador"
+        ]
+      },
+      {
+        id: "MALCA",
+        name: "MALCA",
+        mapImg: "images/MALCA.png",
+        locations: [
+          "Outpost", "Banado", "Santa Muerte Idol", "Chacori Farm", "Uma Marca", "Uma Marca Mine",
+          "El Establo", "Combat Outpost", "Icoya", "Sicario House", "El Pais de la Felicidad",
+          "Holy Malca Base", "Los Crios de la Muerte", "La Buena Muerte"
+        ]
+      },
+      {
+        id: "MEDIALUNA",
+        name: "MEDIA LUNA",
+        mapImg: "images/MEDIALUNA.png",
+        locations: [
+          "Combat Outpost", "Rebel Campsite", "Makeshift Runway", "El Cañon", "La Loma", "F.O.B. Buitre",
+          "El Acantilado", "Chipaya Farm", "Checkpoint", "El Puente del Diablo", "Shooting Range",
+          "Acevedo", "Archaeology Site", "Observation Post", "Cardoza", "M.O.B. Condor", "Junin"
+        ]
+      },
+      {
+        id: "MOJOCOYO",
+        name: "MOJOCOYO",
+        mapImg: "images/MOJOCOYO.png",
+        locations: [
+          "Makeshift Runway", "Cocaine Hideout", "Gas Station Via-B Gas", "Capachunco", "Checkpoint",
+          "Prison Camp", "Mojocoyo Base", "Quispe Farm", "La Vieja Granja", "Panua Village", "Private Helipad",
+          "Sacrificial Site", "Chullpas", "Rancho Sabala", "Lieutenant House", "Almacén de Quinua",
+          "Barrera Farm", "Abandoned Prospecting Site", "Outpost", "Chacatal", "Sicario House", "La Curva de la Muerte"
+        ]
+      },
+      {
+        id: "MONTEPUNCU",
+        name: "MONTE PUNCU",
+        mapImg: "images/MONTEPUNCU.png",
+        locations: [
+          "Secure Barn 01", "Experimental Farm 01", "Outpost", "Chaca Barraca", "Rebel Campsite",
+          "A Car Wreck", "Agronomic Center", "La Cumbre", "Rojas Farm", "El Yayo Cooperative",
+          "Las Tumbas del Camino", "Santa Blanca Campsite", "Klaus Barbie House"
+        ]
+      },
+      {
+        id: "MONTUYOC",
+        name: "MONTUYOC",
+        mapImg: "images/MONTUYOC.png",
+        locations: [
+          "San Francisco Monastery", "Montuyoc Training Base", "Pre Columbian Necropolis", "Gas Station Via-B Gas",
+          "Sicarios Boot Camp", "Supply Depot", "Laguna Colorada Baths", "Makeshift Runway", "Checkpoint",
+          "Mapooca Farm", "Tupac Katari Tomb", "Outpost", "Vieja Granja", "Araca Village", "Choza Padre Mine",
+          "Hunter Shelter", "Laguna Colorada", "Lafuente Farm", "Choza Padre", "Inca Corral Farm", "Condor Cairn"
+        ]
+      },
+      {
+        id: "OCORO",
+        name: "OCORO",
+        mapImg: "images/OCORO.png",
+        locations: [
+          "Outpost", "Buchon House", "Coca Paste Factory", "A Fisherman's House", "Puerto Grande",
+          "Zona Narco Prohibida", "Combat Outpost", "Puerto Nuevo", "Nenma Freight Yard", "Moko",
+          "Campo Ana", "Pachamama Scars", "Ocoro Dispensary", "Checkpoint", "Gas Station Via-B Gas",
+          "Santa Rosa", "El Altiplano Verde", "Pujio", "Ocoro Base", "Los Mosquitos"
+        ]
+      },
+      {
+        id: "PNAGUA",
+        name: "PN AGUA VERDE",
+        mapImg: "images/PNAGUA.png",
+        locations: [
+          "Outpost", "La Torre de Arroyo Baya", "Arroyo Baya", "La Nube Blanca", "Playa Sirena",
+          "Secret Cocaine Hideout", "Patuja Mansion", "Ajuga Mansion", "Kantuta Mansion", "Tajibo Mansion",
+          "Playa Tajibo", "Rio Del Jaguar", "Siren Island", "Buchon House", "Riverine Checkpoint",
+          "Goyo", "Agua Verde Base", "Paraiso Casino", "Halcone House", "Paraiso Agua Verde", "Checkpoint", "Alicia Town"
+        ]
+      },
+      {
+        id: "PUCARA",
+        name: "PUCARA",
+        mapImg: "images/PUCARA.png",
+        locations: [
+          "Horco Farm", "Charamokho Village", "Makeshift Runway", "Riverine Docks", "Outpost",
+          "Olico Super Dam", "Todos Santos Town", "Santa Muerte Tomb", "Todos Santos Rock Quarry", "Old Silver Mine",
+          "Sueño Mausoleum", "Pucara Base", "El Nido de Cóndores", "Pilca Village", "Pilca Mine", "Pucara"
+        ]
+      },
+      {
+        id: "REMANZO",
+        name: "REMANZO",
+        mapImg: "images/REMANZO.png",
+        locations: [
+          "Las Mulas", "Poco Irrigation Tank", "Poco", "F.O.B. Puma", "Outpost", "Remanzo Base",
+          "Test Center", "Ovejas Real Slaughterhouse", "Buying Office", "Marcavi", "Observation Post",
+          "San Vicente", "Factory Electro Energy Drink", "Liquid Cocaine Lab", "Gas Station"
+        ]
+      },
+      {
+        id: "SANMATEO",
+        name: "SAN MATEO",
+        mapImg: "images/SANMATEO.png",
+        locations: [
+          "Checkpoint", "La Casa Abandonada", "Train Station", "La Carcel Del Pueblo", "Abandoned House",
+          "San Mateo Base", "Makeshift Runway", "Flores Farm", "Prison Rosario", "Rebel Campsite",
+          "Gas Station Via-B Gas", "Outpost", "Narco-Muro", "Sicario House", "Boot Camp",
+          "Valle Verde", "El Vaquero", "Restaurante Humacha"
+        ]
+      },
+      {
+        id: "TABACAL",
+        name: "TABACAL",
+        mapImg: "images/TABACAL.png",
+        locations: [
+          "Rebel Campsite", "Killasisa Farm", "Makeshift Runway", "Secure Barn West", "La Cote Molinos",
+          "Outpost", "Tabacal Base", "Buchone House", "SNPC Freight Yard", "El Sicario Invencible",
+          "Crashed Plane", "Barrientos Coop", "Gas Station Via-B Gas", "Bella Selva", "El Cocalero Fallecido",
+          "Secure Barn East", "Jaruma Cooperative", "Pilpintu Farm", "Observation Post"
+        ]
+      },
+      {
+        id: "VILLAVERDE",
+        name: "VILLA VERDE",
+        mapImg: "images/VILLAVERDE.png",
+        locations: [
+          "Outpost", "Lafuente Farm", "Pinaicobo Farm", "La Buena Pesca", "Villa Verde",
+          "El Yayo Cooperative", "Camacho Farm", "Coca Drying Site", "Gas Station Via-B Gas",
+          "Makeshift Runway", "La Gran Colina", "La Marqueza", "Precursor's Storage",
+          "Pyrolusite Laboratory Dos", "Lookout", "Puerto de la Coca", "Villa Verde Base", "Maco",
+          "Pyrolusite Laboratory Uno", "Forest Parking", "Palmeras", "Mama Coca Shrine", "Leipez Cooperative",
+          "Prospecting Black Site", "Ore Storage", "F.O.B. Tucan", "Illegal Pyrolusite Mine", "Road Market",
+          "Observation Post", "Boicobu Farm", "Imaybe Glade", "Quya Farm", "Quya Secure Barn"
+        ]
+      }
+    ];
 
+    const CODENAMES = [
+      'WIDOW','SPIDER','MAMBA','ADDER','APOLLO','AVALANCHE','BADGER','BANSHEE','GRIZZLY','BISHOP',
+      'BOOMER','BOAR','BERSERKER','BLACK KNIGHT','BREAKER','BUFFALO','CANARY','CORAL','COPPER','CRIMSON',
+      'CROW','DANGER','DAGGER','DINGO','DIAMOND','DRAGON','EAGLE','FIRESTICK','FOX','FIREFLY','GRIFFIN',
+      'GHOST','GOPHER','HARVESTER','HIGHLANDER','HUNTER','HOUND','HAWK','JACKSON','JESTER','KAHUNA',
+      'KEEPER','LANTERN','LYNX','LEOPARD','MAGE','MONARCH','MOTHER','OBELISK','OCELOT','ORACLE','OVERLORD',
+      'PAWN','PEQUOD','POLARIS','RAZOR','RED DRAGON','RED QUEEN','REAVER','RORK','RIPLEY','SABRE','SEAL',
+      'SHADOW','SHAMAN','SPARROW','SPECTRE','SPEARFISH','SPEAR','STONE','SWEEPER','TOMAHAWK','TIGER',
+      'HATCHET','UMBRA','UMBRELLA','VANDAL','VIPER','SNAKE','WARDEN','WANDERER','WARLOCK','WHITE WIZARD',
+      'WHITE RABBIT','X-RAY','ZEBRA','ZIPPER','TORCH','BLADE','TOXIC','MIST','SMOKE','AVATAR','ARCHER',
+      'ANIMA','BARRACUDA','BLACKOUT','BLITZ','BLIZZARD','BOLT','BULLDOG','BUTCHER','CARNIVAL','CASTLE',
+      'CHARGER','COBRA','COMET','CRUSADER','DARKSTAR','DISCIPLE','ECLIPSE','ENIGMA','EREBUS','EXCALIBUR',
+      'FALCON','FIRESTORM','FROST','FURY','GAMMA','GOLIATH','GLADIATOR','GRINCH','GUARDIAN','HARRIER',
+      'HAVOC','HAZARD','HELLHOUND','HELIOS','HORUS','HYDRA','HURRICANE','HAMMER','INFERNO','IRONHIDE',
+      'IRONCLAD','IVORY','JAGUAR','JACKAL','JUGGERNAUT','KODIAK','KESTREL','KNIGHT','KUMA','LANCER',
+      'LIGHTNING','MAGICIAN','MAVERICK','MARAUDER','MIRAGE','MONGOOSE','MUSTANG','NEBULA','NEMESIS',
+      'NIGHTHAWK','NIGHTSHADE','NEPTUNE','NOVA','OBSIDIAN','OMEGA','ONYX','ORION','OXIDE','OUTLAW',
+      'PANTHER','PALADIN','PHANTOM','PHOENIX','PUMA','PYRO','POSEIDON','QUAKER','RAPTOR','RAZORBACK',
+      'REAPER','RENEGADE','RIPTIDE','RONIN','RUBEDO','SABER','SAPPHIRE','SANDMAN','SANDSTORM','SCALER',
+      'SCORPION','SOLO','SPITFIRE','STALKER','STORMRIDER','STRIKER','TALON','TEMPEST','THUNDER','TITAN',
+      'TYPHOON','UNDERTAKER','UNDERTOW','URSA','VALKYRIE','VENGEANCE','VENOM','VIGILANTE','VORTEX',
+      'WARBRINGER','WARCRY','WARHAWK','WARLORD','WHISPER','WIDOWMAKER','WOLVERINE','WRAITH','WYVERN',
+      'XERXES','YANKEE','YELLOWJACKET','YUKON','ZEUS','ZERO','ZEPHYR','ZODIAC'
+    ];
 
-<script>
+    // State Tracking
+    const selectedLocationsMap = new Map(); // key: "PROVINCE_INDEX", value: Set of location indices
 
-function previewlocs() {
-        const locationsoverlay = document.getElementById('locationsoverlay');
-        locationsoverlay.style.display = 'flex';
+    // Initialize UI
+    document.addEventListener("DOMContentLoaded", () => {
+      renderAccordions();
+      updateGlobalStats();
+    });
+
+    // Render Accordions
+    function renderAccordions() {
+      const container = document.getElementById("accordionList");
+      container.innerHTML = "";
+
+      PROVINCES_DATA.forEach((prov, pIdx) => {
+        const card = document.createElement("div");
+        card.className = "province-card";
+        card.id = `provCard_${pIdx}`;
+
+        const selectedSet = selectedLocationsMap.get(pIdx) || new Set();
+        const selCount = selectedSet.size;
+
+        if (selCount > 0) card.classList.add("has-selections");
+
+        // Header
+        const header = document.createElement("div");
+        header.className = "province-header";
+        header.onclick = (e) => toggleAccordion(pIdx, e);
+
+        header.innerHTML = `
+          <div class="province-title-group">
+            <span class="province-name">${prov.name}</span>
+          </div>
+          <div class="province-actions">
+            <button type="button" class="btn-xs" onclick="event.stopPropagation(); clearInProvince(${pIdx})">Clear</button>
+            <svg class="chevron-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </div>
+        `;
+
+        // Body
+        const body = document.createElement("div");
+        body.className = "province-body";
+
+        // Map preview section
+        const mapSec = document.createElement("div");
+        mapSec.className = "province-map-preview";
+        mapSec.innerHTML = `
+          <img src="${prov.mapImg}" alt="${prov.name} Map" class="map-thumb" onclick="openMapLightbox(${pIdx})">
+          <div class="map-hint">Click map thumbnail to expand full tactical grid for ${prov.name}.</div>
+        `;
+        body.appendChild(mapSec);
+
+        // Grid of locations
+        const grid = document.createElement("div");
+        grid.className = "locations-grid";
+        grid.id = `grid_${pIdx}`;
+
+        prov.locations.forEach((loc, lIdx) => {
+          const isChecked = selectedSet.has(lIdx);
+          const item = document.createElement("div");
+          item.className = `location-checkbox-item ${isChecked ? 'checked' : ''}`;
+          item.id = `locItem_${pIdx}_${lIdx}`;
+          item.onclick = () => toggleLocation(pIdx, lIdx);
+
+          item.innerHTML = `
+            <div class="custom-checkbox">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+            </div>
+            <span class="location-name">${loc}</span>
+          `;
+          grid.appendChild(item);
+        });
+
+        body.appendChild(grid);
+        card.appendChild(header);
+        card.appendChild(body);
+        container.appendChild(card);
+      });
     }
 
-    function closeLocationsoverlay() {
-        const locationsoverlay = document.getElementById('locationsoverlay');
-        locationsoverlay.style.display = 'none';
+    // Toggle Accordion Open/Closed
+    function toggleAccordion(pIdx, event) {
+      const card = document.getElementById(`provCard_${pIdx}`);
+      card.classList.toggle("open");
     }
 
-function on() {
-  document.getElementById("overlay").style.display = "block";
-  document.getElementById("provincesMap").style.display = "block";
-}
-
-function off() {
-  document.getElementById("overlay").style.display = "none";
-}
-
- function showInstructions() {
-        document.getElementById("instructions-overlay").style.display = "flex";
+    function expandAllAccordions() {
+      PROVINCES_DATA.forEach((_, pIdx) => {
+        document.getElementById(`provCard_${pIdx}`)?.classList.add("open");
+      });
     }
 
-    function hideInstructions() {
-        document.getElementById("instructions-overlay").style.display = "none";
+    function collapseAllAccordions() {
+      PROVINCES_DATA.forEach((_, pIdx) => {
+        document.getElementById(`provCard_${pIdx}`)?.classList.remove("open");
+      });
     }
-</script>
+
+    // Location Checkbox Actions
+    function toggleLocation(pIdx, lIdx) {
+      if (!selectedLocationsMap.has(pIdx)) {
+        selectedLocationsMap.set(pIdx, new Set());
+      }
+      const set = selectedLocationsMap.get(pIdx);
+
+      if (set.has(lIdx)) {
+        set.delete(lIdx);
+      } else {
+        set.add(lIdx);
+      }
+
+      updateProvinceUI(pIdx);
+      updateGlobalStats();
+    }
+
+    function clearInProvince(pIdx) {
+      const set = selectedLocationsMap.get(pIdx);
+      if (!set || set.size === 0) return;
+
+      const provName = PROVINCES_DATA[pIdx].name;
+      if (!confirm(`Are you sure you want to clear ${set.size} selected location(s) in ${provName}?`)) {
+        return;
+      }
+
+      selectedLocationsMap.set(pIdx, new Set());
+      updateProvinceUI(pIdx);
+      updateGlobalStats();
+    }
 
 
-<select name="provinces" size='22' style="width: 300px;font-family:arial;background:black;color:white;border:1px solid rgb(63, 63, 63)" id="provinces" multiple>
-    <option value="BARVECHOS">BARVECHOS</option>
-    <option value="CAIMANES">CAIMANES</option>
-    <option value="ESPIRITU SANTO">ESPIRITU SANTO</option>
-    <option value="FLOR DEL ORO">FLOR DEL ORO</option>
-    <option value="INCA CAMINA">INCA CAMINA</option>
-    <option value="ITACUA">ITACUA</option>
-    <option value="KOANI">KOANI</option>
-    <option value="LA CRUZ">LA CRUZ</option>
-    <option value="LIBERTAD">LIBERTAD</option>
-    <option value="MALCA">MALCA</option>
-    <option value="MEDIA LUNA">MEDIA LUNA</option>
-    <option value="MOJOCOYO">MOJOCOYO</option>
-    <option value="MONTE PUNCU">MONTE PUNCU</option>
-    <option value="MONTUYOC">MONTUYOC</option>
-    <option value="OCORO">OCORO</option>
-    <option value="PN AGUA VERDE">PN AGUA VERDE</option>
-    <option value="PUCARA">PUCARA</option>
-    <option value="REMANZO">REMANZO</option>
-    <option value="SAN MATEO">SAN MATEO</option>
-    <option value="TABACAL">TABACAL</option>
-    <option value="VILLA VERDE">VILLA VERDE</option>
-</select>
+    function updateProvinceUI(pIdx) {
+      const card = document.getElementById(`provCard_${pIdx}`);
+      const set = selectedLocationsMap.get(pIdx) || new Set();
+      const selCount = set.size;
 
-<br>
-<h3 style="color: white; font-family: arial;">Number of locations desired</h3>
+      if (card) {
+        if (selCount > 0) {
+          card.classList.add("has-selections");
+        } else {
+          card.classList.remove("has-selections");
+        }
+      }
 
+      // Update checkboxes in grid
+      PROVINCES_DATA[pIdx].locations.forEach((_, lIdx) => {
+        const item = document.getElementById(`locItem_${pIdx}_${lIdx}`);
+        if (item) {
+          if (set.has(lIdx)) {
+            item.classList.add("checked");
+          } else {
+            item.classList.remove("checked");
+          }
+        }
+      });
+    }
 
+    function updateGlobalStats() {
+      let totalLocs = 0;
+      let activeProvs = 0;
 
-<form id="formNbrLocs" action="">
-  <input type="text" style="width: 300px;height:20px;font-family:arial;background:black;color:white;border:1px solid rgb(63, 63, 63)" id="inputNumberOfLoc"><br><br>
-  <input type="button" id='generateButton' style="width: 300px;height:40px;font-family:arial;font-size:100%;background:black;color:white;border:1px solid rgb(63, 63, 63)" onclick="generateOp()" value="🔀 Generate random operation">
-</form>
+      selectedLocationsMap.forEach((set) => {
+        if (set.size > 0) {
+          totalLocs += set.size;
+          activeProvs++;
+        }
+      });
 
+      document.getElementById("globalLocCount").textContent = `${totalLocs} Selected`;
+      document.getElementById("globalProvCount").textContent = `in ${activeProvs} Province${activeProvs === 1 ? '' : 's'}`;
+    }
 
+    // Realtime Search Filter
+    function filterLocations() {
+      const query = document.getElementById("searchInput").value.trim().toLowerCase();
 
-<script>
-var input = document.getElementById("inputNumberOfLoc");
-input.addEventListener("keypress", function(event) {
-  if (event.key === "Enter") {
-    event.preventDefault();
-    document.getElementById("generateButton").click();
-  }
-});
-</script>
+      PROVINCES_DATA.forEach((prov, pIdx) => {
+        const card = document.getElementById(`provCard_${pIdx}`);
+        let matchInProv = false;
 
+        if (!query) {
+          card.style.display = "";
+          prov.locations.forEach((_, lIdx) => {
+            const item = document.getElementById(`locItem_${pIdx}_${lIdx}`);
+            if (item) item.style.display = "";
+          });
+          return;
+        }
 
-<script>
-	function generateOp() {
- 
+        // Check province name
+        const provNameMatch = prov.name.toLowerCase().includes(query);
 
-		//Clean OPORD values
-		const opordBoxClear = document.getElementById('opordBox');
-		opordBoxClear.innerHTML = '' + '<br>';
-		
+        prov.locations.forEach((loc, lIdx) => {
+          const item = document.getElementById(`locItem_${pIdx}_${lIdx}`);
+          const locMatch = loc.toLowerCase().includes(query);
 
-		
-		
-		//Grab which provinces are selected
-		var provincesSelected = [];
-		for (var option of document.getElementById('provinces').options) {
-		if (option.selected) {
-		provincesSelected.push(option.value);
-		}
-		}
-		
-		//Stop if no provinces selected
-		if (provincesSelected.length < 1) {
-		alert('No provinces selected. Select one or more provinces.');
-		return;
-		}
-	
-		//Grab the 'Number of locations desired'
-		let numberOfLoc = document.getElementById("formNbrLocs").elements["inputNumberOfLoc"].value;
+          if (provNameMatch || locMatch) {
+            if (item) item.style.display = "";
+            matchInProv = true;
+          } else {
+            if (item) item.style.display = "none";
+          }
+        });
 
-		//Stop if no number provided
-		if (numberOfLoc.length < 1) {
-		alert('No number of locations desired provided. Provide a number.');
-		return;
-		}
-		
-		//Stop if number provided is not a number
-		if (isNaN(numberOfLoc)) {
-		alert(numberOfLoc + ' is not a valid number, provide a number.');
-		return;
-		}
-		
-		//Create arrays for provinces locations
-		const barvechos = [
-  "Bartolome Farm",
-  "Checkpoint",
-  "Matico",
-  "La Leproserna",
-  "Barvechos Mine Quarry",
-  "Gas Station Via-B Gas",
-  "Outpost",
-  "Outpost",
-  "Outpost",
-  "Nidia Flores' Hacienda",
-  "Outpost",
-  "Checkpoint",
-  "Barvechos Base",
-  "Makeshift Runway",
-  "Outpost",
-  "Barvechos",
-  "Macoya Cooperative",
-  "Barvechos Mine",
-  "Outpost",
-  "Lieutenant House",
-  "Pucamayu",
-  "Los Fisgones",
-  "Santa Maria Farm",
-  "Carretera 3",
-  "Nueva Plata Site"
-];
+        if (matchInProv) {
+          card.style.display = "";
+          card.classList.add("open"); // expand matching card
+        } else {
+          card.style.display = "none";
+        }
+      });
+    }
 
-const caimanes = [
-  "Malpaso Farm",
-  "Gas Station",
-  "La Frontera",
-  "Riverine Checkpoint",
-  "Makeshift Hospital",
-  "Rebel Campsite",
-  "Outpost",
-  "Ingani",
-  "Camargo Campsite",
-  "Caimanes Base",
-  "San Miguel Ruins",
-  "Puerto Chico",
-  "Combat Outpost",
-  "River Market",
-  "Los Hombres Jaguares",
-  "Outpost",
-  "Gas Station Via-B Gas",
-  "Rebel Campsite",
-  "Frontera",
-  "Buchon House",
-  "Las Anguila Wreck",
-  "Child Hunt"
-];
+    // MAIN GENERATION & PROMPT COPY ACTION
+    function generateAndCopyPrompt() {
+      const selectedLocNames = [];
+      const activeProvinceIndices = [];
 
-		const espiritusanto = [
-  'Buchone Chapel',
-  'Outpost',
-  'Outpost',
-  'Alta Garcia Mine',
-  'Alta Gracia',
-  'Pilgrim House',
-  'Shrine of Truth',
-  'Santa Muerte Sanctuary',
-  'Espiritu Santo Base',
-  'Observation Post',
-  'Pilgrim House',
-  'Experimental Farm 03',
-  'Lajosa Farm',
-  'Guari',
-  'Guari Mine',
-  'Los Humildes Peregrinos',
-  'Outpost',
-  'Huanca Farm',
-  'Observation Post',
-  'Miski Secure Barn',
-  'Miski Farm',
-  'Outpost',
-  'Shrine of Purity',
-  'Coca Warehouse',
-  'Bahia Floresta',
-  'Huayani Farm',
-  'Buchon House',
-  'Shrine of Loyalty'
-];
+      selectedLocationsMap.forEach((set, pIdx) => {
+        if (set.size > 0) {
+          activeProvinceIndices.push(pIdx);
+          set.forEach((lIdx) => {
+            selectedLocNames.push(PROVINCES_DATA[pIdx].locations[lIdx]);
+          });
+        }
+      });
 
-		
-	const flordeloro = [
-  'Hoalaca Ruins',
-  'Nupucu',
-  'Combat Outpost',
-  'Combat Outpost',
-  'Los Tramperos',
-  'Train Freight Yard',
-  'Combat Outpost',
-  'Rocha',
-  'Rocha Sawmill',
-  'Checkpoint',
-  'Halcone House',
-  'Armadillo Hunting Lodge',
-  'Gas Station Via-B Gas',
-  'M.O.B. Jaguar',
-  'Unidad Train Freight Yard',
-  'Checkpoint',
-  'Unidad Military Hospital',
-  'Huma Chua Sawmill',
-  'La Fortaleza',
-  'Huma Chua',
-  'Observation Post',
-  'Makeshift Runway',
-  'Chorrilos Wood Storage',
-  'Checkpoint',
-  'Checkpoint',
-  'Chorrillos',
-  'F.O.B. Serpiente',
-  'Checkpoint'
-];
+      if (selectedLocNames.length === 0) {
+        alert("⚠️ No locations selected! Please expand a province and check at least one location.");
+        return;
+      }
 
-const incacamina = [
-  'Outpost',
-  'Inca Camina Base',
-  'Inca Chaca',
-  'Refugio de Pastores',
-  'Crash Site',
-  'Inca Ruins',
-  'Inca Road',
-  'Nevado Llamiru',
-  'San Martin Mountain Hut',
-  'Crash Site',
-  'Trecking Campsite',
-  'Nuevo Mondo',
-  'Cable Car Station',
-  'Lookout',
-  'Train Wrecks',
-  'La Cabaña de Pesca',
-  'Gas Station Via-B Gas',
-  'Inca Camina Freight Yard',
-  'Checkpoint',
-  'Julpe Alto',
-  'Improvised Runway',
-  'Archaeological Site',
-  'Checkpoint',
-  'Santa Catalina Chapel',
-  'Nevado Llamiru Garage',
-  'Ancient Cemetery of Miners',
-  'Sicario House',
-  'Refugio de Pastores'
-];
+      // Generate OPORD Codename & Number
+      const rndInt = Math.floor(Math.random() * 9000) + 1000;
+      const codename = CODENAMES[Math.floor(Math.random() * CODENAMES.length)];
+      const provNamesStr = activeProvinceIndices.map(i => PROVINCES_DATA[i].name).join(", ");
+      const locNamesStr = selectedLocNames.join(", ");
 
-const itacua = [
-  'Buena Vida',
-  'Cotani',
-  'Checkpoint',
-  'Yopil',
-  'Santa Maria',
-  'Culta',
-  'Hunt Lodge',
-  'Santa Catalina Chapel',
-  'Outpost',
-  'Vieja Granja',
-  'F.O.B. Armadillo',
-  'Baurecito Ruins',
-  'Campo de Futbol el Yayo',
-  'Colque Ranch',
-  'Atollo Farm',
-  'Mendez Farm',
-  'Sicario House',
-  'Pantoja',
-  'Observation Post',
-  'Outpost',
-  'Bocca Farm',
-  'Checkpoint',
-  'La Casa Del Mexicano',
-  'Itacua Base',
-  'Khochi'
-];
+      const promptText = `Act as a Military Operations Specialist for MILSIM GAMING. Your task is to generate a summarized (always below 1800 characters to fit Discord maximum message length) tactical Operation Order (OPORD) based on a brief scenario description you need to make up yourself based on the locations the user selected and which are listed at the end of this prompt (the USER DATA: section), respect the order they are in. Use a random military callsign for the team that will execute the operation. Enemy faction is 'Santa Blanca Cartel'. All locations named 'FOB' or similar are enemy, not friendly. Use the following structural logic for each section:
 
-const koani = [
-  'Narco-Slaughter',
-  'Huertas Mine',
-  'Koani Railway Camp',
-  'Santa Blanca Living District',
-  'Huertas',
-  'Truck Depot',
-  'Crashed Plane',
-  'Checkpoint',
-  'Combat Outpost',
-  'Outpost',
-  'Locotal Mine',
-  'Outpost',
-  'A Prehistoric Site',
-  'Koani Lithium Mine',
-  'Truck Stop Mamani',
-  'Gas Station Via-B Gas',
-  'Salt Hotel',
-  'Combat Outpost',
-  'El Arbol de Piedra',
-  'Outpost',
-  'Improvised Runway',
-  'Salt Miner\'s House',
-  'Sacani Salt Mines',
-  'Mina de Sal',
-  'Outpost',
-  'El Albergue',
-  'Sacani',
-  'Unidad Campsite',
-  'Shamanic Site',
-  'Train Cemetery',
-  'El Buen Sal',
-  'Makeshift Runway',
-  'Salt Mine Condori',
-  'Koani Air Base',
-  'Crashed Plane'
-];
+Header: Create a unique Operation number (OPORD NO. *4 random digits*)
+make sure to show AO : ${provNamesStr}
 
-const lacruz = [
-  'Hoyito',
-  'F.O.B. Vibora',
-  'Rioja Ranch',
-  'Combat Outpost',
-  'San Rodrigo Monastery',
-  'Outpost',
-  'Buchon House',
-  'Makeshift Runway',
-  'Santa Elena',
-  'La Cruz Freight Yard',
-  'Outpost',
-  'Outpost',
-  'La Hacha Buena',
-  'Rebel Campsite',
-  'Outpost',
-  'Cemetery El Bosque Quemado',
-  'Isque',
-  'La Cruz Base',
-  'Burned Forest',
-  'Luluni Ruins',
-  'Carrasco Farm',
-  'El Pequeño Lago',
-  'Outpost'
-];
+1. SITUATION AND MISSION Describe the incident, enemy activity, and the "hook" that justifies the mission, inspire yourself directly by the location names. Write a clear "Who, What, Where, and Why" statement (without making an actual Who What Where Why bullet list, this is a guideline to help you write), summarizing the primary objective and the units involved.
+
+3. EXECUTION: Break the mission into chronological Phases with objectives (Phase I, II, III). One phase per user data location. Make up a 'HVT' profile at one of the locations at random, few sentences that use a fictional (ALWAYS A RANDOM SPANISH NAME) and made up info about why capturing or neutralizing the enemy is important.
+
+4. SERVICE & SUPPORT: Make up info about which Close Air support, Exfil helicopter or Ground vehicle assets are available. Always say that the team will leave the 'nearest safehouse' to infiltrate the AO.*
+ All air assets are only helicopters, never mention A-10 or never fighter jets. Ground vehicle can either be 'Technical' or 'Truck' and it's not always necessary to have one declared.
+
+5. COMMAND & SIGNAL: Make up callsigns for command, the radio frequency, and provide at least two unique codewords for mission milestones.
+
+Tone and Style: Use professional military jargon, be concise, and use bold headers with bullet points for readability.
 
 
-const libertad = [
-  'Forestry Site',
-  'Checkpoint',
-  'Observation Post',
-  'Pa Kollu',
-  'La Guarida de Tres Brujas',
-  'Outpost',
-  'Shrine of Wealth',
-  'Bolivar Square',
-  'Libertad',
-  'Checkpoint',
-  'F.O.B. Oso Hormiguero',
-  'Los Cuatros Hermanos',
-  'Los Viejos Pinos',
-  'Viloma Tres Gas Field',
-  'Outpost',
-  'Oso',
-  'Viloma Dos Oil Field',
-  'Viloma Uno Oil Field',
-  'Viloma Refinery',
-  'Chem Precursors Storage',
-  'Viloma',
-  'Libertad Airport',
-  'Road Market',
-  'Narco-Slaughter',
-  'Chemical Institute Via-B Gas',
-  'Libertad Base',
-  'Gas Station Via-B Gas',
-  'Outpost',
-  'Viloma Cuatro Gas Field',
-  'Combat Outpost',
-  'El Escondite del Cazador'
-];
 
-const malca = [
-  'Outpost',
-  'Banado',
-  'Santa Muerte Idol',
-  'Chacori Farm',
-  'Uma Marca',
-  'Uma Marca Mine',
-  'El Establo',
-  'Combat Outpost',
-  'Outpost',
-  'Icoya',
-  'Sicario House',
-  'El Pais de la Felicidad',
-  'Holy Malca Base',
-  'Los Crios de la Muerte',
-  'La Buena Muerte'
-];
+USER DATA:
+${locNamesStr}`;
 
-const medialuna = [
-  'Combat Outpost',
-  'Rebel Campsite',
-  'Makeshift Runway',
-  'El Cañon',
-  'Combat Outpost',
-  'La Loma',
-  'F.O.B. Buitre',
-  'El Acantilado',
-  'Chipaya Farm',
-  'Checkpoint',
-  'El Puente del Diablo',
-  'Shooting Range',
-  'Combat Outpost',
-  'Checkpoint',
-  'Acevedo',
-  'Rebel Campsite',
-  'Checkpoint',
-  'Archaeology Site',
-  'Observation Post',
-  'Cardoza',
-  'M.O.B. Condor',
-  'Junin'
-];
+      // Copy to Clipboard
+      navigator.clipboard.writeText(promptText)
+        .then(() => {
+          showCopyPromptOverlay(selectedLocNames.length, activeProvinceIndices.length, promptText);
+          displayOpordResult(rndInt, codename, activeProvinceIndices, selectedLocNames);
+        })
+        .catch((err) => {
+          console.error("Clipboard Error: ", err);
+          // Fallback if clipboard API fails
+          showCopyPromptOverlay(selectedLocNames.length, activeProvinceIndices.length, promptText);
+          displayOpordResult(rndInt, codename, activeProvinceIndices, selectedLocNames);
+        });
+    }
 
-const mojocoyo = [
-  "Makeshift Runway",
-  "Cocaine Hideout",
-  "Gas Station Via-B Gas",
-  "Capachunco",
-  "Checkpoint",
-  "Prison Camp",
-  "Mojocoyo Base",
-  "Quispe Farm",
-  "La Vieja Granja",
-  "Panua Village",
-  "Private Helipad",
-  "Cocaine Hideout",
-  "Sacrificial Site",
-  "Chullpas",
-  "Rancho Sabala",
-  "Lieutenant House",
-  "Almacén de Quinua",
-  "Barrera Farm",
-  "Cocaine Hideout",
-  "Abandoned Prospecting Site",
-  "Cocaine Hideout",
-  "Outpost",
-  "Chacatal",
-  "Sicario House",
-  "La Curva de la Muerte"
-];
+    // Display Copy Prompt Overlay
+    function showCopyPromptOverlay(locCount, provCount) {
+      const desc = document.getElementById("copyOverlayDesc");
+      desc.innerHTML = `Your customized mission prompt featuring <strong>${locCount} location${locCount === 1 ? '' : 's'}</strong> across <strong>${provCount} province${provCount === 1 ? '' : 's'}</strong> has been copied to your clipboard!<br><br>Click an AI service below to launch it, paste your prompt, and generate your operation briefing.<br><br><span style="display:block; color: #94a3b8; font-size: 0.85rem;">Use the generated operation details & province map references below to execute your mission in Ghost Recon Wildlands. Be creative and add roleplay for things in the world that aren't maybe exactly as written. Make it realistic!</span>`;
 
-const montepuncu = [
-  "Secure Barn 01",
-  "Experimental Farm 01",
-  "Outpost",
-  "Chaca Barraca",
-  "Rebel Campsite",
-  "Outpost",
-  "Rebel Campsite",
-  "A Car Wreck",
-  "Agronomic Center",
-  "La Cumbre",
-  "Rojas Farm",
-  "El Yayo Cooperative",
-  "Las Tumbas del Camino",
-  "Las Tumbas del Camino",
-  "Santa Blanca Campsite",
-  "Klaus Barbie House"
-];
+      document.getElementById("copyPromptOverlay").classList.add("active");
+    }
 
-const montuyoc = [
-  "San Francisco Monastery",
-  "Montuyoc Training Base",
-  "Pre Columbian Necropolis",
-  "Gas Station Via-B Gas",
-  "Sicarios Boot Camp",
-  "Supply Depot",
-  "Laguna Colorada Baths",
-  "Makeshift Runway",
-  "Checkpoint",
-  "Mapooca Farm",
-  "Tupac Katari Tomb",
-  "Outpost",
-  "Vieja Granja",
-  "Araca Village",
-  "Choza Padre Mine",
-  "Hunter Shelter",
-  "Laguna Colorada",
-  "Lafuente Farm",
-  "Choza Padre",
-  "Inca Corral Farm",
-  "Condor Cairn"
-];
+    // Render OPORD details on main page
+    function displayOpordResult(opordNum, codename, provIndices, locNames) {
+      const card = document.getElementById("opordCard");
+      const title = document.getElementById("opordTitle");
+      const text = document.getElementById("opordText");
+      const mapsGrid = document.getElementById("opordMapsGrid");
 
-const ocoro = [
-  "Outpost",
-  "Buchon House",
-  "Coca Paste Factory",
-  "Outpost",
-  "A Fisherman's House",
-  "Puerto Grande",
-  "Zona Narco Prohibida",
-  "Outpost",
-  "Combat Outpost",
-  "Zona Narco Prohibida",
-  "Zona Narco Prohibida",
-  "Puerto Nuevo",
-  "Nenma Freight Yard",
-  "Moko",
-  "Zona Narco Prohibida",
-  "Zona Narco Prohibida",
-  "Campo Ana",
-  "Outpost",
-  "Pachamama Scars",
-  "Ocoro Dispensary",
-  "Checkpoint",
-  "Gas Station Via-B Gas",
-  "Santa Rosa",
-  "El Altiplano Verde",
-  "Outpost",
-  "Gas Station Via-B Gas",
-  "Checkpoint",
-  "Outpost",
-  "Outpost",
-  "Checkpoint",
-  "Pujio",
-  "Outpost",
-  "Ocoro Base",
-  "Los Mosquitos"
-];
+      title.textContent = `OPORD ${opordNum} - CODENAME: ${codename}`;
 
-const pnaguaverde = [
-  "Outpost",
-  "La Torre de Arroyo Baya",
-  "Arroyo Baya",
-  "La Nube Blanca",
-  "Playa Sirena",
-  "Outpost",
-  "Secret Cocaine Hideout",
-  "Patuja Mansion",
-  "Ajuga Mansion",
-  "Kantuta Mansion",
-  "Tajibo Mansion",
-  "Playa Tajibo",
-  "Rio Del Jaguar",
-  "Siren Island",
-  "Buchon House",
-  "Riverine Checkpoint",
-  "Goyo",
-  "Agua Verde Base",
-  "Paraiso Casino",
-  "Halcone House",
-  "Outpost",
-  "Paraiso Agua Verde",
-  "Checkpoint",
-  "Alicia Town"
-];
+      const provNames = provIndices.map(i => PROVINCES_DATA[i].name).join(", ");
+      
+      text.textContent = `AREA OF OPERATIONS:
+${provNames}
 
-const pucara = [
-  "Horco Farm",
-  "Charamokho Village",
-  "Makeshift Runway",
-  "Riverine Docks",
-  "Outpost",
-  "Olico Super Dam",
-  "Todos Santos Town",
-  "Santa Muerte Tomb",
-  "Todos Santos Rock Quarry",
-  "Old Silver Mine",
-  "Santa Muerte Tomb",
-  "Sueño Mausoleum",
-  "Pucara Base",
-  "El Nido de Cóndores",
-  "Outpost",
-  "Santa Muerte Tomb",
-  "Pilca Village",
-  "Pilca Mine",
-  "Pucara",
-  "Outpost"
-];
-
-const remanzo = [
-  "Las Mulas",
-  "Poco Irrigation Tank",
-  "Poco",
-  "F.O.B. Puma",
-  "Outpost",
-  "Remanzo Base",
-  "Test Center",
-  "Ovejas Real Slaughterhouse",
-  "Buying Office",
-  "Marcavi",
-  "Outpost",
-  "Observation Post",
-  "San Vicente",
-  "Factory Electro Energy Drink",
-  "Liquid Cocaine Lab",
-  "Gas Station"
-];
-
-const sanmateo = [
-  "Checkpoint",
-  "La Casa Abandonada",
-  "Train Station",
-  "La Carcel Del Pueblo",
-  "Abandoned House",
-  "San Mateo Base",
-  "Makeshift Runway",
-  "Flores Farm",
-  "Prison Rosario",
-  "Rebel Campsite",
-  "Gas Station Via-B Gas",
-  "Outpost",
-  "Narco-Muro",
-  "Outpost",
-  "Outpost",
-  "Sicario House",
-  "Boot Camp",
-  "Valle Verde",
-  "El Vaquero",
-  "Restaurante Humacha",
-  "Makeshift Runway",
-  "Checkpoint"
-];
-
-const tabacal = [
-  "Rebel Campsite",
-  "Killasisa Farm",
-  "Makeshift Runway",
-  "Secure Barn West",
-  "La Cote Molinos",
-  "Outpost",
-  "Tabacal Base",
-  "Outpost",
-  "Buchone House",
-  "SNPC Freight Yard",
-  "El Sicario Invencible",
-  "Crashed Plane",
-  "Barrientos Coop",
-  "Gas Station Via-B Gas",
-  "Bella Selva",
-  "El Cocalero Fallecido",
-  "Secure Barn East",
-  "Jaruma Cooperative",
-  "Pilpintu Farm",
-  "Observation Post"
-];
-
-const villaverde = [
-  "Outpost",
-  "Lafuente Farm",
-  "Pinaicobo Farm",
-  "La Buena Pesca",
-  "Villa Verde",
-  "El Yayo Cooperative",
-  "Camacho Farm",
-  "Coca Drying Site",
-  "Outpost",
-  "Gas Station Via-B Gas",
-  "Makeshift Runway",
-  "La Gran Colina",
-  "La Marqueza",
-  "Precursor's Storage",
-  "Outpost",
-  "Pyrolusite Laboratory Dos",
-  "Outpost",
-  "Lookout",
-  "Puerto de la Coca",
-  "Villa Verde Base",
-  "Maco",
-  "Pyrolusite Laboratory Uno",
-  "Forest Parking",
-  "Palmeras",
-  "Mama Coca Shrine",
-  "Leipez Cooperative",
-  "Prospecting Black Site",
-  "Ore Storage",
-  "F.O.B. Tucan",
-  "Illegal Pyrolusite Mine",
-  "Road Market",
-  "Observation Post",
-  "Boicobu Farm",
-  "Imaybe Glade",
-  "Quya Farm",
-  "Quya Secure Barn"
-];
-
-		//For each provinces selected, build total array of possible locations to choose from
-		randomObjectives = null
-		randomObjectives = []; 
-		
-		provincesSelected.forEach(function callback(province) {
-		
-			if (province == 'BARVECHOS') {
-			randomObjectives = randomObjectives.concat(barvechos)
-			}
-			
-			if (province == 'CAIMANES') {
-			randomObjectives = randomObjectives.concat(caimanes)
-			}
-			
-			if (province == 'ESPIRITU SANTO') {
-			randomObjectives = randomObjectives.concat(espiritusanto)
-			}
-			
-			if (province == 'FLOR DEL ORO') {
-			randomObjectives = randomObjectives.concat(flordeloro)
-			}
-						
-			if (province == 'INCA CAMINA') {
-			randomObjectives = randomObjectives.concat(incacamina)
-			}
-						
-			if (province == 'ITACUA') {
-			randomObjectives = randomObjectives.concat(itacua)
-			}
-						
-			if (province == 'KOANI') {
-			randomObjectives = randomObjectives.concat(koani)
-			}
-						
-			if (province == 'LA CRUZ') {
-			randomObjectives = randomObjectives.concat(lacruz)
-			}
-						
-			if (province == 'LIBERTAD') {
-			randomObjectives = randomObjectives.concat(libertad)
-			}
-						
-			if (province == 'MALCA') {
-			randomObjectives = randomObjectives.concat(malca)
-			}
-						
-			if (province == 'MEDIA LUNA') {
-			randomObjectives = randomObjectives.concat(medialuna)
-			}
-						
-			if (province == 'MOJOCOYO') {
-			randomObjectives = randomObjectives.concat(mojocoyo)
-			}
-						
-			if (province == 'MONTE PUNCU') {
-			randomObjectives = randomObjectives.concat(montepuncu)
-			}
-						
-			if (province == 'MONTUYOC') {
-			randomObjectives = randomObjectives.concat(montuyoc)
-			}
-						
-			if (province == 'OCORO') {
-			randomObjectives = randomObjectives.concat(ocoro)
-			}
-						
-			if (province == 'PN AGUA VERDE') {
-			randomObjectives = randomObjectives.concat(pnaguaverde)
-			}
-						
-			if (province == 'PUCARA') {
-			randomObjectives = randomObjectives.concat(pucara)
-			}
-						
-			if (province == 'REMANZO') {
-			randomObjectives = randomObjectives.concat(remanzo)
-			}
-						
-			if (province == 'SAN MATEO') {
-			randomObjectives = randomObjectives.concat(sanmateo)
-			}
-						
-			if (province == 'TABACAL') {
-			randomObjectives = randomObjectives.concat(tabacal)
-			}
-						
-			if (province == 'VILLA VERDE') {
-			randomObjectives = randomObjectives.concat(villaverde)
-			}
-						
-
-			
-		});
-		
-		
-// Shuffle the total array
-const shuffled = randomObjectives.sort(() => 0.5 - Math.random());
-// Get sub-array of first numberOfLoc elements after shuffled
-const randomSelection = shuffled.slice(0, numberOfLoc);
-
-		
-		
-		//Build OPORD text from data and selections
-		
-		//HORIZONTAL DIVIDER LINE
-		const hrT = document.createElement('hr');
-		const opordBoxT = document.getElementById('opordBox');
-		opordBoxT.appendChild(hrT);
-		
-		//BLANK LINE
-		var br = document.createElement("br")
-		 opordBoxT.appendChild(br);
-		
-		//Generate random number of OPORD
-		function randomIntFromInterval(min, max) {
-		return Math.floor(Math.random() * (max - min + 1) + min)
-		}
-		const rndInt = randomIntFromInterval(1, 9999)
-		
-		//Pick a random codename
-const codenames = ['WIDOW','SPIDER','MAMBA','ADDER','APOLLO','AVALANCHE','BADGER','BANSHEE','GRIZZLY','BISHOP','BOOMER','BOAR','BERSERKER','BLACK KNIGHT','BREAKER','BUFFALO','CANARY','CORAL','COPPER','CRIMSON','CROW','DANGER','DAGGER','DINGO','DIAMOND','DRAGON','EAGLE','FIRESTICK','FOX','FIREFLY','GRIFFIN','GHOST','GOPHER','HARVESTER','HIGHLANDER','HUNTER','HOUND','HAWK','JACKSON','JESTER','KAHUNA','KEEPER','LANTERN','LYNX','LEOPARD','MAGE','MONARCH','MOTHER','OBELISK','OCELOT','ORACLE','OVERLORD','PAWN','PEQUOD','POLARIS','RAZOR','RED DRAGON','RED QUEEN','REAVER','RORK','RIPLEY','SABRE','SEAL','SHADOW','SHAMAN','SPARROW','SPECTRE','SPEARFISH','SPEAR','STONE','SWEEPER','TOMAHAWK','TIGER','HATCHET','UMBRA','UMBRELLA','VANDAL','VIPER','SNAKE','WARDEN','WANDERER','WARLOCK','WHITE WIZARD','WHITE RABBIT','X-RAY','ZEBRA','ZIPPER','TORCH','BLADE','TOXIC','MIST','SMOKE','AVALANCHE','AVATAR','ARCHER','ANIMA','BARRACUDA','BANSHEE','BLACKOUT','BLITZ','BLIZZARD','BOLT','BULLDOG','BUTCHER','CARNIVAL','CASTLE','CHARGER','COBRA','COMET','CRIMSON','CROW','CRUSADER','DAGGER','DARKSTAR','DISCIPLE','DRAGON','EAGLE','ECLIPSE','ENIGMA','EREBUS','EXCALIBUR','FALCON','FIRESTORM','FOX','FROST','FURY','GAMMA','GOLIATH','GLADIATOR','GHOST','GRIFFIN','GRINCH','GUARDIAN','HARRIER','HAVOC','HAZARD','HELLHOUND','HELIOS','HORUS','HYDRA','HUNTER','HURRICANE','HAMMER','INFERNO','IRONHIDE','IRONCLAD','IVORY','JAGUAR','JACKAL','JUGGERNAUT','KODIAK','KESTREL','KNIGHT','KUMA','LANCER','LIGHTNING','LYNX','MAGICIAN','MAMBA','MAVERICK','MARAUDER','MIRAGE','MONGOOSE','MUSTANG','NEBULA','NEMESIS','NIGHTHAWK','NIGHTSHADE','NEPTUNE','NOVA','OBSIDIAN','OMEGA','ONYX','ORACLE','ORION','OXIDE','OUTLAW','PANTHER','PALADIN','PHANTOM','PHOENIX','PUMA','PYRO','POSEIDON','QUAKER','RAPTOR','RAZOR','RAZORBACK','REAPER','RENEGADE','RIPTIDE','RONIN','RUBEDO','SABER','SAPPHIRE','SANDMAN','SANDSTORM','SCALER','SCORPION','SHADOW','SOLO','SPECTRE','SPITFIRE','STALKER','STORMRIDER','STRIKER','TALON','TEMPEST','THUNDER','TITAN','TYPHOON','UNDERTAKER','UNDERTOW','URSA','VALKYRIE','VENGEANCE','VENOM','VIGILANTE','VIPER','VORTEX','WARBRINGER','WARCRY','WARHAWK','WARLOCK','WARLORD','WARDEN','WHISPER','WIDOWMAKER','WOLVERINE','WRAITH','WYVERN','X-RAY','XERXES','YANKEE','YELLOWJACKET','YUKON','ZEUS','ZERO','ZEPHYR','ZODIAC'];
-		// Shuffle codenames array
-		const shuffledCodenames = codenames.sort(() => 0.5 - Math.random());
-		// Get first element from shuffled codenamesarray
-		codename = shuffledCodenames.slice(0, 1);
-		
-		// ... existing code ...
-codename = shuffledCodenames.slice(0, 1);
-
-// --- MOVED PROMPT GENERATION HERE ---
-var promptText = `You are now a MILSIM gaming operation writer. Enemy faction is 'Santa Blanca Cartel'. All locations named 'FOB' or similar are enemy, not friendly. I will give you a template and instructions below framed by * *, please generate a realistic military operation with military lingo throughout and respect all instructions, especially the order (SITUATION AND MISSION first, CONCEPT OF OPERATION second, OBJECTIVES third). Throughout all the text refer to the team in the first person ('we') and don't split the team.
-OPERATION: opCodename
-
-SITUATION AND MISSION:
-*The section below framed by [] contains the locations the team needs to go to (each separated by a comma). Generate a storyline describing the situation the team needs to handle based on the objectives you will generate for each locations, be creative but use realistic military objectives. Ensure objectives are varied and richely detailed. Don't write separate paragraphs for each locations. Keep it short. Make sure the section framed by [] is NOT included in your output.
-[randomSelection]
-*
-
-CONCEPT OF OPERATION :
-*Generate a short paragraph describing how the team will leave the 'nearest safehouse' to infiltrate the AO then move to our objectives.*
-
-OBJECTIVES :
-*Generate a list of objectives based on the SITUATION AND MISSION paragraph you generated above. Each objective should be marked with letter like Alpha,Bravo,Charlie,etc. and be one very brief sentence. There should be the same number of objectives listed as there were items in the section framed by []*
-
-*Generate a list at the bottom of the operation named "---HVT profiles (integrate in the op as needed)---" containing a few HVT profiles to act as secondary objectives. Dont use a russian name for the HVT, only spanish male names.
+TARGET OBJECTIVES (${locNames.length}):
+${locNames.map((loc, idx) => `  ${idx + 1}. ${loc}`).join("\n")}
 `;
 
-// Replace placeholders immediately
-promptText = promptText.replace("opCodename", codename);
-promptText = promptText.replace("randomSelection", randomSelection);
-// ------------------------------------
-					
-		 // Create a CHATGPT button element
-  var ChatGPTButton = document.createElement("button");
-    ChatGPTButton.style.width = "300px";
-	    ChatGPTButton.style.height = "40px";
-  ChatGPTButton.style.fontSize = "110%"; 
-  ChatGPTButton.style.background = "black"; 
-  ChatGPTButton.style.color = "white"; 
-  ChatGPTButton.style.border = "1px solid gray"; 
-
-  // Set the text content of the ChatGPTButton
-  ChatGPTButton.textContent = "Copy AI prompt 📋";
-
-  // Add an event listener to the ChatGPTButton
- // Add an event listener to the ChatGPTButton
-  ChatGPTButton.addEventListener("click", function() {
-    // Just use the promptText variable defined above
-    navigator.clipboard.writeText(promptText)
-      .then(() => {
-        alert('Custom prompt has been copied to the clipboard. Now go to your ChatGPT, paste the prompt, fine tune as needed and enjoy the magic! It is recommended you regenerate in ChatGPT a few times until you get a good result.');
-      })
-      .catch(err => {
-        console.error('Error copying prompt:', err);
+      mapsGrid.innerHTML = "";
+      provIndices.forEach(pIdx => {
+        const prov = PROVINCES_DATA[pIdx];
+        const mapItem = document.createElement("div");
+        mapItem.className = "opord-map-item";
+        mapItem.innerHTML = `
+          <img src="${prov.mapImg}" alt="${prov.name} Map" onclick="openMapModal('${prov.mapImg}')">
+          <p>🗺️ ${prov.name}</p>
+        `;
+        mapsGrid.appendChild(mapItem);
       });
-  });
-  
-opordBoxT.appendChild(ChatGPTButton);
-// --- START OF NEW AI SECTION ---
 
-    // 1. CREATE "GENERATE OP (AI)" BUTTON
-    var GenAIButton = document.createElement("button");
-    GenAIButton.style.width = "300px";
-    GenAIButton.style.height = "40px";
-    GenAIButton.style.fontSize = "110%";
-    GenAIButton.style.background = "black";
-    GenAIButton.style.color = "white";
-    GenAIButton.style.border = "1px solid gray";
-    GenAIButton.style.marginTop = "10px"; 
-    GenAIButton.textContent = "Generate Op (AI) ✨";
+      card.classList.add("active");
+      card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
 
-    // 2. CREATE OUTPUT BOX (Hidden by default)
-    var AIOutputBox = document.createElement("div");
-    AIOutputBox.setAttribute('style', 'font-family: courier new, monospace; white-space: pre-wrap; text-align: left; background: rgba(0,0,0,0.8); color: #cccccc; padding: 15px; border: 1px solid gray; margin-top: 15px; width: 90%; display: none;');
+    // Global variable for map lightbox navigation
+    let currentLightboxIndex = 0;
+    let isWorldMapLightbox = false;
 
-    // 3. CREATE "COPY OUTPUT" BUTTON (Hidden by default)
-    var CopyOutputButton = document.createElement("button");
-    CopyOutputButton.style.width = "300px";
-    CopyOutputButton.style.height = "30px";
-    CopyOutputButton.style.fontSize = "100%";
-    CopyOutputButton.style.background = "#222"; 
-    CopyOutputButton.style.color = "white";
-    CopyOutputButton.style.border = "1px solid gray";
-    CopyOutputButton.style.marginTop = "5px";
-    CopyOutputButton.style.cursor = "pointer";
-    CopyOutputButton.style.display = "none"; 
-    CopyOutputButton.textContent = "Copy Generated Op 📄";
 
-    // Listener for Copy Output
-    CopyOutputButton.addEventListener("click", function() {
-        navigator.clipboard.writeText(AIOutputBox.textContent)
-            .then(() => {
-                alert('Full Operation copied to clipboard!');
-            })
-            .catch(err => {
-                console.error('Error copying text:', err);
-            });
-    });
-    
-    // Listener for Generate
-    GenAIButton.addEventListener("click", async function() {
-        // Show the box, hide copy button while loading
-        AIOutputBox.style.display = "block";
-        CopyOutputButton.style.display = "none";
-        AIOutputBox.innerHTML = "<i>Establishing Uplink... Interpreting Mission Data...<br>Please Wait...</i>";
+    // MAP LIGHTBOX SYSTEM (JUST THE IMAGE)
+    function openMapLightbox(indexOrSrc) {
+      const overlay = document.getElementById("mapLightboxOverlay");
+      const img = document.getElementById("lightboxImg");
+      if (!overlay || !img) return;
 
-        try {
-            // Send to Puter.js using the 'promptText' variable defined in your existing code
-            const response = await puter.ai.chat(promptText, {
-                model: "google/gemini-2.5-flash" 
-            });
+      if (typeof indexOrSrc === 'number') {
+        const prov = PROVINCES_DATA[indexOrSrc];
+        if (prov) img.src = prov.mapImg;
+      } else if (typeof indexOrSrc === 'string') {
+        img.src = indexOrSrc;
+      }
 
-            // Display Result
-            AIOutputBox.textContent = response.message.content;
-            
-            // Show the Copy Output button now that text exists
-            CopyOutputButton.style.display = "block";
+      overlay.classList.add("active");
+    }
 
-        } catch (err) {
-            AIOutputBox.innerHTML = "<span style='color:red'>Uplink Failed. Error: " + err.message + "</span>";
+    function openMapModal(imgSrc) {
+      openMapLightbox(imgSrc);
+    }
+
+    function showWorldMap() {
+      openMapLightbox("./images/wlprovs.png");
+    }
+
+    function closeMapLightbox() {
+      const overlay = document.getElementById("mapLightboxOverlay");
+      if (overlay) {
+        overlay.classList.remove("active");
+      }
+    }
+
+    // Modal Helpers
+    function showInstructions() {
+      document.getElementById("instructionsOverlay").classList.add("active");
+    }
+
+    function closeModal(id) {
+      document.getElementById(id)?.classList.remove("active");
+    }
+
+    // Keyboard ESC support
+    document.addEventListener("keydown", (e) => {
+      const mapOverlay = document.getElementById("mapLightboxOverlay");
+      if (mapOverlay && mapOverlay.classList.contains("active")) {
+        if (e.key === "Escape") {
+          closeMapLightbox();
         }
+      }
     });
-
-    // 4. APPEND EVERYTHING TO THE BOX
-    opordBoxT.appendChild(document.createElement("br")); 
-    opordBoxT.appendChild(GenAIButton);
-    opordBoxT.appendChild(AIOutputBox);
-    opordBoxT.appendChild(CopyOutputButton);
-
-    // --- END OF NEW AI SECTION ---
- var br = document.createElement("br")
-opordBoxT.appendChild(br);
- var br = document.createElement("br")
-opordBoxT.appendChild(br);
-
-// Create the "Open ChatGPT" button element
-var openChatGPTButton = document.createElement("button");
-openChatGPTButton.style.width = "300px";
-openChatGPTButton.style.height = "40px";
-openChatGPTButton.style.fontSize = "110%"; 
-openChatGPTButton.style.background = "black"; 
-openChatGPTButton.style.color = "white"; 
-openChatGPTButton.style.border = "1px solid gray"; 
-
-// Set the text content of the OpenChatGPTButton
-openChatGPTButton.textContent = "Open ChatGPT 🌐";
-
-<!-- Add an event listener to the OpenChatGPTButton -->
-openChatGPTButton.addEventListener("click", function() {
-    // Create an anchor element
-    const a = document.createElement('a');
-    a.href = 'https://chatgpt.com/';
-    a.target = '_blank'; // Opens in a new tab
-    a.click(); // Simulates a click on the anchor element
-});
-
-
-
-
-// Add line breaks to match the spacing of your original code
-var br1 = document.createElement("br");
-opordBoxT.appendChild(br1);
-var br2 = document.createElement("br");
-opordBoxT.appendChild(br2);
-
-
-  
-		//OPORD NO.X
-		const opord = document.createElement('div');
-		opord.setAttribute(
-		'style',
-		'font-family:arial',
-		);
-		opord.textContent = 'OPORD '+rndInt;
-		const opordBox = document.getElementById('opordBox');
-		opordBox.appendChild(opord);
-		
-		//BLANK LINE
-		 var br = document.createElement("br")
-		 opordBox.appendChild(br);
-		
-		//CODENAME: X
-		const codenameLabel = document.createElement('div');
-		codenameLabel.setAttribute(
-		'style',
-		'font-family:arial',
-		);
-		codenameLabel.textContent = 'CODENAME: '+codename;
-		
-		opordBox.appendChild(codenameLabel);
-		
-		//BLANK LINE
-		 var br = document.createElement("br")
-		 opordBox.appendChild(br);
-		 
-		 //AREA OF OPERATIONS:
-		const ao = document.createElement('div');
-		ao.setAttribute(
-		'style',
-		'font-family:arial',
-		);
-		ao.textContent = 'AREA OF OPERATIONS:';
-		opordBox.appendChild(ao);
-		
-		//BLANK LINE
-		var br = document.createElement("br")
-		 opordBox.appendChild(br);
-		
-		//LIST PROVINCES SELECTED
-		provincesSelected.forEach(CreateTextAO);
-
-		function CreateTextAO(item) {
-		 const aoProvinces = document.createElement('div');
-		aoProvinces.setAttribute(
-		'style',
-		'font-family:arial',
-		);
-		aoProvinces.textContent = item;
-		opordBox.appendChild(aoProvinces);
-		}
-		
-		//BLANK LINE
-		var br = document.createElement("br")
-		opordBox.appendChild(br);
-				
-		//OBJECTIVES:
-		const objectives = document.createElement('div');
-		objectives.setAttribute(
-		'style',
-		'font-family:arial',
-		);
-		objectives.textContent = 'OBJECTIVES:';
-		opordBox.appendChild(objectives);						
-		
-		//BLANK LINE
-		var br = document.createElement("br")
-		opordBox.appendChild(br);		
-	
-		//LIST OBJECTIVES FROM THE RANDOM ROLL
-		randomSelection.forEach(CreateTextObjectives)
-		function CreateTextObjectives(item) {
-		 const objectiveslist = document.createElement('div');
-		objectiveslist.setAttribute(
-		'style',
-		'font-family:arial',
-		);
-		objectiveslist.textContent = item;
-		opordBox.appendChild(objectiveslist);
-		}
-		
-		//BLANK LINE
-		var br = document.createElement("br")
-		opordBox.appendChild(br);
-
-   
-		
-		
-  
-    provincesSelected.forEach(function callback(province) {
-
-//SHOW CORRENSPONDING MAPS
-
-  if (province == 'BARVECHOS') {
-    var text = document.createElement("p");
-  text.textContent = "🗺️BARVECHOS";
-  text.style.fontWeight = "bold"; // Optional: Make the text bold
-  text.style.fontFamily = "arial";
-  opordBox.appendChild(text);
-    var img = document.createElement("img");
-img.src = "images/BARVECHOS.png"; // Correct relative path
-img.style.width = "600px"; // Optional: Set the width
-img.style.border = "5px solid black"
-opordBox.appendChild(img);
-}
-
-if (province == 'CAIMANES') {
-  var text = document.createElement("p");
-  text.textContent = "🗺️CAIMANES";
-  text.style.fontWeight = "bold"; // Optional: Make the text bold
-  text.style.fontFamily = "arial";
-  opordBox.appendChild(text);
-  var img = document.createElement("img");
-img.src = "images/CAIMANES.png"; // Correct relative path
-img.style.width = "600px"; // Optional: Set the width
-img.style.border = "5px solid black"
-opordBox.appendChild(img);
-}
-
-if (province == 'ESPIRITU SANTO') {
-  var text = document.createElement("p");
-  text.textContent = "🗺️ESPIRITU SANTO";
-  text.style.fontWeight = "bold"; // Optional: Make the text bold
-  text.style.fontFamily = "arial";
-  opordBox.appendChild(text);
-  var img = document.createElement("img");
-img.src = "images/ESPIRITUSANTO.png"; // Correct relative path
-img.style.width = "600px"; // Optional: Set the width
-img.style.border = "5px solid black"
-opordBox.appendChild(img);
-
-}
-
-if (province == 'FLOR DEL ORO') {
-  var text = document.createElement("p");
-  text.textContent = "🗺️FLOR DEL ORO";
-  text.style.fontWeight = "bold"; // Optional: Make the text bold
-  text.style.fontFamily = "arial";
-  opordBox.appendChild(text);
-  var img = document.createElement("img");
-  img.src = "images/FLORDELORO.png"; // Correct relative path
-  img.style.width = "600px"; // Optional: Set the width
-  img.style.border = "5px solid black";
-  opordBox.appendChild(img);
-}
-
-
-if (province == 'INCA CAMINA') {
-  var text = document.createElement("p");
-  text.textContent = "🗺️INCA CAMINA";
-  text.style.fontWeight = "bold"; // Optional: Make the text bold
-  text.style.fontFamily = "arial";
-  opordBox.appendChild(text);
-  var img = document.createElement("img");
-  img.src = "images/INCACAMINA.png"; // Correct relative path
-  img.style.width = "600px"; // Optional: Set the width
-  img.style.border = "5px solid black";
-  opordBox.appendChild(img);
-}
-
-if (province == 'ITACUA') {
-
-var text = document.createElement("p");
-text.textContent = "🗺️ITACUA";
-text.style.fontWeight = "bold"; // Optional: Make the text bold
-text.style.fontFamily = "arial";
-opordBox.appendChild(text);
-var img = document.createElement("img");
-img.src = "images/ITACUA.png"; // Correct relative path
-img.style.width = "600px"; // Optional: Set the width
-img.style.border = "5px solid black"
-opordBox.appendChild(img);
-
-}
-
-if (province == 'KOANI') {
-  var text = document.createElement("p");
-  text.textContent = "🗺️KOANI";
-  text.style.fontWeight = "bold"; // Optional: Make the text bold
-  text.style.fontFamily = "arial";
-  opordBox.appendChild(text);
-var img = document.createElement("img");
-img.src = "images/KOANI.png"; // Correct relative path
-img.style.width = "600px"; // Optional: Set the width
-img.style.border = "5px solid black"
-opordBox.appendChild(img);
-
-}
-
-if (province == 'LA CRUZ') {
-  var text = document.createElement("p");
-  text.textContent = "🗺️LA CRUZ";
-  text.style.fontWeight = "bold"; // Optional: Make the text bold
-  text.style.fontFamily = "arial";
-  opordBox.appendChild(text);
-var img = document.createElement("img");
-img.src = "images/LACRUZ.png"; // Correct relative path
-img.style.width = "600px"; // Optional: Set the width
-img.style.border = "5px solid black"
-opordBox.appendChild(img);
-}
-
-if (province == 'LIBERTAD') {
-  var text = document.createElement("p");
-  text.textContent = "🗺️LIBERTAD";
-  text.style.fontWeight = "bold"; // Optional: Make the text bold
-  text.style.fontFamily = "arial";
-  opordBox.appendChild(text);
-var img = document.createElement("img");
-img.src = "images/LIBERTAD.png"; // Correct relative path
-img.style.width = "600px"; // Optional: Set the width
-img.style.border = "5px solid black"
-opordBox.appendChild(img);
-}
-
-if (province == 'MALCA') {
-var text = document.createElement("p");
-text.textContent = "🗺️MALCA";
-text.style.fontWeight = "bold"; // Optional: Make the text bold
-text.style.fontFamily = "arial";
-opordBox.appendChild(text);
-var img = document.createElement("img");
-img.src = "images/MALCA.png"; // Correct relative path
-img.style.width = "600px"; // Optional: Set the width
-img.style.border = "5px solid black"
-opordBox.appendChild(img);
-}
-
-if (province == 'MEDIA LUNA') {
-  var text = document.createElement("p");
-text.textContent = "🗺️MEDIA LUNA";
-text.style.fontWeight = "bold"; // Optional: Make the text bold
-text.style.fontFamily = "arial";
-opordBox.appendChild(text);
-var img = document.createElement("img");
-img.src = "images/MEDIALUNA.png"; // Correct relative path
-img.style.width = "600px"; // Optional: Set the width
-img.style.border = "5px solid black"
-opordBox.appendChild(img);
-}
-
-if (province == 'MOJOCOYO') {
-  var text = document.createElement("p");
-text.textContent = "🗺️MOJOCOYO";
-text.style.fontWeight = "bold"; // Optional: Make the text bold
-text.style.fontFamily = "arial";
-opordBox.appendChild(text);
-var img = document.createElement("img");
-img.src = "images/MOJOCOYO.png"; // Correct relative path
-img.style.width = "600px"; // Optional: Set the width
-img.style.border = "5px solid black"
-opordBox.appendChild(img);
-}
-
-if (province == 'MONTE PUNCU') {
-  var text = document.createElement("p");
-text.textContent = "🗺️MONTE PUNCU";
-text.style.fontWeight = "bold"; // Optional: Make the text bold
-text.style.fontFamily = "arial";
-opordBox.appendChild(text);
-var img = document.createElement("img");
-img.src = "images/MONTEPUNCU.png"; // Correct relative path
-img.style.width = "600px"; // Optional: Set the width
-img.style.border = "5px solid black"
-opordBox.appendChild(img);
-}
-
-if (province == 'MONTUYOC') {
-  var text = document.createElement("p");
-text.textContent = "🗺️MONTUYOC";
-text.style.fontWeight = "bold"; // Optional: Make the text bold
-text.style.fontFamily = "arial";
-opordBox.appendChild(text);
-var img = document.createElement("img");
-img.src = "images/MONTUYOC.png"; // Correct relative path
-img.style.width = "600px"; // Optional: Set the width
-img.style.border = "5px solid black"
-opordBox.appendChild(img);
-}
-
-if (province == 'OCORO') {
-  var text = document.createElement("p");
-text.textContent = "🗺️OCORO";
-text.style.fontWeight = "bold"; // Optional: Make the text bold
-text.style.fontFamily = "arial";
-opordBox.appendChild(text);
-var img = document.createElement("img");
-img.src = "images/OCORO.png"; // Correct relative path
-img.style.width = "600px"; // Optional: Set the width
-img.style.border = "5px solid black"
-opordBox.appendChild(img);
-}
-
-if (province == 'PN AGUA VERDE') {
-  var text = document.createElement("p");
-text.textContent = "🗺️PN AGUA VERDE";
-text.style.fontWeight = "bold"; // Optional: Make the text bold
-text.style.fontFamily = "arial";
-opordBox.appendChild(text);
-var img = document.createElement("img");
-img.src = "images/PNAGUA.png"; // Correct relative path
-img.style.width = "600px"; // Optional: Set the width
-img.style.border = "5px solid black"
-opordBox.appendChild(img);
-}
-
-if (province == 'PUCARA') {
-  var text = document.createElement("p");
-text.textContent = "🗺️PUCARA";
-text.style.fontWeight = "bold"; // Optional: Make the text bold
-text.style.fontFamily = "arial";
-opordBox.appendChild(text);
-var img = document.createElement("img");
-img.src = "images/PUCARA.png"; // Correct relative path
-img.style.width = "600px"; // Optional: Set the width
-img.style.border = "5px solid black"
-opordBox.appendChild(img);
-}
-
-if (province == 'REMANZO') {
-  var text = document.createElement("p");
-text.textContent = "🗺️REMANZO";
-text.style.fontWeight = "bold"; // Optional: Make the text bold
-text.style.fontFamily = "arial";
-opordBox.appendChild(text);
-var img = document.createElement("img");
-img.src = "images/REMANZO.png"; // Correct relative path
-img.style.width = "600px"; // Optional: Set the width
-img.style.border = "5px solid black"
-opordBox.appendChild(img); 
-}
-
-if (province == 'SAN MATEO') {
-  var text = document.createElement("p");
-text.textContent = "🗺️SAN MATEO";
-text.style.fontWeight = "bold"; // Optional: Make the text bold
-text.style.fontFamily = "arial";
-opordBox.appendChild(text);
-var img = document.createElement("img");
-img.src = "images/SANMATEO.png"; // Correct relative path
-img.style.width = "600px"; // Optional: Set the width
-img.style.border = "5px solid black"
-opordBox.appendChild(img); 
-}
-
-if (province == 'TABACAL') {
-  var text = document.createElement("p");
-text.textContent = "🗺️TABACAL";
-text.style.fontWeight = "bold"; // Optional: Make the text bold
-text.style.fontFamily = "arial";
-opordBox.appendChild(text);
-var img = document.createElement("img");
-img.src = "images/TABACAL.png"; // Correct relative path
-img.style.width = "600px"; // Optional: Set the width
-img.style.border = "5px solid black"
-opordBox.appendChild(img); 
-}
-
-if (province == 'VILLA VERDE') {
-  var text = document.createElement("p");
-text.textContent = "🗺️VILLA VERDE";
-text.style.fontWeight = "bold"; // Optional: Make the text bold
-text.style.fontFamily = "arial";
-opordBox.appendChild(text);
-var img = document.createElement("img");
-img.src = "images/VILLAVERDE.png"; // Correct relative path
-img.style.width = "600px"; // Optional: Set the width
-img.style.border = "5px solid black"
-opordBox.appendChild(img); 
-}
-
-
-
-});
-
-
-    //SHOW MAP LINK
-   // var link = document.getElementById('interactivemap');
-  //  link.style.display = 'block';
-		
-	}
-</script>
-
-<div id="opordBox"></div>
-<br>
-<hr>
-
-<br>
-<a href="https://www.swissgameguides.com/maps/ghost_recon_wildlands/world/interactive_map.html" id="interactivemap" style="font-family:arial; display:none; text-decoration:none;" target="_blank" rel="noopener noreferrer"> 👉 INTERACTIVE MAP 👈</a>
-
-
-
-
-
-<br>
-</center> 
-
+  </script>
 </body>
-
 </html>
-
