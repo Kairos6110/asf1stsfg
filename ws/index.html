@@ -1420,6 +1420,112 @@
       white-space: nowrap;
     }
 
+    .op-generators-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+    }
+
+    @media (min-width: 760px) {
+      .op-generators-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    .generator-card {
+      display: flex;
+      flex-direction: column;
+      gap: 1.15rem;
+      padding: clamp(1.2rem, 2.2vw, 1.8rem);
+      background:
+        linear-gradient(135deg, rgba(165, 168, 102, 0.08), transparent 40%),
+        linear-gradient(180deg, rgba(18, 27, 21, 0.95), rgba(10, 15, 12, 0.98));
+      border: 1px solid var(--line-soft);
+      border-radius: var(--radius);
+      transition: border-color 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease;
+    }
+
+    .generator-card:hover {
+      border-color: var(--olive-2);
+      box-shadow: 0 0.75rem 2rem rgba(0, 0, 0, 0.5);
+    }
+
+    .generator-card-head {
+      display: flex;
+      flex-direction: column;
+      gap: 0.45rem;
+    }
+
+    .generator-badge {
+      align-self: flex-start;
+      display: inline-flex;
+      align-items: center;
+      padding: 0.25rem 0.65rem;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(107, 142, 35, 0.15);
+      color: var(--olive-2);
+      font-size: 0.75rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .generator-card h3 {
+      display: flex;
+      align-items: center;
+      gap: 0.55rem;
+      margin: 0;
+      color: var(--ink);
+      font-size: 1.15rem;
+      font-weight: 700;
+    }
+
+    .generator-card h3 .icon {
+      --size: 1.25rem;
+      color: var(--olive-2);
+    }
+
+    .generator-img-zoom {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      border-radius: var(--radius);
+      overflow: hidden;
+      border: 1px solid var(--line-soft);
+      background: #050807;
+    }
+
+    .generator-img-zoom img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .generator-body {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .generator-body p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+
+    .generator-action {
+      margin-top: 0.5rem;
+    }
+
+    .generator-action .button {
+      width: 100%;
+      justify-content: center;
+      padding: 0.85rem 1.25rem;
+      font-size: 0.95rem;
+      letter-spacing: 0.04em;
+    }
+
     .principle-logo {
       width: min(20rem, 72vw);
     }
@@ -1439,6 +1545,36 @@
       line-height: 1.62;
       text-align: justify;
       overflow-wrap: break-word;
+    }
+
+    .overview-squad-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1rem;
+      width: 100%;
+      margin-top: 0.5rem;
+    }
+
+    @media (min-width: 640px) {
+      .overview-squad-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    .overview-squad-zoom {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      border-radius: var(--radius);
+      overflow: hidden;
+      border: 1px solid var(--line-soft);
+      background: #050807;
+      box-shadow: 0 0.5rem 1.5rem var(--shadow);
+    }
+
+    .overview-squad-zoom img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
     }
 
     .principle-actions {
@@ -1886,7 +2022,8 @@
       <div class="nav-links" id="nav-links">
         <div class="nav-section nav-section-primary" aria-label="Page sections">
         <a href="#principle"><span class="icon" style="--icon: url('icons/node_modules/bootstrap-icons/icons/compass.svg');"></span>Overview</a>
-        <a href="#campaign"><span class="icon" style="--icon: url('icons/node_modules/bootstrap-icons/icons/journal-text.svg');"></span>Immersive Campaign</a>
+        <a href="#campaign"><span class="icon" style="--icon: url('icons/node_modules/bootstrap-icons/icons/journal-text.svg');"></span>Breakpoint Campaign</a>
+        <a href="#op-generators"><span class="icon" style="--icon: url('icons/node_modules/bootstrap-icons/icons/clipboard-data.svg');"></span>Operation Generators</a>
         <a href="#gallery"><span class="icon" style="--icon: url('icons/node_modules/bootstrap-icons/icons/images.svg');"></span>Gallery</a>
         <a href="#kits"><span class="icon" style="--icon: url('icons/node_modules/bootstrap-icons/icons/backpack2.svg');"></span>Kits</a>
         <a href="#tactical"><span class="icon" style="--icon: url('icons/node_modules/bootstrap-icons/icons/bullseye.svg');"></span>Tactics</a>
@@ -1896,7 +2033,6 @@
         <a href="https://kairos6110.github.io/gbtf/Callsigns.html" target="_blank" rel="noopener noreferrer"><span class="icon" style="--icon: url('icons/node_modules/bootstrap-icons/icons/person-vcard.svg');"></span>Callsigns</a>
         <a href="https://kairos6110.github.io/gbtf/soundboard.html" target="_blank" rel="noopener noreferrer"><span class="icon" style="--icon: url('icons/node_modules/bootstrap-icons/icons/soundwave.svg');"></span>Soundboard</a>
         <a href="https://kairos6110.github.io/gbtf/OperationsArchive/opords.html" target="_blank" rel="noopener noreferrer"><span class="icon" style="--icon: url('icons/node_modules/bootstrap-icons/icons/archive.svg');"></span>Operations Vault</a>
-        <a href="https://kairos6110.github.io/gbtf/OpGen2/index.html" target="_blank" rel="noopener noreferrer"><span class="icon" style="--icon: url('icons/node_modules/bootstrap-icons/icons/clipboard-data.svg');"></span>Operation Generator</a>
         <a href="https://kairos6110.github.io/gbtf/ws/wildfire" target="_blank" rel="noopener noreferrer"><span class="icon" style="--icon: url('icons/node_modules/bootstrap-icons/icons/journal-text.svg');"></span>Wildfire Campaign</a>
         <a href="https://kairos6110.github.io/gbtf/ws/silverstone" target="_blank" rel="noopener noreferrer"><span class="icon" style="--icon: url('icons/node_modules/bootstrap-icons/icons/journal-text.svg');"></span>Silverstone Campaign</a>
         </div>
@@ -1935,14 +2071,22 @@
       </div>
       <div class="panel principle">
         <div class="principle-content">
-          <p>GBTF is a Ghost Recon Breakpoint community, occasionally active in other games, offering a streamlined, player-first TACSIM experience built around realism, teamwork, and freedom. There is no mandatory training, micromanagement, or restrictions on gear, weapons, classes, or game settings, operators are free to enjoy everything the game has to offer. We simply expect members to communicate, coordinate, and approach each operation with a realistic tactical mindset. With OUR VERY OWN IMMERSIVE CAMPAIGN, multiple custom operations, advanced immersion tools, detailed self-paced guides, and a friendly yet professional community, GBTF welcomes both new and experienced players seeking authentic special forces gameplay. Welcome home, Operator. Respect. Integrity. Honor.</p>
-          <div class="sps-video-panel" aria-label="GBTF SPS video">
-            <div class="sps-video-shell">
-              <video class="sps-video" id="sps-presentation-video" src="GBTF_PRES.mp4" poster="vidpreviewimage.jpg" preload="metadata" playsinline aria-label="GBTF SPS presentation video"></video>
-              <button class="sps-video-play" type="button" aria-label="Play GBTF presentation video with audio">
-                <span class="icon" style="--icon: url('icons/node_modules/bootstrap-icons/icons/play-fill.svg');" aria-hidden="true"></span>
-              </button>
-            </div>
+          <p>GBTF is a Ghost Recon (Breakpoint and Wildlands) community, occasionally active in other games, offering a streamlined, player-first TACSIM experience built around realism, teamwork, and freedom. There is no mandatory training, micromanagement, or restrictions on gear, weapons, classes, or game settings, operators are free to enjoy everything the game has to offer. We simply expect members to communicate, coordinate, and approach each operation with a realistic tactical mindset. With OUR VERY OWN IMMERSIVE CAMPAIGN, multiple custom operations, advanced immersion tools, detailed self-paced guides, and a friendly yet professional community, GBTF welcomes both new and experienced players seeking authentic special forces gameplay. Welcome home, Operator. Respect. Integrity. Honor.</p>
+        </div>
+        <div class="overview-squad-grid">
+          <button class="image-zoom overview-squad-zoom" type="button" aria-label="Open Breakpoint Squad image">
+            <img src="bpsquad.jpg" alt="GBTF Breakpoint Squad">
+          </button>
+          <button class="image-zoom overview-squad-zoom" type="button" aria-label="Open Wildlands Squad image">
+            <img src="wlsquad.webp" alt="GBTF Wildlands Squad">
+          </button>
+        </div>
+        <div class="sps-video-panel" aria-label="GBTF SPS video">
+          <div class="sps-video-shell">
+            <video class="sps-video" src="GBTF_PRES.mp4" poster="vidpreviewimage.jpg" preload="metadata" playsinline aria-label="GBTF SPS presentation video"></video>
+            <button class="sps-video-play" type="button" aria-label="Play GBTF presentation video with audio">
+              <span class="icon" style="--icon: url('icons/node_modules/bootstrap-icons/icons/play-fill.svg');" aria-hidden="true"></span>
+            </button>
           </div>
         </div>
         <div class="principle-actions">
@@ -1960,7 +2104,7 @@
       <div class="section-head">
         <span class="section-kicker">Special Operations</span>
         <span class="icon icon-lg" style="--icon: url('icons/node_modules/bootstrap-icons/icons/journal-text.svg');" aria-hidden="true"></span>
-        <h2 id="campaign-title">Immersive Campaign</h2>
+        <h2 id="campaign-title">Breakpoint Campaign</h2>
       </div>
       <div class="panel campaign-panel">
         <button class="image-zoom campaign-img-zoom" type="button" aria-label="Open Auroa map">
@@ -1969,6 +2113,46 @@
         <a class="button" href="https://kairos6110.github.io/gbtf/ws/gbtfcampaign/#sitrep" target="_blank" rel="noopener noreferrer">
           <span class="icon" style="--icon: url('icons/node_modules/bootstrap-icons/icons/box-arrow-up-right.svg');"></span>START THE JOURNEY
         </a>
+      </div>
+    </section>
+
+    <section class="section" id="op-generators" aria-labelledby="op-generators-title">
+      <div class="section-head">
+        <span class="section-kicker">Tactical Tools</span>
+        <span class="icon icon-lg" style="--icon: url('icons/node_modules/bootstrap-icons/icons/clipboard-data.svg');" aria-hidden="true"></span>
+        <h2 id="op-generators-title">Operation Generators</h2>
+      </div>
+
+      <div class="op-generators-grid">
+        <article class="panel generator-card">
+          <div class="generator-card-head">
+            <span class="generator-badge">Breakpoint AO</span>
+            <h3><span class="icon" style="--icon: url('icons/node_modules/bootstrap-icons/icons/cpu.svg');"></span>Breakpoint Operation Generator</h3>
+          </div>
+          <button class="image-zoom generator-img-zoom" type="button" aria-label="Open Breakpoint Operation Generator preview">
+            <img src="bplogo.jpg" alt="Ghost Recon Breakpoint logo preview">
+          </button>
+          <div class="generator-action">
+            <a class="button" href="https://kairos6110.github.io/gbtf/OpGen2/index.html" target="_blank" rel="noopener noreferrer">
+              <span class="icon" style="--icon: url('icons/node_modules/bootstrap-icons/icons/box-arrow-up-right.svg');"></span>LAUNCH BREAKPOINT GENERATOR
+            </a>
+          </div>
+        </article>
+
+        <article class="panel generator-card">
+          <div class="generator-card-head">
+            <span class="generator-badge">Wildlands AO</span>
+            <h3><span class="icon" style="--icon: url('icons/node_modules/bootstrap-icons/icons/sliders.svg');"></span>Wildlands Operation Generator</h3>
+          </div>
+          <button class="image-zoom generator-img-zoom" type="button" aria-label="Open Wildlands Operation Generator preview">
+            <img src="wllogo.jpg" alt="Ghost Recon Wildlands logo preview">
+          </button>
+          <div class="generator-action">
+            <a class="button" href="https://kairos6110.github.io/gbtf/WlOpGenerator.html" target="_blank" rel="noopener noreferrer">
+              <span class="icon" style="--icon: url('icons/node_modules/bootstrap-icons/icons/box-arrow-up-right.svg');"></span>LAUNCH WILDLANDS GENERATOR
+            </a>
+          </div>
+        </article>
       </div>
     </section>
 
