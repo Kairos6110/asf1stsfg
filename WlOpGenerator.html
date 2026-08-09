@@ -325,8 +325,9 @@
       user-select: none;
       -webkit-user-select: none;
       touch-action: none;
-      transform: translateZ(0);
-      -webkit-transform: translateZ(0);
+      -webkit-tap-highlight-color: transparent;
+      transform: translate3d(0, 0, 0);
+      -webkit-transform: translate3d(0, 0, 0);
     }
     .map-viewport:active {
       cursor: grabbing;
@@ -356,6 +357,9 @@
     }
 
     /* Performance Optimization Class applied during active pan/zoom */
+    .map-viewport.is-interacting .base-marker-group {
+      pointer-events: none;
+    }
     .map-viewport.is-interacting .base-marker-circle,
     .map-viewport.is-interacting .base-marker-center,
     .map-viewport.is-interacting .base-marker-label-bg {
@@ -371,8 +375,8 @@
       will-change: transform;
       backface-visibility: hidden;
       -webkit-backface-visibility: hidden;
-      transform-style: preserve-3d;
-      -webkit-transform-style: preserve-3d;
+      -webkit-perspective: 1000;
+      perspective: 1000;
     }
 
     .map-stage img {
@@ -380,7 +384,16 @@
       pointer-events: none;
       backface-visibility: hidden;
       -webkit-backface-visibility: hidden;
-      -webkit-transform: translateZ(0);
+      transform: translate3d(0, 0, 0);
+      -webkit-transform: translate3d(0, 0, 0);
+    }
+
+    .marker-overlay {
+      pointer-events: auto;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      transform: translate3d(0, 0, 0);
+      -webkit-transform: translate3d(0, 0, 0);
     }
 
     /* SVG Marker Base Styles: Default = Tactical Green */
@@ -987,7 +1000,20 @@
     // Render Markers on Map SVG matching New_WlOpGenerator structure
     function renderMarkers() {
       const query = searchInput.value.trim().toLowerCase();
-      markerOverlay.innerHTML = '';
+      
+      // If markers already exist, just update class names without rebuilding SVG DOM
+      if (markerOverlay.children.length === bases.length) {
+        bases.forEach(base => {
+          const group = document.getElementById(`marker_${base.id}`);
+          if (!group) return;
+          const isSearchMatch = query && base.name.toLowerCase().includes(query);
+          const isSelected = selectedBaseIds.includes(base.id);
+          group.setAttribute('class', `base-marker-group ${isSelected ? 'selected' : ''} ${isSearchMatch ? 'search-highlight' : ''}`);
+        });
+        return;
+      }
+
+      const fragment = document.createDocumentFragment();
 
       bases.forEach(base => {
         const isSearchMatch = query && base.name.toLowerCase().includes(query);
@@ -1016,10 +1042,16 @@
         const labelGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
         labelGroup.setAttribute('class', 'base-marker-label-group');
 
+        // Estimate label width based on char length (approx 9px per char + 22px padding) to avoid layout thrashing
+        const approxWidth = base.name.length * 8.8 + 22;
         const labelBg = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
         labelBg.setAttribute('class', 'base-marker-label-bg');
         labelBg.setAttribute('rx', '5.4');
         labelBg.setAttribute('ry', '5.4');
+        labelBg.setAttribute('x', -approxWidth / 2);
+        labelBg.setAttribute('y', -53.2);
+        labelBg.setAttribute('width', approxWidth);
+        labelBg.setAttribute('height', 20);
 
         const textLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
         textLabel.setAttribute('x', '0');
@@ -1040,21 +1072,11 @@
           toggleBaseSelection(base.id, e);
         });
 
-        markerOverlay.appendChild(group);
-
-        // Dynamically compute badge width for dark text container
-        requestAnimationFrame(() => {
-          try {
-            const bbox = textLabel.getBBox();
-            const paddingX = 21.6;
-            const paddingY = 12.6;
-            labelBg.setAttribute('x', bbox.x - paddingX / 2);
-            labelBg.setAttribute('y', bbox.y - paddingY / 2);
-            labelBg.setAttribute('width', bbox.width + paddingX);
-            labelBg.setAttribute('height', bbox.height + paddingY);
-          } catch (err) {}
-        });
+        fragment.appendChild(group);
       });
+
+      markerOverlay.innerHTML = '';
+      markerOverlay.appendChild(fragment);
     }
 
     function toggleBaseSelection(id, event) {
