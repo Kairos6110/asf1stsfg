@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>Ghost Recon Wildlands Operation Generator</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🗺️</text></svg>">
 
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -337,30 +338,6 @@
       display: block;
     }
 
-    /* Floating Coordinates Badge */
-    .coords-floating-badge {
-      position: absolute;
-      bottom: max(14px, env(safe-area-inset-bottom));
-      left: 50%;
-      transform: translateX(-50%);
-      background: rgba(10, 15, 25, 0.9);
-      border: 1px solid var(--border-highlight);
-      border-radius: var(--radius-sm);
-      padding: 5px 14px;
-      font-family: 'Rajdhani', monospace;
-      font-weight: 700;
-      font-size: 0.85rem;
-      color: var(--accent-gold);
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.75);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      pointer-events: none;
-      z-index: 20;
-      letter-spacing: 1px;
-      opacity: 0.85;
-      white-space: nowrap;
-    }
-
     /* Floating Zoom Controls */
     .map-zoom-controls {
       position: absolute;
@@ -595,6 +572,15 @@
       .ai-launchers-grid {
         gap: 8px;
       }
+      .map-zoom-controls {
+        bottom: max(12px, env(safe-area-inset-bottom));
+        right: 10px;
+      }
+      .map-zoom-btn {
+        width: 34px;
+        height: 34px;
+        font-size: 0.9rem;
+      }
     }
   </style>
 </head>
@@ -649,16 +635,11 @@
         <!-- Loading State -->
         <div class="map-loader-overlay" id="mapLoader">
           <div class="tactical-spinner"></div>
-          <div class="map-loader-text">INITIALIZING TACTICAL SATELLITE MAP...</div>
+          <div class="map-loader-text">Initializing TACMAP...</div>
         </div>
 
-        <!-- Floating Coordinates Badge -->
-        <div class="coords-floating-badge" id="coordsDisplay">X: --- | Y: ---</div>
-
-        <!-- Floating Zoom Controls -->
+        <!-- Floating Reset View Control -->
         <div class="map-zoom-controls">
-          <button type="button" class="map-zoom-btn" onclick="zoomIn()" title="Zoom In" aria-label="Zoom In">+</button>
-          <button type="button" class="map-zoom-btn" onclick="zoomOut()" title="Zoom Out" aria-label="Zoom Out">−</button>
           <button type="button" class="map-zoom-btn" onclick="fitMapToScreen()" title="Reset View" aria-label="Reset View" style="font-size: 0.95rem;">⛶</button>
         </div>
       </div>
@@ -761,7 +742,6 @@
     const selectedCountDisplay = document.getElementById('selectedCountDisplay');
     const searchInput = document.getElementById('searchInput');
     const searchResultsDropdown = document.getElementById('searchResultsDropdown');
-    const coordsDisplay = document.getElementById('coordsDisplay');
     const mapLoader = document.getElementById('mapLoader');
 
     let mapImage = new Image();
@@ -1309,15 +1289,6 @@
         const screenY = e.clientY - rect.top;
 
         if (screenX >= 0 && screenX <= rect.width && screenY >= 0 && screenY <= rect.height) {
-          const stageX = Math.round((screenX - panX) / zoom);
-          const stageY = Math.round((screenY - panY) / zoom);
-
-          if (stageX >= 0 && stageX <= imgNaturalWidth && stageY >= 0 && stageY <= imgNaturalHeight) {
-            if (coordsDisplay) {
-              coordsDisplay.textContent = `X: ${stageX} | Y: ${stageY}`;
-            }
-          }
-
           // Hover detection on desktop
           if (!isDragging && !isMouseDown) {
             const hit = hitTestBase(screenX, screenY);
@@ -1377,7 +1348,7 @@
       // MOBILE TOUCH GESTURES (Flawless 1-finger pan, 2-finger pinch & pan, double-tap zoom)
       mapViewport.addEventListener('touchstart', (e) => {
         if (e.touches.length === 1) {
-          isMouseDown = true;
+          isMouseDown = false; // keep mouse state false during touch to prevent synthetic mouseup double-toggle
           isTouchDragging = false;
           isPinching = false;
           dragStartX = e.touches[0].clientX;
@@ -1422,14 +1393,6 @@
             requestRender();
           }
 
-          // Update touch coordinates display
-          const screenX = t.clientX - rect.left;
-          const screenY = t.clientY - rect.top;
-          const stageX = Math.round((screenX - panX) / zoom);
-          const stageY = Math.round((screenY - panY) / zoom);
-          if (coordsDisplay && stageX >= 0 && stageX <= imgNaturalWidth && stageY >= 0 && stageY <= imgNaturalHeight) {
-            coordsDisplay.textContent = `X: ${stageX} | Y: ${stageY}`;
-          }
         } else if (e.touches.length === 2 && isPinching) {
           const t1 = e.touches[0];
           const t2 = e.touches[1];
@@ -1455,6 +1418,11 @@
       }, { passive: false });
 
       mapViewport.addEventListener('touchend', (e) => {
+        // Prevent browser from firing synthesized mouse events (mousedown/mouseup/click)
+        if (e.cancelable) {
+          e.preventDefault();
+        }
+
         if (isPinching && e.touches.length < 2) {
           isPinching = false;
           if (e.touches.length === 1) {
@@ -1462,7 +1430,7 @@
             dragStartY = e.touches[0].clientY;
             initialPanX = panX;
             initialPanY = panY;
-            isMouseDown = true;
+            isMouseDown = false;
             isTouchDragging = false;
           }
           return;
@@ -1471,28 +1439,27 @@
         if (e.touches.length === 0) {
           const touchDuration = performance.now() - touchStartTime;
 
-          // Single Tap detection
-          if (!isTouchDragging && !isPinching && touchDuration < 380) {
+          // Clean Single Tap detection for marker selection toggle
+          if (!isTouchDragging && !isPinching && touchDuration < 450) {
             const rect = mapViewport.getBoundingClientRect();
             const screenX = dragStartX - rect.left;
             const screenY = dragStartY - rect.top;
 
-            const now = performance.now();
-            const distFromLastTap = Math.hypot(screenX - lastTapX, screenY - lastTapY);
-
-            // Check for Double-Tap Zoom
-            if (now - lastTapTime < 320 && distFromLastTap < 35) {
-              const targetZoom = zoom < 0.9 ? 1.5 : MIN_ZOOM;
-              zoomTo(targetZoom, screenX, screenY);
-              lastTapTime = 0;
+            const hit = hitTestBase(screenX, screenY);
+            if (hit) {
+              toggleBaseSelection(hit.id);
             } else {
-              lastTapTime = now;
-              lastTapX = screenX;
-              lastTapY = screenY;
-
-              const hit = hitTestBase(screenX, screenY);
-              if (hit) {
-                toggleBaseSelection(hit.id);
+              // Double-tap zoom only when tapping empty map space
+              const now = performance.now();
+              const distFromLastTap = Math.hypot(screenX - lastTapX, screenY - lastTapY);
+              if (now - lastTapTime < 320 && distFromLastTap < 35) {
+                const targetZoom = zoom < 0.9 ? 1.5 : MIN_ZOOM;
+                zoomTo(targetZoom, screenX, screenY);
+                lastTapTime = 0;
+              } else {
+                lastTapTime = now;
+                lastTapX = screenX;
+                lastTapY = screenY;
               }
             }
           }
@@ -1501,7 +1468,7 @@
           isTouchDragging = false;
           isPinching = false;
         }
-      });
+      }, { passive: false });
 
       // Prevent iOS Safari Native Gesture Scaling
       document.addEventListener('gesturestart', (e) => e.preventDefault(), { passive: false });
