@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>Ghost Recon Wildlands Operation Generator</title>
 
   <!-- Google Fonts -->
@@ -34,32 +34,35 @@
       box-sizing: border-box;
       margin: 0;
       padding: 0;
+      -webkit-tap-highlight-color: transparent;
     }
 
-    body {
+    html, body {
+      width: 100%;
+      height: 100%;
+      height: 100vh;
+      height: 100dvh;
+      overflow: hidden;
       background-color: var(--bg-dark);
-      background-image: 
-        radial-gradient(circle at 50% 0%, rgba(30, 41, 59, 0.5) 0%, rgba(7, 10, 15, 1) 70%),
-        linear-gradient(to bottom, rgba(7, 10, 15, 0.8), rgba(7, 10, 15, 0.95));
-      background-attachment: fixed;
       color: var(--text-main);
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      min-height: 100vh;
-      overflow-x: hidden;
       line-height: 1.5;
+      overscroll-behavior: none;
+      -webkit-user-select: none;
+      user-select: none;
     }
 
     /* Custom Scrollbar */
     ::-webkit-scrollbar {
-      width: 8px;
-      height: 8px;
+      width: 6px;
+      height: 6px;
     }
     ::-webkit-scrollbar-track {
       background: var(--bg-dark);
     }
     ::-webkit-scrollbar-thumb {
       background: #1e293b;
-      border-radius: 4px;
+      border-radius: 3px;
     }
     ::-webkit-scrollbar-thumb:hover {
       background: var(--accent-gold);
@@ -69,21 +72,26 @@
       display: flex;
       flex-direction: column;
       height: 100vh;
+      height: 100dvh;
       width: 100vw;
+      width: 100dvw;
       overflow: hidden;
+      position: relative;
     }
 
     /* Structured 4-Row Control Panel */
     header.app-header {
-      background: rgba(15, 23, 42, 0.95);
+      background: rgba(15, 23, 42, 0.96);
       border-bottom: 1px solid var(--border-color);
-      padding: 10px 16px;
+      padding: max(8px, env(safe-area-inset-top)) 14px 10px;
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 7px;
       z-index: 100;
       flex-shrink: 0;
-      backdrop-filter: blur(12px);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
     }
 
     .header-row {
@@ -110,6 +118,13 @@
       text-align: center;
     }
 
+    /* Row 2: Instructions & Discord */
+    .row-aux {
+      justify-content: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
     /* Row 3: Search Bar */
     .row-search {
       justify-content: center;
@@ -121,24 +136,84 @@
       max-width: 420px;
     }
 
-    .stats-badge {
-      background: rgba(245, 158, 11, 0.15);
-      color: var(--accent-gold);
-      border: 1px solid rgba(245, 158, 11, 0.3);
-      padding: 5px 12px;
+    .search-input {
+      width: 100%;
+      background: rgba(10, 15, 25, 0.9);
+      border: 1px solid var(--border-color);
+      color: #ffffff;
+      padding: 6px 10px 6px 32px;
       border-radius: var(--radius-sm);
-      font-family: 'Rajdhani', sans-serif;
-      font-weight: 700;
       font-size: 0.9rem;
-      white-space: nowrap;
-      flex-shrink: 0;
+      font-weight: 500;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      -webkit-user-select: text;
+      user-select: text;
+    }
+    .search-input::placeholder {
+      color: rgba(255, 255, 255, 0.6);
+    }
+    .search-input:focus {
+      border-color: var(--accent-gold);
+      box-shadow: 0 0 10px var(--accent-gold-glow);
+    }
+    .search-icon {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--accent-gold);
+      font-size: 0.85rem;
+      pointer-events: none;
     }
 
-    /* Row 3: Auxiliary Buttons */
-    .row-aux {
-      justify-content: center;
-      gap: 8px;
-      flex-wrap: wrap;
+    /* Search Results Dropdown */
+    .search-results-dropdown {
+      display: none;
+      position: absolute;
+      top: calc(100% + 5px);
+      left: 0;
+      width: 100%;
+      max-height: 240px;
+      overflow-y: auto;
+      background: rgba(15, 23, 42, 0.98);
+      border: 1px solid var(--border-highlight);
+      border-radius: var(--radius-sm);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.85);
+      z-index: 500;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+    }
+    .search-results-dropdown.active {
+      display: block;
+    }
+    .search-result-item {
+      padding: 8px 12px;
+      font-size: 0.85rem;
+      color: var(--text-main);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      transition: background 0.15s ease;
+    }
+    .search-result-item:last-child {
+      border-bottom: none;
+    }
+    .search-result-item:hover, .search-result-item:active {
+      background: rgba(245, 158, 11, 0.18);
+      color: var(--accent-gold);
+    }
+    .search-result-name {
+      font-family: 'Rajdhani', sans-serif;
+      font-weight: 700;
+      font-size: 0.95rem;
+      text-transform: capitalize;
+    }
+    .search-result-coords {
+      font-size: 0.75rem;
+      color: var(--text-dim);
     }
 
     /* Row 4: Stats Badge, Clear Selection & Copy Prompt Buttons */
@@ -148,6 +223,19 @@
       gap: 10px;
       align-items: center;
       flex-wrap: wrap;
+    }
+
+    .stats-badge {
+      background: rgba(245, 158, 11, 0.15);
+      color: var(--accent-gold);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      padding: 4px 12px;
+      border-radius: var(--radius-sm);
+      font-family: 'Rajdhani', sans-serif;
+      font-weight: 700;
+      font-size: 0.9rem;
+      white-space: nowrap;
+      flex-shrink: 0;
     }
 
     .btn-flex {
@@ -171,6 +259,7 @@
       border: none;
       white-space: nowrap;
       text-decoration: none;
+      touch-action: manipulation;
     }
 
     .btn-primary {
@@ -178,7 +267,7 @@
       color: #000;
       box-shadow: 0 4px 14px rgba(245, 158, 11, 0.4);
     }
-    .btn-primary:hover {
+    .btn-primary:hover, .btn-primary:active {
       background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
       box-shadow: 0 6px 20px rgba(245, 158, 11, 0.6);
       transform: translateY(-1px);
@@ -189,22 +278,12 @@
       color: var(--text-main);
       border: 1px solid var(--border-color);
       backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
     }
-    .btn-secondary:hover {
-      background: rgba(51, 65, 85, 0.8);
+    .btn-secondary:hover, .btn-secondary:active {
+      background: rgba(51, 65, 85, 0.85);
       border-color: rgba(255, 255, 255, 0.2);
       color: #fff;
-    }
-
-    .btn-icon {
-      padding: 8px;
-      background: rgba(30, 41, 59, 0.7);
-      color: var(--text-main);
-      border: 1px solid var(--border-color);
-    }
-    .btn-icon:hover {
-      background: rgba(51, 65, 85, 0.8);
-      color: var(--accent-gold);
     }
 
     .btn-xs {
@@ -219,417 +298,159 @@
       cursor: pointer;
       transition: all 0.2s;
     }
-    .btn-xs:hover {
+    .btn-xs:hover, .btn-xs:active {
       background: rgba(51, 65, 85, 0.8);
       color: var(--text-main);
       border-color: rgba(255, 255, 255, 0.2);
     }
 
-    .search-box {
-      position: relative;
-      flex: 1;
-      width: 100%;
-    }
-    .search-input {
-      width: 100%;
-      background: rgba(15, 23, 42, 0.85);
-      border: 1px solid var(--border-color);
-      color: #ffffff;
-      padding: 6px 10px 6px 30px;
-      border-radius: var(--radius-sm);
-      font-size: 0.9rem;
-      font-weight: 500;
-      outline: none;
-      transition: border-color 0.2s;
-    }
-    .search-input::placeholder {
-      color: rgba(255, 255, 255, 0.65);
-    }
-    .search-input:focus {
-      border-color: var(--accent-gold);
-      color: #ffffff;
-    }
-    .search-icon {
-      position: absolute;
-      left: 10px;
-      top: 50%;
-      transform: translateY(-50%);
-      color: var(--accent-gold);
-      font-size: 0.85rem;
-      pointer-events: none;
-    }
-
-    /* Search Results Dropdown */
-    .search-results-dropdown {
-      display: none;
-      position: absolute;
-      top: calc(100% + 6px);
-      left: 0;
-      width: 100%;
-      max-height: 260px;
-      overflow-y: auto;
-      background: rgba(15, 23, 42, 0.96);
-      border: 1px solid var(--border-highlight);
-      border-radius: var(--radius-sm);
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.8);
-      z-index: 500;
-      backdrop-filter: blur(12px);
-    }
-    .search-results-dropdown.active {
-      display: block;
-    }
-    .search-result-item {
-      padding: 8px 12px;
-      font-size: 0.85rem;
-      color: var(--text-main);
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-      transition: background 0.15s ease;
-    }
-    .search-result-item:last-child {
-      border-bottom: none;
-    }
-    .search-result-item:hover {
-      background: rgba(245, 158, 11, 0.15);
-      color: var(--accent-gold);
-    }
-    .search-result-name {
-      font-family: 'Rajdhani', sans-serif;
-      font-weight: 700;
-      font-size: 0.95rem;
-      text-transform: capitalize;
-    }
-    .search-result-coords {
-      font-size: 0.75rem;
-      color: var(--text-dim);
-    }
-
-    /* Workspace */
+    /* Workspace & Map Viewport */
     .workspace {
       display: flex;
       flex: 1;
       position: relative;
       overflow: hidden;
+      width: 100%;
+      height: 100%;
+      background: #030712;
     }
 
-    /* Map Viewport & Stage */
     .map-viewport {
       flex: 1;
+      width: 100%;
+      height: 100%;
       position: relative;
-      background: #030712;
       overflow: hidden;
       cursor: grab;
-      user-select: none;
-      -webkit-user-select: none;
       touch-action: none;
-      -webkit-tap-highlight-color: transparent;
-      transform: translate3d(0, 0, 0);
-      -webkit-transform: translate3d(0, 0, 0);
     }
     .map-viewport:active {
       cursor: grabbing;
     }
 
-    /* Floating Coordinates Badge */
-    .coords-floating-badge {
+    #mapCanvas {
       position: absolute;
-      bottom: 16px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: rgba(10, 15, 25, 0.88);
-      border: 1px solid var(--border-highlight);
-      border-radius: var(--radius-sm);
-      padding: 6px 16px;
-      font-family: 'Rajdhani', monospace;
-      font-weight: 700;
-      font-size: 0.9rem;
-      color: var(--accent-gold);
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.7);
-      backdrop-filter: blur(10px);
-      pointer-events: none;
-      z-index: 200;
-      letter-spacing: 1px;
-      opacity: 0.7;
-      transition: opacity 0.2s ease;
-    }
-
-    /* Performance Optimization Class applied during active pan/zoom */
-    .map-viewport.is-interacting .base-marker-group {
-      pointer-events: none;
-    }
-    .map-viewport.is-interacting .base-marker-circle,
-    .map-viewport.is-interacting .base-marker-center,
-    .map-viewport.is-interacting .base-marker-label-bg {
-      filter: none !important;
-      transition: none !important;
-    }
-
-    .map-stage {
-      position: absolute;
-      top: 0;
-      left: 0;
-      transform-origin: 0 0;
-      will-change: transform;
-      backface-visibility: hidden;
-      -webkit-backface-visibility: hidden;
-      -webkit-perspective: 1000;
-      perspective: 1000;
-    }
-
-    .map-stage img {
-      display: block;
-      pointer-events: none;
-      backface-visibility: hidden;
-      -webkit-backface-visibility: hidden;
-      transform: translate3d(0, 0, 0);
-      -webkit-transform: translate3d(0, 0, 0);
-    }
-
-    .marker-overlay {
-      pointer-events: auto;
-      backface-visibility: hidden;
-      -webkit-backface-visibility: hidden;
-      transform: translate3d(0, 0, 0);
-      -webkit-transform: translate3d(0, 0, 0);
-    }
-
-    /* SVG Marker Base Styles: Default = Tactical Green */
-    .base-marker-group {
-      cursor: pointer;
-    }
-
-    .base-marker-circle {
-      fill: rgba(57, 255, 20, 0.25);
-      stroke: #39ff14;
-      stroke-width: 3.6px;
-      transition: fill 0.15s ease, stroke 0.15s ease;
-    }
-
-    .base-marker-center {
-      fill: #39ff14;
-      transition: fill 0.15s ease;
-    }
-
-    .base-marker-group:hover .base-marker-circle {
-      fill: rgba(57, 255, 20, 0.5);
-    }
-
-    .base-marker-label-group {
-      pointer-events: none;
-    }
-
-    .base-marker-label-bg {
-      fill: rgba(10, 14, 23, 0.94);
-      stroke: #39ff14;
-      stroke-width: 1.35px;
-      transition: fill 0.15s ease, stroke 0.15s ease;
-    }
-
-    .base-marker-label {
-      font-family: 'Rajdhani', -apple-system, sans-serif;
-      font-weight: 700;
-      font-size: 13.5px;
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
-      fill: #ffffff;
-      text-anchor: middle;
-      dominant-baseline: middle;
-      pointer-events: none;
-    }
-
-    /* Selected State: Tactical Blue */
-    .base-marker-group.selected .base-marker-circle {
-      fill: rgba(6, 182, 212, 0.4);
-      stroke: #06b6d4;
-      stroke-width: 4px;
-    }
-
-    .base-marker-group.selected .base-marker-center {
-      fill: #06b6d4;
-    }
-
-    .base-marker-group.selected .base-marker-label-bg {
-      stroke: #06b6d4;
-      fill: rgba(6, 30, 45, 0.95);
-    }
-
-    .base-marker-group.selected .base-marker-label {
-      fill: #38bdf8;
-    }
-
-    /* Search Result Highlight State: Red */
-    .base-marker-group.search-highlight .base-marker-circle {
-      stroke: #ef4444;
-      fill: rgba(239, 68, 68, 0.45);
-      stroke-width: 4.5px;
-    }
-    .base-marker-group.search-highlight .base-marker-center {
-      fill: #ef4444;
-    }
-    .base-marker-group.search-highlight .base-marker-label-bg {
-      stroke: #ef4444;
-      fill: rgba(45, 10, 10, 0.95);
-    }
-    .base-marker-group.search-highlight .base-marker-label {
-      fill: #f87171;
-    }
-
-    /* Sidebar */
-    .sidebar {
-      width: 380px;
-      background: rgba(15, 23, 42, 0.95);
-      border-left: 1px solid var(--border-color);
-      display: flex;
-      flex-direction: column;
-      backdrop-filter: blur(16px);
-      transition: width 0.3s ease, transform 0.3s ease;
-      z-index: 80;
-      flex-shrink: 0;
-    }
-    .sidebar.collapsed {
-      width: 0;
-      transform: translateX(100%);
-      overflow: hidden;
-      border-left: none;
-    }
-
-    .sidebar-header {
-      padding: 14px 18px;
-      background: rgba(10, 14, 23, 0.8);
-      border-bottom: 1px solid var(--border-color);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .sidebar-title {
-      font-family: 'Rajdhani', sans-serif;
-      font-size: 1.1rem;
-      font-weight: 700;
-      color: var(--text-main);
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .sidebar-content {
-      flex: 1;
-      overflow-y: auto;
-      padding: 12px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    /* Base List Item in Sidebar */
-    .base-item {
-      background: rgba(10, 15, 25, 0.6);
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius-sm);
-      padding: 10px 14px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-    .base-item:hover {
-      background: rgba(30, 41, 59, 0.7);
-      border-color: rgba(255, 255, 255, 0.15);
-    }
-    .base-item.selected {
-      background: rgba(245, 158, 11, 0.15);
-      border-color: rgba(245, 158, 11, 0.4);
-    }
-
-    .base-item-info {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-    }
-    .base-item-name {
-      font-family: 'Rajdhani', sans-serif;
-      font-size: 1rem;
-      font-weight: 700;
-      color: var(--text-main);
-      text-transform: capitalize;
-    }
-    .base-item.selected .base-item-name {
-      color: var(--accent-gold);
-    }
-    .base-item-coords {
-      font-size: 0.75rem;
-      color: var(--text-dim);
-    }
-
-    .custom-checkbox {
-      width: 18px;
-      height: 18px;
-      border: 1.5px solid var(--text-dim);
-      border-radius: 4px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.2s;
-      flex-shrink: 0;
-    }
-    .base-item.selected .custom-checkbox {
-      background: var(--accent-gold);
-      border-color: var(--accent-gold);
-      color: #000;
-    }
-
-    /* Generated OPORD Output Area inside Sidebar or Modal */
-    .opord-card {
-      margin-top: 10px;
-      background: rgba(7, 10, 15, 0.95);
-      border: 1px solid var(--border-highlight);
-      border-radius: var(--radius-md);
-      padding: 16px;
-      box-shadow: var(--shadow-lg);
-      display: none;
-    }
-    .opord-card.active {
-      display: block;
-    }
-
-    .opord-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 1px solid var(--border-color);
-      padding-bottom: 8px;
-      margin-bottom: 12px;
-    }
-
-    .opord-title {
-      font-family: 'Rajdhani', sans-serif;
-      font-size: 1.2rem;
-      color: var(--accent-gold);
-      font-weight: 700;
-    }
-
-    .opord-details {
-      font-family: 'Courier New', Courier, monospace;
-      font-size: 0.85rem;
-      color: #cbd5e1;
-      line-height: 1.5;
-      white-space: pre-wrap;
-    }
-
-    /* Modals Base */
-    .modal-overlay {
-      display: none;
-      position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(3, 7, 18, 0.85);
+      display: block;
+    }
+
+    /* Floating Coordinates Badge */
+    .coords-floating-badge {
+      position: absolute;
+      bottom: max(14px, env(safe-area-inset-bottom));
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(10, 15, 25, 0.9);
+      border: 1px solid var(--border-highlight);
+      border-radius: var(--radius-sm);
+      padding: 5px 14px;
+      font-family: 'Rajdhani', monospace;
+      font-weight: 700;
+      font-size: 0.85rem;
+      color: var(--accent-gold);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.75);
       backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      pointer-events: none;
+      z-index: 20;
+      letter-spacing: 1px;
+      opacity: 0.85;
+      white-space: nowrap;
+    }
+
+    /* Floating Zoom Controls */
+    .map-zoom-controls {
+      position: absolute;
+      right: 14px;
+      bottom: max(14px, env(safe-area-inset-bottom));
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      z-index: 20;
+    }
+
+    .map-zoom-btn {
+      width: 38px;
+      height: 38px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      color: var(--text-main);
+      font-size: 1.2rem;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      transition: all 0.15s ease;
+      touch-action: manipulation;
+    }
+    .map-zoom-btn:hover, .map-zoom-btn:active {
+      background: rgba(30, 41, 59, 0.95);
+      border-color: var(--accent-gold);
+      color: var(--accent-gold);
+    }
+
+    /* Tactical Map Loading Overlay */
+    .map-loader-overlay {
+      position: absolute;
+      inset: 0;
+      background: #030712;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      z-index: 30;
+      transition: opacity 0.4s ease, visibility 0.4s;
+    }
+    .map-loader-overlay.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .tactical-spinner {
+      width: 52px;
+      height: 52px;
+      border: 3px solid rgba(245, 158, 11, 0.15);
+      border-top-color: var(--accent-gold);
+      border-right-color: var(--accent-cyan);
+      border-radius: 50%;
+      animation: tacticalSpin 0.9s linear infinite;
+    }
+    @keyframes tacticalSpin {
+      to { transform: rotate(360deg); }
+    }
+
+    .map-loader-text {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      color: var(--accent-gold);
+      text-transform: uppercase;
+      animation: pulseText 1.5s ease-in-out infinite;
+    }
+    @keyframes pulseText {
+      0%, 100% { opacity: 0.6; }
+      50% { opacity: 1; }
+    }
+
+    /* Modals */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(3, 7, 18, 0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
       z-index: 1000;
       justify-content: center;
       align-items: center;
@@ -641,22 +462,22 @@
     }
 
     .modal-box {
-      background: rgba(15, 23, 42, 0.95);
+      background: rgba(15, 23, 42, 0.96);
       border: 1px solid var(--border-highlight);
       border-radius: var(--radius-lg);
-      padding: 28px;
+      padding: 26px;
       max-width: 520px;
       width: 100%;
-      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 25px var(--accent-gold-glow);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.85), 0 0 25px var(--accent-gold-glow);
       position: relative;
       text-align: center;
-      animation: modalSlideUp 0.25s ease-out;
+      animation: modalSlideUp 0.22s ease-out;
     }
 
     @keyframes modalSlideUp {
       from {
         opacity: 0;
-        transform: translateY(20px);
+        transform: translateY(18px);
       }
       to {
         opacity: 1;
@@ -677,7 +498,7 @@
       border-radius: 4px;
       transition: color 0.2s;
     }
-    .modal-close:hover {
+    .modal-close:hover, .modal-close:active {
       color: #fff;
     }
 
@@ -697,7 +518,7 @@
 
     .modal-title {
       font-family: 'Rajdhani', sans-serif;
-      font-size: 1.4rem;
+      font-size: 1.35rem;
       font-weight: 700;
       color: #fff;
       margin-bottom: 6px;
@@ -724,7 +545,7 @@
       align-items: center;
       justify-content: center;
       gap: 8px;
-      padding: 14px 10px;
+      padding: 12px 10px;
       background: rgba(30, 41, 59, 0.6);
       border: 1px solid var(--border-color);
       border-radius: var(--radius-md);
@@ -732,26 +553,47 @@
       text-decoration: none;
       font-family: 'Rajdhani', sans-serif;
       font-weight: 700;
-      font-size: 1rem;
+      font-size: 0.95rem;
       transition: all 0.2s ease;
     }
-    .ai-launch-btn:hover {
+    .ai-launch-btn:hover, .ai-launch-btn:active {
       transform: translateY(-2px);
       box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
     }
-    .ai-btn-gemini:hover { border-color: #8ab4f8; background: rgba(66, 133, 244, 0.15); color: #8ab4f8; }
-    .ai-btn-chatgpt:hover { border-color: #10a37f; background: rgba(16, 163, 127, 0.15); color: #10a37f; }
-    .ai-btn-claude:hover { border-color: #d97757; background: rgba(217, 119, 87, 0.15); color: #d97757; }
-    .ai-btn-grok:hover { border-color: #38bdf8; background: rgba(56, 189, 248, 0.15); color: #38bdf8; }
+    .ai-btn-gemini:hover, .ai-btn-gemini:active { border-color: #8ab4f8; background: rgba(66, 133, 244, 0.18); color: #8ab4f8; }
+    .ai-btn-chatgpt:hover, .ai-btn-chatgpt:active { border-color: #10a37f; background: rgba(16, 163, 127, 0.18); color: #10a37f; }
+    .ai-btn-claude:hover, .ai-btn-claude:active { border-color: #d97757; background: rgba(217, 119, 87, 0.18); color: #d97757; }
+    .ai-btn-grok:hover, .ai-btn-grok:active { border-color: #38bdf8; background: rgba(56, 189, 248, 0.18); color: #38bdf8; }
 
     /* Responsive */
     @media (max-width: 768px) {
+      header.app-header {
+        padding: max(6px, env(safe-area-inset-top)) 10px 8px;
+        gap: 6px;
+      }
       .row-title h1 {
         font-size: 1rem;
       }
       .btn {
         padding: 5px 10px;
         font-size: 0.8rem;
+      }
+      .btn-flex {
+        padding: 6px 14px;
+      }
+      .search-input {
+        font-size: 0.85rem;
+        padding: 5px 8px 5px 28px;
+      }
+      .stats-badge {
+        padding: 3px 9px;
+        font-size: 0.82rem;
+      }
+      .modal-box {
+        padding: 20px 16px;
+      }
+      .ai-launchers-grid {
+        gap: 8px;
       }
     }
   </style>
@@ -802,11 +644,23 @@
     <div class="workspace">
       <!-- Map Viewport -->
       <div class="map-viewport" id="mapViewport">
-        <div class="map-stage" id="mapStage">
-          <img id="mapImage" src="fullmap.jpg" alt="Ghost Recon Wildlands Map" draggable="false">
-          <svg id="markerOverlay" class="marker-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: auto;"></svg>
+        <canvas id="mapCanvas"></canvas>
+
+        <!-- Loading State -->
+        <div class="map-loader-overlay" id="mapLoader">
+          <div class="tactical-spinner"></div>
+          <div class="map-loader-text">INITIALIZING TACTICAL SATELLITE MAP...</div>
         </div>
+
+        <!-- Floating Coordinates Badge -->
         <div class="coords-floating-badge" id="coordsDisplay">X: --- | Y: ---</div>
+
+        <!-- Floating Zoom Controls -->
+        <div class="map-zoom-controls">
+          <button type="button" class="map-zoom-btn" onclick="zoomIn()" title="Zoom In" aria-label="Zoom In">+</button>
+          <button type="button" class="map-zoom-btn" onclick="zoomOut()" title="Zoom Out" aria-label="Zoom Out">−</button>
+          <button type="button" class="map-zoom-btn" onclick="fitMapToScreen()" title="Reset View" aria-label="Reset View" style="font-size: 0.95rem;">⛶</button>
+        </div>
       </div>
     </div>
   </div>
@@ -852,13 +706,13 @@
       <button type="button" class="modal-close" onclick="closeModal('instructionsOverlay')">✕</button>
       <div class="modal-title" style="text-align: center;">Instructions</div>
       <div class="modal-desc" style="color: #cbd5e1; font-size: 0.9rem; line-height: 1.7; margin-top: 16px;">
-        <p><strong>1. Select Locations directly on Map:</strong> Pan & Zoom around the full map. Click any marker circle to select it for your operation.</p>
+        <p><strong>1. Select Locations directly on Map:</strong> Pan & Zoom around the full map. Click or tap any marker circle to select it for your operation.</p>
         <br>
         <p><strong>2. Copy Prompt:</strong> Click <strong>Copy Prompt 📋</strong> at the top. Your tailored prompt will instantly copy to your clipboard.</p>
         <br>
-        <p><strong>3. Generate via AI:</strong> In the popup overlay, choose your preferred AI generator (Gemini, ChatGPT, Claude, Grok or just go to your app of choice). Paste the prompt and generate your detailed storyline & objectives.</p>
+        <p><strong>3. Generate via AI:</strong> In the popup overlay, choose your preferred AI generator (Gemini, ChatGPT, Claude, Grok or your app of choice). Paste the prompt and generate your detailed storyline & objectives.</p>
         <br>
-        <p><strong>4. Execute:</strong> Execute your custom mission in Ghost Recon Wildlands. Be creative and add roleplay for things in the world that aren't maybe exactly as written!</p>
+        <p><strong>4. Execute:</strong> Execute your custom mission in Ghost Recon Wildlands. Be creative and add roleplay for tactical immersion!</p>
         <br>
         <p style="text-align: center; color: var(--accent-gold); font-weight: 700; font-family: 'Rajdhani', sans-serif; font-size: 1.15rem; letter-spacing: 0.5px;">Good luck, Ghost.</p>
       </div>
@@ -896,40 +750,74 @@
     ];
 
     // State Variables
-    let bases = []; // Array of base location objects from bases.json: { id, name, x, y }
-    let selectedBaseIds = []; // Track selected base IDs in order of selection
-    
-    // Map Interaction State
-    let zoom = 1.0;
-    const MIN_ZOOM = 0.09;
-    const MAX_ZOOM = 2.5;
+    let bases = []; // Array of base location objects: { id, name, x, y }
+    let selectedBaseIds = []; // Sequential selection order
+    let searchQuery = '';
+
+    // Map Viewport Dimensions & Image State
+    const mapViewport = document.getElementById('mapViewport');
+    const canvas = document.getElementById('mapCanvas');
+    const ctx = canvas.getContext('2d', { alpha: false, desynchronized: true });
+    const selectedCountDisplay = document.getElementById('selectedCountDisplay');
+    const searchInput = document.getElementById('searchInput');
+    const searchResultsDropdown = document.getElementById('searchResultsDropdown');
+    const coordsDisplay = document.getElementById('coordsDisplay');
+    const mapLoader = document.getElementById('mapLoader');
+
+    let mapImage = new Image();
+    let isImageLoaded = false;
+    let imgNaturalWidth = 7676;
+    let imgNaturalHeight = 7680;
+
+    // Viewport Pan & Zoom State
+    let zoom = 0.1;
+    let MIN_ZOOM = 0.05;
+    let MAX_ZOOM = 2.5;
     let panX = 0;
     let panY = 0;
+    let viewportWidth = 0;
+    let viewportHeight = 0;
+    let dpr = 1;
+
+    // Interaction State
     let isMouseDown = false;
     let isDragging = false;
     let dragStartX = 0;
     let dragStartY = 0;
     let initialPanX = 0;
     let initialPanY = 0;
+    let hoverBaseId = null;
 
-    // Elements
-    const mapViewport = document.getElementById('mapViewport');
-    const mapStage = document.getElementById('mapStage');
-    const mapImage = document.getElementById('mapImage');
-    const markerOverlay = document.getElementById('markerOverlay');
-    const baseList = document.getElementById('baseList');
-    const sidebar = document.getElementById('sidebar');
-    const toggleSidebarBtn = document.getElementById('toggleSidebarBtn');
-    const selectedCountDisplay = document.getElementById('selectedCountDisplay');
-    const searchInput = document.getElementById('searchInput');
+    // Touch Interaction State
+    let touchStartTime = 0;
+    let isTouchDragging = false;
+    let isPinching = false;
+    let touchStartDist = 0;
+    let touchStartMidX = 0;
+    let touchStartMidY = 0;
+    let touchStartZoom = 1;
+    let touchStartPanX = 0;
+    let touchStartPanY = 0;
+    let lastTapTime = 0;
+    let lastTapX = 0;
+    let lastTapY = 0;
+
+    // Animation Frame Request Tracker
+    let animationFrameId = null;
+    let activeAnimation = null;
 
     // Initialize
     document.addEventListener('DOMContentLoaded', async () => {
-      await loadBasesData();
-      renderMarkers();
-      setupMapImage();
+      initCanvasSize();
       setupEventListeners();
+      await loadBasesData();
+      loadMapImage();
       updateSelectedCount();
+
+      // Ensure custom fonts are loaded before drawing labels
+      if (document.fonts) {
+        document.fonts.ready.then(() => requestRender());
+      }
     });
 
     async function loadBasesData() {
@@ -944,164 +832,313 @@
       }
     }
 
-    function setupMapImage() {
-      if (mapImage.complete) {
-        onImageLoaded();
+    function loadMapImage() {
+      mapImage.src = 'fullmap.jpg';
+      if (mapImage.decode) {
+        mapImage.decode()
+          .then(() => onMapImageReady())
+          .catch(() => {
+            mapImage.onload = onMapImageReady;
+          });
       } else {
-        mapImage.onload = onImageLoaded;
+        mapImage.onload = onMapImageReady;
       }
     }
 
-    function onImageLoaded() {
-      const w = mapImage.naturalWidth || mapImage.width;
-      const h = mapImage.naturalHeight || mapImage.height;
-      mapStage.style.width = w + 'px';
-      mapStage.style.height = h + 'px';
-      markerOverlay.setAttribute('viewBox', `0 0 ${w} ${h}`);
-      markerOverlay.setAttribute('width', w);
-      markerOverlay.setAttribute('height', h);
-
-      centerMap();
-      renderMarkers();
+    function onMapImageReady() {
+      imgNaturalWidth = mapImage.naturalWidth || 7676;
+      imgNaturalHeight = mapImage.naturalHeight || 7680;
+      isImageLoaded = true;
+      if (mapLoader) {
+        mapLoader.classList.add('hidden');
+      }
+      fitMapToScreen();
     }
 
-    function centerMap() {
-      const viewportRect = mapViewport.getBoundingClientRect();
-      const imgW = mapImage.naturalWidth || mapImage.width || 1000;
-      const imgH = mapImage.naturalHeight || mapImage.height || 1000;
+    function initCanvasSize() {
+      const rect = mapViewport.getBoundingClientRect();
+      viewportWidth = rect.width;
+      viewportHeight = rect.height;
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
 
-      // Calculate scale to fit entire map within viewport
+      canvas.width = Math.round(viewportWidth * dpr);
+      canvas.height = Math.round(viewportHeight * dpr);
+      canvas.style.width = viewportWidth + 'px';
+      canvas.style.height = viewportHeight + 'px';
+
+      requestRender();
+    }
+
+    // Window / Viewport Resize Observer
+    const resizeObserver = new ResizeObserver(() => {
+      const rect = mapViewport.getBoundingClientRect();
+      if (rect.width !== viewportWidth || rect.height !== viewportHeight) {
+        const prevW = viewportWidth;
+        const prevH = viewportHeight;
+        initCanvasSize();
+        if (prevW > 0 && prevH > 0 && isImageLoaded) {
+          // Adjust pan to keep center point stable
+          panX += (viewportWidth - prevW) / 2;
+          panY += (viewportHeight - prevH) / 2;
+          constrainPan();
+          requestRender();
+        }
+      }
+    });
+    resizeObserver.observe(mapViewport);
+
+    function fitMapToScreen() {
+      if (!viewportWidth || !viewportHeight || !imgNaturalWidth || !imgNaturalHeight) return;
+
       const fitZoom = Math.min(
-        viewportRect.width / imgW,
-        viewportRect.height / imgH
+        viewportWidth / imgNaturalWidth,
+        viewportHeight / imgNaturalHeight
       );
 
-      zoom = Math.max(MIN_ZOOM, Math.min(fitZoom, MAX_ZOOM));
+      MIN_ZOOM = Math.max(0.04, fitZoom * 0.85);
+      zoom = fitZoom;
 
-      const stageW = imgW * zoom;
-      const stageH = imgH * zoom;
+      const stageW = imgNaturalWidth * zoom;
+      const stageH = imgNaturalHeight * zoom;
 
-      panX = (viewportRect.width - stageW) / 2;
-      panY = (viewportRect.height - stageH) / 2;
-      applyTransform();
+      panX = (viewportWidth - stageW) / 2;
+      panY = (viewportHeight - stageH) / 2;
+
+      requestRender();
     }
 
-    let rAFScheduled = false;
+    function constrainPan() {
+      const w = imgNaturalWidth * zoom;
+      const h = imgNaturalHeight * zoom;
+      const padX = viewportWidth * 0.65;
+      const padY = viewportHeight * 0.65;
 
-    function applyTransform() {
-      if (rAFScheduled) return;
-      rAFScheduled = true;
-      requestAnimationFrame(() => {
-        mapStage.style.transform = `translate3d(${panX}px, ${panY}px, 0) scale(${zoom})`;
-        rAFScheduled = false;
-      });
+      panX = Math.min(viewportWidth - (viewportWidth - padX), Math.max(-w + padX, panX));
+      panY = Math.min(viewportHeight - (viewportHeight - padY), Math.max(-h + padY, panY));
     }
 
-    // Render Markers on Map SVG matching New_WlOpGenerator structure
-    function renderMarkers() {
-      const query = searchInput.value.trim().toLowerCase();
-      
-      // If markers already exist, just update class names without rebuilding SVG DOM
-      if (markerOverlay.children.length === bases.length) {
-        bases.forEach(base => {
-          const group = document.getElementById(`marker_${base.id}`);
-          if (!group) return;
-          const isSearchMatch = query && base.name.toLowerCase().includes(query);
-          const isSelected = selectedBaseIds.includes(base.id);
-          group.setAttribute('class', `base-marker-group ${isSelected ? 'selected' : ''} ${isSearchMatch ? 'search-highlight' : ''}`);
-        });
+    function requestRender() {
+      if (!animationFrameId) {
+        animationFrameId = requestAnimationFrame(render);
+      }
+    }
+
+    // High Performance Hardware-Accelerated Viewport Renderer
+    function render() {
+      animationFrameId = null;
+
+      if (!ctx || !viewportWidth || !viewportHeight) return;
+
+      ctx.save();
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.fillStyle = '#030712';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      if (!isImageLoaded) {
+        ctx.restore();
         return;
       }
 
-      const fragment = document.createDocumentFragment();
+      // Apply viewport transform with device pixel ratio
+      ctx.setTransform(zoom * dpr, 0, 0, zoom * dpr, panX * dpr, panY * dpr);
 
-      bases.forEach(base => {
-        const isSearchMatch = query && base.name.toLowerCase().includes(query);
+      // Draw map image
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = zoom < 0.25 ? 'medium' : 'high';
+      ctx.drawImage(mapImage, 0, 0, imgNaturalWidth, imgNaturalHeight);
+
+      // Viewport Frustum Culling bounds in world coordinates
+      const margin = 200 / zoom;
+      const viewMinX = -panX / zoom - margin;
+      const viewMaxX = (viewportWidth - panX) / zoom + margin;
+      const viewMinY = -panY / zoom - margin;
+      const viewMaxY = (viewportHeight - panY) / zoom + margin;
+
+      // Group markers into regular, search-matches, and selected
+      const query = searchQuery;
+      const visibleBases = [];
+
+      for (let i = 0; i < bases.length; i++) {
+        const b = bases[i];
+        if (b.x >= viewMinX && b.x <= viewMaxX && b.y >= viewMinY && b.y <= viewMaxY) {
+          visibleBases.push(b);
+        }
+      }
+
+      // Render regular unselected markers first
+      for (let i = 0; i < visibleBases.length; i++) {
+        const base = visibleBases[i];
         const isSelected = selectedBaseIds.includes(base.id);
+        const isSearchMatch = query && base.name.toLowerCase().includes(query);
+        if (!isSelected && !isSearchMatch) {
+          drawMarker(base, false, false, base.id === hoverBaseId);
+        }
+      }
 
-        const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-        group.setAttribute('class', `base-marker-group ${isSelected ? 'selected' : ''} ${isSearchMatch ? 'search-highlight' : ''}`);
-        group.setAttribute('id', `marker_${base.id}`);
-        group.setAttribute('transform', `translate(${base.x}, ${base.y})`);
+      // Render search highlighted markers
+      for (let i = 0; i < visibleBases.length; i++) {
+        const base = visibleBases[i];
+        const isSelected = selectedBaseIds.includes(base.id);
+        const isSearchMatch = query && base.name.toLowerCase().includes(query);
+        if (isSearchMatch && !isSelected) {
+          drawMarker(base, false, true, base.id === hoverBaseId);
+        }
+      }
 
-        // Outer Ring
-        const circleOuter = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-        circleOuter.setAttribute('cx', '0');
-        circleOuter.setAttribute('cy', '0');
-        circleOuter.setAttribute('r', '32.4');
-        circleOuter.setAttribute('class', 'base-marker-circle');
+      // Render selected markers on top with high prominence
+      for (let i = 0; i < visibleBases.length; i++) {
+        const base = visibleBases[i];
+        const isSelected = selectedBaseIds.includes(base.id);
+        if (isSelected) {
+          const isSearchMatch = query && base.name.toLowerCase().includes(query);
+          drawMarker(base, true, isSearchMatch, base.id === hoverBaseId);
+        }
+      }
 
-        // Center Dot
-        const centerDot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-        centerDot.setAttribute('cx', '0');
-        centerDot.setAttribute('cy', '0');
-        centerDot.setAttribute('r', '7.2');
-        centerDot.setAttribute('class', 'base-marker-center');
-
-        // Label Badge Container
-        const labelGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-        labelGroup.setAttribute('class', 'base-marker-label-group');
-
-        // Estimate label width based on char length (approx 9px per char + 22px padding) to avoid layout thrashing
-        const approxWidth = base.name.length * 8.8 + 22;
-        const labelBg = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-        labelBg.setAttribute('class', 'base-marker-label-bg');
-        labelBg.setAttribute('rx', '5.4');
-        labelBg.setAttribute('ry', '5.4');
-        labelBg.setAttribute('x', -approxWidth / 2);
-        labelBg.setAttribute('y', -53.2);
-        labelBg.setAttribute('width', approxWidth);
-        labelBg.setAttribute('height', 20);
-
-        const textLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-        textLabel.setAttribute('x', '0');
-        textLabel.setAttribute('y', '-43.2');
-        textLabel.setAttribute('class', 'base-marker-label');
-        textLabel.textContent = base.name.toUpperCase();
-
-        labelGroup.appendChild(labelBg);
-        labelGroup.appendChild(textLabel);
-
-        group.appendChild(circleOuter);
-        group.appendChild(centerDot);
-        group.appendChild(labelGroup);
-
-        group.addEventListener('click', (e) => {
-          if (isDragging) return;
-          e.stopPropagation();
-          toggleBaseSelection(base.id, e);
-        });
-
-        fragment.appendChild(group);
-      });
-
-      markerOverlay.innerHTML = '';
-      markerOverlay.appendChild(fragment);
+      ctx.restore();
     }
 
-    function toggleBaseSelection(id, event) {
-      if (event) event.stopPropagation();
+    // Draw Individual Marker
+    function drawMarker(base, isSelected, isSearchMatch, isHovered) {
+      ctx.save();
+      ctx.translate(base.x, base.y);
 
+      // Colors based on state
+      let ringStroke = '#39ff14'; // Tactical Neon Green
+      let ringFill = isHovered ? 'rgba(57, 255, 20, 0.45)' : 'rgba(57, 255, 20, 0.25)';
+      let centerFill = '#39ff14';
+      let badgeBg = 'rgba(10, 14, 23, 0.94)';
+      let badgeBorder = '#39ff14';
+      let badgeText = '#ffffff';
+
+      if (isSearchMatch) {
+        ringStroke = '#ef4444'; // Tactical Crimson Red
+        ringFill = isHovered ? 'rgba(239, 68, 68, 0.6)' : 'rgba(239, 68, 68, 0.45)';
+        centerFill = '#ef4444';
+        badgeBg = 'rgba(45, 10, 10, 0.95)';
+        badgeBorder = '#ef4444';
+        badgeText = '#f87171';
+      }
+
+      if (isSelected) {
+        ringStroke = '#06b6d4'; // Tactical Cyan / Blue
+        ringFill = isHovered ? 'rgba(6, 182, 212, 0.55)' : 'rgba(6, 182, 212, 0.4)';
+        centerFill = '#06b6d4';
+        badgeBg = 'rgba(6, 30, 45, 0.95)';
+        badgeBorder = '#06b6d4';
+        badgeText = '#38bdf8';
+      }
+
+      // Outer Circle Ring
+      ctx.beginPath();
+      ctx.arc(0, 0, 32.4, 0, Math.PI * 2);
+      ctx.fillStyle = ringFill;
+      ctx.fill();
+      ctx.strokeStyle = ringStroke;
+      ctx.lineWidth = isSelected ? 4.5 : (isSearchMatch ? 4.2 : 3.6);
+      ctx.stroke();
+
+      // Center Dot
+      ctx.beginPath();
+      ctx.arc(0, 0, 7.2, 0, Math.PI * 2);
+      ctx.fillStyle = centerFill;
+      ctx.fill();
+
+      // Label Badge
+      const nameUpper = base.name.toUpperCase();
+      const approxWidth = base.name.length * 8.8 + 24;
+      const badgeHeight = 21;
+      const badgeY = -54.2;
+
+      ctx.beginPath();
+      roundRect(ctx, -approxWidth / 2, badgeY, approxWidth, badgeHeight, 5.4);
+      ctx.fillStyle = badgeBg;
+      ctx.fill();
+      ctx.strokeStyle = badgeBorder;
+      ctx.lineWidth = isSelected ? 1.8 : 1.35;
+      ctx.stroke();
+
+      // Label Text
+      ctx.fillStyle = badgeText;
+      ctx.font = '700 13.5px "Rajdhani", -apple-system, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(nameUpper, 0, badgeY + badgeHeight / 2 + 0.5);
+
+      // If selected, draw sequential badge indicator number
+      if (isSelected) {
+        const orderNum = selectedBaseIds.indexOf(base.id) + 1;
+        if (orderNum > 0) {
+          ctx.beginPath();
+          ctx.arc(approxWidth / 2 + 2, badgeY + badgeHeight / 2, 8.5, 0, Math.PI * 2);
+          ctx.fillStyle = '#06b6d4';
+          ctx.fill();
+          ctx.fillStyle = '#000000';
+          ctx.font = '900 10.5px "Rajdhani", sans-serif';
+          ctx.fillText(orderNum.toString(), approxWidth / 2 + 2, badgeY + badgeHeight / 2 + 0.5);
+        }
+      }
+
+      ctx.restore();
+    }
+
+    function roundRect(ctx, x, y, width, height, radius) {
+      ctx.beginPath();
+      ctx.moveTo(x + radius, y);
+      ctx.lineTo(x + width - radius, y);
+      ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+      ctx.lineTo(x + width, y + height - radius);
+      ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+      ctx.lineTo(x + radius, y + height);
+      ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+      ctx.lineTo(x, y + radius);
+      ctx.quadraticCurveTo(x, y, x + radius, y);
+      ctx.closePath();
+    }
+
+    // Spatial Hit Testing for Tap / Click Selection
+    function hitTestBase(screenX, screenY) {
+      if (!bases.length) return null;
+
+      const worldX = (screenX - panX) / zoom;
+      const worldY = (screenY - panY) / zoom;
+
+      let closestBase = null;
+      let minDistance = Infinity;
+      // Generous hit radius for mobile thumbs (minimum 36px in screen pixels)
+      const maxScreenDist = Math.max(38, 48 * zoom);
+
+      for (let i = 0; i < bases.length; i++) {
+        const b = bases[i];
+        const screenDist = Math.hypot(
+          (b.x * zoom + panX) - screenX,
+          (b.y * zoom + panY) - screenY
+        );
+
+        if (screenDist <= maxScreenDist && screenDist < minDistance) {
+          minDistance = screenDist;
+          closestBase = b;
+        }
+      }
+
+      return closestBase;
+    }
+
+    function toggleBaseSelection(id) {
       const idx = selectedBaseIds.indexOf(id);
       if (idx !== -1) {
         selectedBaseIds.splice(idx, 1);
       } else {
         selectedBaseIds.push(id);
+        if (navigator.vibrate) {
+          try { navigator.vibrate(15); } catch (_) {}
+        }
       }
 
-      updateSingleMarkerUI(id);
       updateSelectedCount();
-    }
-
-    function updateSingleMarkerUI(id) {
-      const marker = document.getElementById(`marker_${id}`);
-      if (!marker) return;
-
-      const isSelected = selectedBaseIds.includes(id);
-      if (isSelected) {
-        marker.classList.add('selected');
-      } else {
-        marker.classList.remove('selected');
+      requestRender();
+      if (searchResultsDropdown && searchResultsDropdown.classList.contains('active')) {
+        filterLocations();
       }
     }
 
@@ -1112,34 +1149,37 @@
 
     function clearAllSelections() {
       if (selectedBaseIds.length === 0) return;
-      
+
       const count = selectedBaseIds.length;
       if (!confirm(`Are you sure you want to clear ${count} selected location${count === 1 ? '' : 's'}?`)) {
         return;
       }
 
       selectedBaseIds = [];
-      renderMarkers();
       updateSelectedCount();
+      requestRender();
+      if (searchResultsDropdown && searchResultsDropdown.classList.contains('active')) {
+        filterLocations();
+      }
     }
 
+    // Search Autocomplete & Filter
     function filterLocations() {
-      renderMarkers();
+      searchQuery = (searchInput.value || '').trim().toLowerCase();
+      requestRender();
 
-      const query = searchInput.value.trim().toLowerCase();
-      const dropdown = document.getElementById('searchResultsDropdown');
-      if (!dropdown) return;
+      if (!searchResultsDropdown) return;
 
-      if (!query) {
-        dropdown.classList.remove('active');
-        dropdown.innerHTML = '';
+      if (!searchQuery) {
+        searchResultsDropdown.classList.remove('active');
+        searchResultsDropdown.innerHTML = '';
         return;
       }
 
-      const matches = bases.filter(b => b.name.toLowerCase().includes(query));
+      const matches = bases.filter(b => b.name.toLowerCase().includes(searchQuery));
       if (matches.length === 0) {
-        dropdown.classList.add('active');
-        dropdown.innerHTML = '<div class="search-result-item" style="cursor: default; color: var(--text-dim);">No locations found</div>';
+        searchResultsDropdown.classList.add('active');
+        searchResultsDropdown.innerHTML = '<div class="search-result-item" style="cursor: default; color: var(--text-dim);">No locations found</div>';
         return;
       }
 
@@ -1148,16 +1188,18 @@
         const isSelected = selectedBaseIds.includes(base.id);
         html += `
           <div class="search-result-item" data-id="${base.id}" data-x="${base.x}" data-y="${base.y}">
-            <span class="search-result-name" style="${isSelected ? 'color: var(--accent-gold);' : ''}">${escapeHtml(base.name)} ${isSelected ? '✓' : ''}</span>
+            <span class="search-result-name" style="${isSelected ? 'color: var(--accent-cyan); font-weight: bold;' : ''}">
+              ${escapeHtml(base.name)} ${isSelected ? '✓' : ''}
+            </span>
             <span class="search-result-coords">X: ${base.x} | Y: ${base.y}</span>
           </div>
         `;
       });
 
-      dropdown.innerHTML = html;
-      dropdown.classList.add('active');
+      searchResultsDropdown.innerHTML = html;
+      searchResultsDropdown.classList.add('active');
 
-      dropdown.querySelectorAll('.search-result-item').forEach(item => {
+      searchResultsDropdown.querySelectorAll('.search-result-item').forEach(item => {
         const id = item.getAttribute('data-id');
         const x = parseFloat(item.getAttribute('data-x'));
         const y = parseFloat(item.getAttribute('data-y'));
@@ -1165,21 +1207,92 @@
 
         item.onclick = (e) => {
           e.stopPropagation();
-          dropdown.classList.remove('active');
-          panToLocation(x, y);
+          searchResultsDropdown.classList.remove('active');
+          panToLocation(x, y, true);
         };
       });
     }
 
-    function panToLocation(x, y) {
-      const viewportRect = mapViewport.getBoundingClientRect();
-      panX = (viewportRect.width / 2) - (x * zoom);
-      panY = (viewportRect.height / 2) - (y * zoom);
-      applyTransform();
+    function panToLocation(x, y, smooth = true) {
+      const targetZoom = Math.max(zoom, 0.85);
+      const targetPanX = (viewportWidth / 2) - (x * targetZoom);
+      const targetPanY = (viewportHeight / 2) - (y * targetZoom);
+
+      if (smooth) {
+        animatePanZoom(targetPanX, targetPanY, targetZoom, 320);
+      } else {
+        zoom = targetZoom;
+        panX = targetPanX;
+        panY = targetPanY;
+        constrainPan();
+        requestRender();
+      }
     }
 
-    // Setup Drag, Pan & Zoom Handlers
+    function animatePanZoom(targetPanX, targetPanY, targetZoom, duration = 300) {
+      if (activeAnimation) {
+        cancelAnimationFrame(activeAnimation);
+        activeAnimation = null;
+      }
+
+      const startPanX = panX;
+      const startPanY = panY;
+      const startZoom = zoom;
+      const startTime = performance.now();
+
+      function step(now) {
+        const elapsed = now - startTime;
+        const progress = Math.min(1, elapsed / duration);
+        // Ease Out Cubic
+        const ease = 1 - Math.pow(1 - progress, 3);
+
+        zoom = startZoom + (targetZoom - startZoom) * ease;
+        panX = startPanX + (targetPanX - startPanX) * ease;
+        panY = startPanY + (targetPanY - startPanY) * ease;
+
+        constrainPan();
+        requestRender();
+
+        if (progress < 1) {
+          activeAnimation = requestAnimationFrame(step);
+        } else {
+          activeAnimation = null;
+        }
+      }
+
+      activeAnimation = requestAnimationFrame(step);
+    }
+
+    // Zoom Controls
+    function zoomIn() {
+      zoomTo(zoom * 1.35, viewportWidth / 2, viewportHeight / 2);
+    }
+
+    function zoomOut() {
+      zoomTo(zoom * 0.75, viewportWidth / 2, viewportHeight / 2);
+    }
+
+    function zoomTo(targetZoom, clientScreenX, clientScreenY) {
+      const newZoom = Math.min(Math.max(targetZoom, MIN_ZOOM), MAX_ZOOM);
+      if (newZoom === zoom) return;
+
+      const centerX = clientScreenX !== undefined ? clientScreenX : (viewportWidth / 2);
+      const centerY = clientScreenY !== undefined ? clientScreenY : (viewportHeight / 2);
+
+      const stageX = (centerX - panX) / zoom;
+      const stageY = (centerY - panY) / zoom;
+
+      zoom = newZoom;
+      panX = centerX - (stageX * zoom);
+      panY = centerY - (stageY * zoom);
+
+      constrainPan();
+      requestRender();
+    }
+
+    // Event Listeners Setup
     function setupEventListeners() {
+      // Desktop Mouse Pan & Hover
       mapViewport.addEventListener('mousedown', (e) => {
         if (e.button !== 0) return;
         isMouseDown = true;
@@ -1192,164 +1305,222 @@
 
       window.addEventListener('mousemove', (e) => {
         const rect = mapViewport.getBoundingClientRect();
-        if (e.clientX >= rect.left && e.clientX <= rect.right &&
-            e.clientY >= rect.top && e.clientY <= rect.bottom) {
-          const stageX = Math.round((e.clientX - rect.left - panX) / zoom);
-          const stageY = Math.round((e.clientY - rect.top - panY) / zoom);
-          const imgW = mapImage.naturalWidth || 1;
-          const imgH = mapImage.naturalHeight || 1;
+        const screenX = e.clientX - rect.left;
+        const screenY = e.clientY - rect.top;
 
-          if (stageX >= 0 && stageX <= imgW && stageY >= 0 && stageY <= imgH) {
-            const coordsDisplay = document.getElementById('coordsDisplay');
+        if (screenX >= 0 && screenX <= rect.width && screenY >= 0 && screenY <= rect.height) {
+          const stageX = Math.round((screenX - panX) / zoom);
+          const stageY = Math.round((screenY - panY) / zoom);
+
+          if (stageX >= 0 && stageX <= imgNaturalWidth && stageY >= 0 && stageY <= imgNaturalHeight) {
             if (coordsDisplay) {
               coordsDisplay.textContent = `X: ${stageX} | Y: ${stageY}`;
+            }
+          }
+
+          // Hover detection on desktop
+          if (!isDragging && !isMouseDown) {
+            const hit = hitTestBase(screenX, screenY);
+            const newHover = hit ? hit.id : null;
+            if (newHover !== hoverBaseId) {
+              hoverBaseId = newHover;
+              mapViewport.style.cursor = hoverBaseId ? 'pointer' : 'grab';
+              requestRender();
             }
           }
         }
 
         if (!isMouseDown) return;
+
         const dx = e.clientX - dragStartX;
         const dy = e.clientY - dragStartY;
 
-        if (Math.abs(dx) > 3 || Math.abs(dy) > 3) {
+        if (Math.hypot(dx, dy) > 4) {
           isDragging = true;
         }
 
         if (isDragging) {
           panX = initialPanX + dx;
           panY = initialPanY + dy;
-          applyTransform();
+          constrainPan();
+          requestRender();
         }
       });
 
-      window.addEventListener('mouseup', () => {
+      window.addEventListener('mouseup', (e) => {
+        if (isMouseDown && !isDragging) {
+          const rect = mapViewport.getBoundingClientRect();
+          const screenX = e.clientX - rect.left;
+          const screenY = e.clientY - rect.top;
+
+          if (screenX >= 0 && screenX <= rect.width && screenY >= 0 && screenY <= rect.height) {
+            const hit = hitTestBase(screenX, screenY);
+            if (hit) {
+              toggleBaseSelection(hit.id);
+            }
+          }
+        }
         isMouseDown = false;
+        isDragging = false;
       });
 
-      document.addEventListener('click', (e) => {
-        const searchBox = document.querySelector('.search-box');
-        const dropdown = document.getElementById('searchResultsDropdown');
-        if (searchBox && dropdown && !searchBox.contains(e.target)) {
-          dropdown.classList.remove('active');
-        }
-      });
+      // Desktop Mouse Wheel Zoom
+      mapViewport.addEventListener('wheel', (e) => {
+        e.preventDefault();
+        const rect = mapViewport.getBoundingClientRect();
+        const screenX = e.clientX - rect.left;
+        const screenY = e.clientY - rect.top;
+        const zoomFactor = e.deltaY < 0 ? 1.15 : 0.87;
+        zoomTo(zoom * zoomFactor, screenX, screenY);
+      }, { passive: false });
 
-      // Touch gesture state variables for mobile touch pan & pinch-zoom
-      let touchStartDist = 0;
-      let initialTouchZoom = 1.0;
-      let touchPanStartX = 0;
-      let touchPanStartY = 0;
-
-      let interactTimer = null;
-      function setInteracting() {
-        mapViewport.classList.add('is-interacting');
-        if (interactTimer) clearTimeout(interactTimer);
-        interactTimer = setTimeout(() => {
-          mapViewport.classList.remove('is-interacting');
-        }, 150);
-      }
-
+      // MOBILE TOUCH GESTURES (Flawless 1-finger pan, 2-finger pinch & pan, double-tap zoom)
       mapViewport.addEventListener('touchstart', (e) => {
-        setInteracting();
         if (e.touches.length === 1) {
           isMouseDown = true;
-          isDragging = false;
-          touchPanStartX = e.touches[0].clientX;
-          touchPanStartY = e.touches[0].clientY;
+          isTouchDragging = false;
+          isPinching = false;
+          dragStartX = e.touches[0].clientX;
+          dragStartY = e.touches[0].clientY;
           initialPanX = panX;
           initialPanY = panY;
+          touchStartTime = performance.now();
         } else if (e.touches.length === 2) {
           isMouseDown = false;
-          isDragging = false;
-          touchStartDist = Math.hypot(
-            e.touches[0].clientX - e.touches[1].clientX,
-            e.touches[0].clientY - e.touches[1].clientY
-          );
-          initialTouchZoom = zoom;
+          isTouchDragging = false;
+          isPinching = true;
+
+          const t1 = e.touches[0];
+          const t2 = e.touches[1];
+          touchStartDist = Math.hypot(t1.clientX - t2.clientX, t1.clientY - t2.clientY);
+          touchStartMidX = (t1.clientX + t2.clientX) / 2;
+          touchStartMidY = (t1.clientY + t2.clientY) / 2;
+          touchStartZoom = zoom;
+          touchStartPanX = panX;
+          touchStartPanY = panY;
         }
       }, { passive: false });
 
       mapViewport.addEventListener('touchmove', (e) => {
-        setInteracting();
-        if (e.touches.length === 1 && isMouseDown) {
-          const dx = e.touches[0].clientX - touchPanStartX;
-          const dy = e.touches[0].clientY - touchPanStartY;
+        e.preventDefault();
 
-          if (Math.abs(dx) > 3 || Math.abs(dy) > 3) {
-            isDragging = true;
+        const rect = mapViewport.getBoundingClientRect();
+
+        if (e.touches.length === 1 && !isPinching) {
+          const t = e.touches[0];
+          const dx = t.clientX - dragStartX;
+          const dy = t.clientY - dragStartY;
+
+          if (Math.hypot(dx, dy) > 6) {
+            isTouchDragging = true;
           }
 
-          if (isDragging) {
-            e.preventDefault();
+          if (isTouchDragging) {
             panX = initialPanX + dx;
             panY = initialPanY + dy;
-            applyTransform();
+            constrainPan();
+            requestRender();
           }
 
-          // Update floating coordinate display for touch
-          const rect = mapViewport.getBoundingClientRect();
-          const stageX = Math.round((e.touches[0].clientX - rect.left - panX) / zoom);
-          const stageY = Math.round((e.touches[0].clientY - rect.top - panY) / zoom);
-          const coordsDisplay = document.getElementById('coordsDisplay');
-          if (coordsDisplay && stageX >= 0 && stageY >= 0) {
+          // Update touch coordinates display
+          const screenX = t.clientX - rect.left;
+          const screenY = t.clientY - rect.top;
+          const stageX = Math.round((screenX - panX) / zoom);
+          const stageY = Math.round((screenY - panY) / zoom);
+          if (coordsDisplay && stageX >= 0 && stageX <= imgNaturalWidth && stageY >= 0 && stageY <= imgNaturalHeight) {
             coordsDisplay.textContent = `X: ${stageX} | Y: ${stageY}`;
           }
-        } else if (e.touches.length === 2) {
-          e.preventDefault();
-          const currentDist = Math.hypot(
-            e.touches[0].clientX - e.touches[1].clientX,
-            e.touches[0].clientY - e.touches[1].clientY
-          );
+        } else if (e.touches.length === 2 && isPinching) {
+          const t1 = e.touches[0];
+          const t2 = e.touches[1];
+          const currentDist = Math.hypot(t1.clientX - t2.clientX, t1.clientY - t2.clientY);
+          const currentMidX = (t1.clientX + t2.clientX) / 2;
+          const currentMidY = (t1.clientY + t2.clientY) / 2;
+
           if (touchStartDist > 0) {
             const scale = currentDist / touchStartDist;
-            const centerTouchX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
-            const centerTouchY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
-            zoomTo(initialTouchZoom * scale, centerTouchX, centerTouchY);
+            const targetZoom = Math.min(Math.max(touchStartZoom * scale, MIN_ZOOM), MAX_ZOOM);
+
+            const initialStageX = (touchStartMidX - rect.left - touchStartPanX) / touchStartZoom;
+            const initialStageY = (touchStartMidY - rect.top - touchStartPanY) / touchStartZoom;
+
+            zoom = targetZoom;
+            panX = (currentMidX - rect.left) - (initialStageX * zoom);
+            panY = (currentMidY - rect.top) - (initialStageY * zoom);
+
+            constrainPan();
+            requestRender();
           }
         }
       }, { passive: false });
 
       mapViewport.addEventListener('touchend', (e) => {
+        if (isPinching && e.touches.length < 2) {
+          isPinching = false;
+          if (e.touches.length === 1) {
+            dragStartX = e.touches[0].clientX;
+            dragStartY = e.touches[0].clientY;
+            initialPanX = panX;
+            initialPanY = panY;
+            isMouseDown = true;
+            isTouchDragging = false;
+          }
+          return;
+        }
+
         if (e.touches.length === 0) {
+          const touchDuration = performance.now() - touchStartTime;
+
+          // Single Tap detection
+          if (!isTouchDragging && !isPinching && touchDuration < 380) {
+            const rect = mapViewport.getBoundingClientRect();
+            const screenX = dragStartX - rect.left;
+            const screenY = dragStartY - rect.top;
+
+            const now = performance.now();
+            const distFromLastTap = Math.hypot(screenX - lastTapX, screenY - lastTapY);
+
+            // Check for Double-Tap Zoom
+            if (now - lastTapTime < 320 && distFromLastTap < 35) {
+              const targetZoom = zoom < 0.9 ? 1.5 : MIN_ZOOM;
+              zoomTo(targetZoom, screenX, screenY);
+              lastTapTime = 0;
+            } else {
+              lastTapTime = now;
+              lastTapX = screenX;
+              lastTapY = screenY;
+
+              const hit = hitTestBase(screenX, screenY);
+              if (hit) {
+                toggleBaseSelection(hit.id);
+              }
+            }
+          }
+
           isMouseDown = false;
-          mapViewport.classList.remove('is-interacting');
+          isTouchDragging = false;
+          isPinching = false;
         }
       });
 
-      mapViewport.addEventListener('wheel', (e) => {
-        e.preventDefault();
-        const zoomFactor = e.deltaY < 0 ? 1.1 : 0.9;
-        zoomTo(zoom * zoomFactor, e.clientX, e.clientY);
-      }, { passive: false });
+      // Prevent iOS Safari Native Gesture Scaling
+      document.addEventListener('gesturestart', (e) => e.preventDefault(), { passive: false });
+      document.addEventListener('gesturechange', (e) => e.preventDefault(), { passive: false });
+      document.addEventListener('gestureend', (e) => e.preventDefault(), { passive: false });
 
-      // Sidebar Toggle
-      toggleSidebarBtn.onclick = () => {
-        sidebar.classList.toggle('collapsed');
-      };
-    }
-
-    function zoomTo(targetZoom, clientX, clientY) {
-      const newZoom = Math.min(Math.max(targetZoom, MIN_ZOOM), MAX_ZOOM);
-      if (newZoom === zoom) return;
-
-      const viewportRect = mapViewport.getBoundingClientRect();
-      const centerX = clientX !== undefined ? (clientX - viewportRect.left) : (viewportRect.width / 2);
-      const centerY = clientY !== undefined ? (clientY - viewportRect.top) : (viewportRect.height / 2);
-
-      const stageX = (centerX - panX) / zoom;
-      const stageY = (centerY - panY) / zoom;
-
-      zoom = newZoom;
-      panX = centerX - (stageX * zoom);
-      panY = centerY - (stageY * zoom);
-
-      applyTransform();
+      // Close Search Dropdown on Outside Click
+      document.addEventListener('click', (e) => {
+        const searchBox = document.querySelector('.search-box');
+        if (searchBox && searchResultsDropdown && !searchBox.contains(e.target)) {
+          searchResultsDropdown.classList.remove('active');
+        }
+      });
     }
 
     // MAIN PROMPT GENERATOR ACTION
     function generateAndCopyPrompt() {
       if (selectedBaseIds.length === 0) {
-        alert("⚠️ No locations selected! Click any base marker on the map or check it in the sidebar to select it.");
+        alert("⚠️ No locations selected! Click or tap any base marker on the map to select it.");
         return;
       }
 
@@ -1381,39 +1552,59 @@ Tone and Style: Use professional military jargon, be concise, and use bold heade
 USER DATA:
 ${locNamesStr}`;
 
-      navigator.clipboard.writeText(promptText)
+      copyToClipboard(promptText)
         .then(() => {
-          showCopyPromptOverlay(selectedBases.length, promptText);
-          displayOpordResult(rndInt, codename, selectedBases);
+          showCopyPromptOverlay(selectedBases.length);
         })
         .catch((err) => {
-          console.error("Clipboard Error: ", err);
-          showCopyPromptOverlay(selectedBases.length, promptText);
-          displayOpordResult(rndInt, codename, selectedBases);
+          console.warn("Clipboard Async failed, fallback used: ", err);
+          showCopyPromptOverlay(selectedBases.length);
         });
+    }
+
+    // Robust Clipboard Copy supporting all iOS / Android browsers
+    function copyToClipboard(text) {
+      if (navigator.clipboard && window.isSecureContext) {
+        return navigator.clipboard.writeText(text).catch(() => copyToClipboardFallback(text));
+      } else {
+        return copyToClipboardFallback(text);
+      }
+    }
+
+    function copyToClipboardFallback(text) {
+      return new Promise((resolve, reject) => {
+        try {
+          const textArea = document.createElement("textarea");
+          textArea.value = text;
+          textArea.style.position = "fixed";
+          textArea.style.left = "-999999px";
+          textArea.style.top = "-999999px";
+          document.body.appendChild(textArea);
+          textArea.focus();
+          textArea.select();
+          const successful = document.execCommand('copy');
+          document.body.removeChild(textArea);
+          if (successful) {
+            resolve();
+          } else {
+            reject(new Error('execCommand failed'));
+          }
+        } catch (err) {
+          reject(err);
+        }
+      });
     }
 
     function showCopyPromptOverlay(locCount) {
       const desc = document.getElementById("copyOverlayDesc");
-      desc.innerHTML = `Your customized mission prompt featuring <strong>${locCount} location${locCount === 1 ? '' : 's'}</strong> has been copied to your clipboard!<br><br>Click an AI service below to launch it, paste your prompt, and generate your operation briefing.`;
-      document.getElementById("copyPromptOverlay").classList.add("active");
-    }
-
-    function displayOpordResult(opordNum, codename, selectedBases) {
-      const card = document.getElementById("opordCard");
-      const title = document.getElementById("opordTitle");
-      const text = document.getElementById("opordText");
-
-      title.textContent = `OPORD ${opordNum} - CODENAME: ${codename}`;
-      text.textContent = `TARGET OBJECTIVES (${selectedBases.length}):\n` + 
-        selectedBases.map((b, idx) => `  ${idx + 1}. ${b.name}`).join("\n");
-
-      card.classList.add("active");
-      card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      if (desc) {
+        desc.innerHTML = `Your customized mission prompt featuring <strong>${locCount} location${locCount === 1 ? '' : 's'}</strong> has been copied to your clipboard!<br><br>Click an AI service below to launch it, paste your prompt, and generate your operation briefing.`;
+      }
+      document.getElementById("copyPromptOverlay")?.classList.add("active");
     }
 
     function showInstructions() {
-      document.getElementById("instructionsOverlay").classList.add("active");
+      document.getElementById("instructionsOverlay")?.classList.add("active");
     }
 
     function closeModal(id) {
@@ -1428,6 +1619,7 @@ ${locNamesStr}`;
       if (e.key === "Escape") {
         closeModal('copyPromptOverlay');
         closeModal('instructionsOverlay');
+        if (searchResultsDropdown) searchResultsDropdown.classList.remove('active');
       }
     });
   </script>
