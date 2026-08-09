@@ -1346,20 +1346,24 @@
       }, { passive: false });
 
       // MOBILE TOUCH GESTURES (Flawless 1-finger pan, 2-finger pinch & pan, double-tap zoom)
+      let hasPinched = false;
+
       mapViewport.addEventListener('touchstart', (e) => {
         if (e.touches.length === 1) {
           isMouseDown = false; // keep mouse state false during touch to prevent synthetic mouseup double-toggle
           isTouchDragging = false;
           isPinching = false;
+          hasPinched = false;
           dragStartX = e.touches[0].clientX;
           dragStartY = e.touches[0].clientY;
           initialPanX = panX;
           initialPanY = panY;
           touchStartTime = performance.now();
-        } else if (e.touches.length === 2) {
+        } else if (e.touches.length >= 2) {
           isMouseDown = false;
           isTouchDragging = false;
           isPinching = true;
+          hasPinched = true;
 
           const t1 = e.touches[0];
           const t2 = e.touches[1];
@@ -1377,7 +1381,7 @@
 
         const rect = mapViewport.getBoundingClientRect();
 
-        if (e.touches.length === 1 && !isPinching) {
+        if (e.touches.length === 1 && !isPinching && !hasPinched) {
           const t = e.touches[0];
           const dx = t.clientX - dragStartX;
           const dy = t.clientY - dragStartY;
@@ -1393,26 +1397,30 @@
             requestRender();
           }
 
-        } else if (e.touches.length === 2 && isPinching) {
-          const t1 = e.touches[0];
-          const t2 = e.touches[1];
-          const currentDist = Math.hypot(t1.clientX - t2.clientX, t1.clientY - t2.clientY);
-          const currentMidX = (t1.clientX + t2.clientX) / 2;
-          const currentMidY = (t1.clientY + t2.clientY) / 2;
+        } else if (e.touches.length >= 2 || isPinching) {
+          if (e.touches.length >= 2) {
+            isPinching = true;
+            hasPinched = true;
+            const t1 = e.touches[0];
+            const t2 = e.touches[1];
+            const currentDist = Math.hypot(t1.clientX - t2.clientX, t1.clientY - t2.clientY);
+            const currentMidX = (t1.clientX + t2.clientX) / 2;
+            const currentMidY = (t1.clientY + t2.clientY) / 2;
 
-          if (touchStartDist > 0) {
-            const scale = currentDist / touchStartDist;
-            const targetZoom = Math.min(Math.max(touchStartZoom * scale, MIN_ZOOM), MAX_ZOOM);
+            if (touchStartDist > 0) {
+              const scale = currentDist / touchStartDist;
+              const targetZoom = Math.min(Math.max(touchStartZoom * scale, MIN_ZOOM), MAX_ZOOM);
 
-            const initialStageX = (touchStartMidX - rect.left - touchStartPanX) / touchStartZoom;
-            const initialStageY = (touchStartMidY - rect.top - touchStartPanY) / touchStartZoom;
+              const initialStageX = (touchStartMidX - rect.left - touchStartPanX) / touchStartZoom;
+              const initialStageY = (touchStartMidY - rect.top - touchStartPanY) / touchStartZoom;
 
-            zoom = targetZoom;
-            panX = (currentMidX - rect.left) - (initialStageX * zoom);
-            panY = (currentMidY - rect.top) - (initialStageY * zoom);
+              zoom = targetZoom;
+              panX = (currentMidX - rect.left) - (initialStageX * zoom);
+              panY = (currentMidY - rect.top) - (initialStageY * zoom);
 
-            constrainPan();
-            requestRender();
+              constrainPan();
+              requestRender();
+            }
           }
         }
       }, { passive: false });
@@ -1423,14 +1431,11 @@
           e.preventDefault();
         }
 
-        if (isPinching && e.touches.length < 2) {
-          isPinching = false;
-          if (e.touches.length === 1) {
-            dragStartX = e.touches[0].clientX;
-            dragStartY = e.touches[0].clientY;
-            initialPanX = panX;
-            initialPanY = panY;
-            isMouseDown = false;
+        if (e.touches.length > 0) {
+          // If fingers are still on screen, track pinch state and suppress tap
+          if (isPinching || hasPinched) {
+            isPinching = true;
+            hasPinched = true;
             isTouchDragging = false;
           }
           return;
@@ -1439,8 +1444,8 @@
         if (e.touches.length === 0) {
           const touchDuration = performance.now() - touchStartTime;
 
-          // Clean Single Tap detection for marker selection toggle
-          if (!isTouchDragging && !isPinching && touchDuration < 450) {
+          // Clean Single Tap detection for marker selection toggle (only if pinch was never used)
+          if (!isTouchDragging && !isPinching && !hasPinched && touchDuration < 450) {
             const rect = mapViewport.getBoundingClientRect();
             const screenX = dragStartX - rect.left;
             const screenY = dragStartY - rect.top;
@@ -1467,6 +1472,7 @@
           isMouseDown = false;
           isTouchDragging = false;
           isPinching = false;
+          hasPinched = false;
         }
       }, { passive: false });
 
