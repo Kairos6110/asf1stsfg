@@ -1104,6 +1104,7 @@
       if (!searchQuery) {
         searchResultsDropdown.classList.remove('active');
         searchResultsDropdown.innerHTML = '';
+        if (searchInput) searchInput.blur();
         return;
       }
 
@@ -1139,6 +1140,7 @@
         item.onclick = (e) => {
           e.stopPropagation();
           searchResultsDropdown.classList.remove('active');
+          if (searchInput) searchInput.blur();
           panToLocation(x, y, true);
         };
       });
