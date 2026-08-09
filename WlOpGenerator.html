@@ -323,7 +323,10 @@
       overflow: hidden;
       cursor: grab;
       user-select: none;
+      -webkit-user-select: none;
       touch-action: none;
+      transform: translateZ(0);
+      -webkit-transform: translateZ(0);
     }
     .map-viewport:active {
       cursor: grabbing;
@@ -368,11 +371,16 @@
       will-change: transform;
       backface-visibility: hidden;
       -webkit-backface-visibility: hidden;
+      transform-style: preserve-3d;
+      -webkit-transform-style: preserve-3d;
     }
 
     .map-stage img {
       display: block;
       pointer-events: none;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      -webkit-transform: translateZ(0);
     }
 
     /* SVG Marker Base Styles: Default = Tactical Green */
@@ -876,7 +884,7 @@
 
     // State Variables
     let bases = []; // Array of base location objects from bases.json: { id, name, x, y }
-    let selectedBaseIds = new Set(); // Track selected base IDs
+    let selectedBaseIds = []; // Track selected base IDs in order of selection
     
     // Map Interaction State
     let zoom = 1.0;
@@ -983,7 +991,7 @@
 
       bases.forEach(base => {
         const isSearchMatch = query && base.name.toLowerCase().includes(query);
-        const isSelected = selectedBaseIds.has(base.id);
+        const isSelected = selectedBaseIds.includes(base.id);
 
         const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
         group.setAttribute('class', `base-marker-group ${isSelected ? 'selected' : ''} ${isSearchMatch ? 'search-highlight' : ''}`);
@@ -1052,10 +1060,11 @@
     function toggleBaseSelection(id, event) {
       if (event) event.stopPropagation();
 
-      if (selectedBaseIds.has(id)) {
-        selectedBaseIds.delete(id);
+      const idx = selectedBaseIds.indexOf(id);
+      if (idx !== -1) {
+        selectedBaseIds.splice(idx, 1);
       } else {
-        selectedBaseIds.add(id);
+        selectedBaseIds.push(id);
       }
 
       updateSingleMarkerUI(id);
@@ -1066,7 +1075,7 @@
       const marker = document.getElementById(`marker_${id}`);
       if (!marker) return;
 
-      const isSelected = selectedBaseIds.has(id);
+      const isSelected = selectedBaseIds.includes(id);
       if (isSelected) {
         marker.classList.add('selected');
       } else {
@@ -1075,19 +1084,19 @@
     }
 
     function updateSelectedCount() {
-      const count = selectedBaseIds.size;
+      const count = selectedBaseIds.length;
       selectedCountDisplay.textContent = `${count} Selected`;
     }
 
     function clearAllSelections() {
-      if (selectedBaseIds.size === 0) return;
+      if (selectedBaseIds.length === 0) return;
       
-      const count = selectedBaseIds.size;
+      const count = selectedBaseIds.length;
       if (!confirm(`Are you sure you want to clear ${count} selected location${count === 1 ? '' : 's'}?`)) {
         return;
       }
 
-      selectedBaseIds.clear();
+      selectedBaseIds = [];
       renderMarkers();
       updateSelectedCount();
     }
@@ -1114,7 +1123,7 @@
 
       let html = '';
       matches.forEach(base => {
-        const isSelected = selectedBaseIds.has(base.id);
+        const isSelected = selectedBaseIds.includes(base.id);
         html += `
           <div class="search-result-item" data-id="${base.id}" data-x="${base.x}" data-y="${base.y}">
             <span class="search-result-name" style="${isSelected ? 'color: var(--accent-gold);' : ''}">${escapeHtml(base.name)} ${isSelected ? '✓' : ''}</span>
@@ -1317,12 +1326,14 @@
 
     // MAIN PROMPT GENERATOR ACTION
     function generateAndCopyPrompt() {
-      if (selectedBaseIds.size === 0) {
+      if (selectedBaseIds.length === 0) {
         alert("⚠️ No locations selected! Click any base marker on the map or check it in the sidebar to select it.");
         return;
       }
 
-      const selectedBases = bases.filter(b => selectedBaseIds.has(b.id));
+      // Map selectedBaseIds (which preserves exact click order) to base objects
+      const basesMap = new Map(bases.map(b => [b.id, b]));
+      const selectedBases = selectedBaseIds.map(id => basesMap.get(id)).filter(Boolean);
       const locNamesStr = selectedBases.map(b => b.name).join(", ");
 
       const rndInt = Math.floor(Math.random() * 9000) + 1000;
