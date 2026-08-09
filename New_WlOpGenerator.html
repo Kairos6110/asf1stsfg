@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ghost Recon Wildlands - Base Mapper</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Header Navbar -->
+    <header class="app-header">
+      <div class="brand">
+        <div class="brand-icon">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="9"/>
+            <path d="M12 3v3M12 18v3M3 12h3M18 12h3"/>
+            <circle cx="12" cy="12" r="3" fill="currentColor"/>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <h1>WILDLANDS <span>BASE MAPPER</span></h1>
+          <p class="subtitle">Tactical Base Coordinate Mapping System</p>
+        </div>
+      </div>
+
+      <div class="header-stats">
+        <div class="stat-badge">
+          <span class="stat-label">TAGGED BASES</span>
+          <span class="stat-value" id="baseCount">0</span>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <button id="exportJsonBtn" class="btn btn-primary" title="Export bases to JSON file">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/>
+          </svg>
+          Save / Download JSON
+        </button>
+        <button id="importJsonBtn" class="btn btn-secondary" title="Import bases from JSON file">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
+          </svg>
+          Load JSON File
+        </button>
+        <input type="file" id="fileInput" accept=".json" style="display:none;">
+        <button id="toggleSidebarBtn" class="btn btn-icon" title="Toggle Base List Sidebar">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="18" height="18" rx="2"/>
+            <path d="M9 3v18"/>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Toolbar / Controls -->
+    <div class="toolbar">
+      <div class="tool-group">
+        <span class="tool-label">MODE:</span>
+        <button id="modeAddBtn" class="btn btn-mode active" title="Click anywhere on the map to add a base">
+          <span class="mode-dot"></span> Click to Add Base
+        </button>
+        <button id="modePanBtn" class="btn btn-mode" title="Drag to pan without adding bases">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M5 9l-3 3 3 3M9 5l3-3 3 3M15 19l-3 3-3-3M19 9l3 3-3 3M2 12h20M12 2v20"/>
+          </svg> Pan Mode
+        </button>
+      </div>
+
+      <div class="tool-divider"></div>
+
+      <div class="tool-group zoom-controls">
+        <span class="tool-label">ZOOM:</span>
+        <button id="zoomOutBtn" class="btn btn-icon-sm" title="Zoom Out">-</button>
+        <input type="range" id="zoomRange" min="20" max="150" value="100" step="5" title="Zoom Level (Max 150%)">
+        <button id="zoomInBtn" class="btn btn-icon-sm" title="Zoom In">+</button>
+        <span class="zoom-value" id="zoomValueDisplay">100%</span>
+        <button id="zoomResetBtn" class="btn btn-xs" title="Reset Zoom to 100%">Reset</button>
+      </div>
+
+      <div class="tool-divider"></div>
+
+      <div class="tool-group flex-grow">
+        <div class="search-box">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"/>
+            <path d="M21 21l-4.35-4.35"/>
+          </svg>
+          <input type="text" id="searchInput" placeholder="Search saved bases by name...">
+        </div>
+      </div>
+
+      <div class="tool-group">
+        <span class="coords-display" id="coordsDisplay">X: --- | Y: ---</span>
+      </div>
+    </div>
+
+    <!-- Main Workspace -->
+    <div class="workspace">
+      <!-- Map Container -->
+      <div class="map-viewport" id="mapViewport">
+        <div class="map-stage" id="mapStage">
+          <img id="mapImage" src="fullmap.jpg" alt="Ghost Recon Wildlands Map" draggable="false">
+          <svg id="markerOverlay" class="marker-overlay"></svg>
+        </div>
+
+        <!-- Inline Quick Base Naming Modal -->
+        <div class="quick-modal" id="quickModal" style="display: none;">
+          <div class="quick-modal-header">
+            <span class="modal-title" id="modalTitle">NEW BASE LOCATION</span>
+            <button class="modal-close" id="modalCloseBtn">&times;</button>
+          </div>
+          <div class="quick-modal-body">
+            <label for="baseNameInput">Base Name:</label>
+            <input type="text" id="baseNameInput" placeholder="e.g. MOB Jaguar, FOB Armadillo..." autocomplete="off">
+            <div class="modal-coords-info" id="modalCoordsInfo">Coords: (0, 0)</div>
+          </div>
+          <div class="quick-modal-actions">
+            <button id="deleteModalBaseBtn" class="btn btn-danger btn-sm" style="display: none;" title="Delete this base location">Delete</button>
+            <button id="saveBaseBtn" class="btn btn-success btn-sm">Save Base</button>
+            <button id="cancelBaseBtn" class="btn btn-cancel btn-sm">Cancel (Esc)</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Base List Sidebar -->
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+          <div class="sidebar-title-group" id="collapseSidebarToggle" title="Collapse panel horizontally">
+            <svg class="collapse-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M9 18l6-6-6-6"/>
+            </svg>
+            <h2>SAVED BASES</h2>
+          </div>
+        </div>
+
+        <div class="sidebar-content">
+          <ul id="baseList" class="base-list">
+            <!-- Dynamic Base Items -->
+          </ul>
+          <div id="emptyState" class="empty-state">
+            <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z"/>
+              <path d="M12 8v4l3 3"/>
+            </svg>
+            <p>No bases mapped yet.</p>
+            <p class="sub-text">Click anywhere on the map to place your first base circle!</p>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
