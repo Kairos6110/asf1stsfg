@@ -1104,7 +1104,6 @@
       if (!searchQuery) {
         searchResultsDropdown.classList.remove('active');
         searchResultsDropdown.innerHTML = '';
-        if (searchInput) searchInput.blur();
         return;
       }
 
@@ -1434,11 +1433,14 @@
       document.addEventListener('gesturechange', (e) => e.preventDefault(), { passive: false });
       document.addEventListener('gestureend', (e) => e.preventDefault(), { passive: false });
 
-      // Close Search Dropdown on Outside Click
-      document.addEventListener('click', (e) => {
+      // Close Search Dropdown & Dismiss Mobile Keyboard on Outside Click / Tap
+      document.addEventListener('pointerdown', (e) => {
         const searchBox = document.querySelector('.search-box');
-        if (searchBox && searchResultsDropdown && !searchBox.contains(e.target)) {
-          searchResultsDropdown.classList.remove('active');
+        if (searchBox && !searchBox.contains(e.target)) {
+          if (searchResultsDropdown) searchResultsDropdown.classList.remove('active');
+          if (searchInput && document.activeElement === searchInput) {
+            searchInput.blur();
+          }
         }
       });
     }
