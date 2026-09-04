@@ -347,6 +347,13 @@
       border-color: var(--accent);
     }
 
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+      border-color: var(--line);
+    }
+
     .danger-button {
       background: linear-gradient(180deg, rgba(122, 44, 39, 0.96), rgba(70, 22, 20, 0.98));
       border-color: rgba(216, 77, 69, 0.5);
@@ -678,7 +685,7 @@
       max-height: min(88vh, 860px);
       max-height: min(88dvh, 860px);
       display: grid;
-      grid-template-rows: minmax(0, 1fr) auto;
+      grid-template-rows: auto minmax(0, 1fr) auto;
       gap: 0;
       padding: 0;
       overflow: hidden;
@@ -687,6 +694,25 @@
       background:
         linear-gradient(180deg, rgba(29, 40, 32, 0.98), rgba(9, 14, 11, 0.99)),
         var(--panel);
+    }
+
+    .opord-result-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 18px;
+      border-bottom: 1px solid rgba(196, 219, 84, 0.16);
+      background: rgba(8, 13, 10, 0.96);
+    }
+
+    .opord-result-header h2 {
+      margin: 0;
+      font-size: 1.15rem;
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
 
     .opord-result-body {
@@ -938,6 +964,20 @@
 
     .opord-result-actions button {
       text-align: center;
+    }
+
+    #copyOpordResultBtn {
+      background: linear-gradient(180deg, rgba(62, 88, 48, 0.96), rgba(35, 52, 27, 0.98));
+      border-color: var(--accent);
+      color: var(--accent);
+      font-weight: 600;
+      letter-spacing: 0.03em;
+    }
+
+    #copyOpordResultBtn:hover {
+      background: linear-gradient(180deg, rgba(78, 110, 60, 0.96), rgba(45, 66, 35, 0.98));
+      border-color: #e2f572;
+      color: #fff;
     }
 
     .community-opords-card {
@@ -1476,7 +1516,7 @@
 
           <section class="panel panel-actions" id="actionsSection" hidden>
             <button id="copyPromptBtn" type="button" hidden>Craft OPORD</button>
-            <button id="generateOpordBtn" type="button" hidden>Instant OPORD (Quick)</button>
+            <button id="generateOpordBtn" type="button" hidden>Generate OPORD</button>
           </section>
         </div>
       </div>
@@ -1496,7 +1536,7 @@
       <h2 class="modal-title--center" id="instructionsTitle">Breakpoint Operation Generator</h2>
       <ol class="instruction-list">
         <li>Look around and select 🟢 or search for the locations you want to target. The map displays <strong>ALL</strong> enemy bases, but not every single map item to maintain visual clarity. Click ▲ / ▼ to hide or show the panel for a larger map view.</li>
-        <li>After selecting locations, click 'Craft OPORD' and follow the instructions.</li>
+        <li>After selecting locations, click 'Craft OPORD' or 'Generate OPORD' and follow the instructions.</li>
         <li>Enjoy playing your custom roleplay mission!</li>
       </ol>
       <a class="discord-text-link" href="https://discord.gg/BXvQFwBq8z" target="_blank" rel="noreferrer noopener">
@@ -1526,12 +1566,16 @@
   </div>
 
   <div class="modal-backdrop" id="opordResultModal" hidden>
-    <div class="modal-card modal-card--wide opord-result-card" role="dialog" aria-modal="true" aria-label="Assigned OPORD" aria-describedby="opordResultOutput">
+    <div class="modal-card modal-card--wide opord-result-card" role="dialog" aria-modal="true" aria-labelledby="opordResultTitle" aria-describedby="opordResultOutput">
+      <div class="opord-result-header">
+        <h2 id="opordResultTitle">⚡ Mission OPORD</h2>
+        <button class="community-opords-close-button" id="closeOpordResultTopBtn" type="button" aria-label="Close OPORD">X</button>
+      </div>
       <div class="opord-result-body">
         <div class="opord-result-output" id="opordResultOutput" aria-live="polite">Waiting...</div>
       </div>
       <div class="modal-actions modal-actions--split opord-result-actions">
-        <button id="copyOpordResultBtn" type="button">COPY</button>
+        <button id="copyOpordResultBtn" type="button">COPY OPORD</button>
         <button id="closeOpordResultBtn" type="button">CLOSE</button>
       </div>
     </div>
@@ -1635,10 +1679,12 @@
     const MAX_NATIVE_ZOOM = 6;
     const SEARCH_RESULT_ZOOM = 4.5;
     const ENABLE_BACKEND_OPORD_FEATURES = false;
+    const OPORD_LLM_ENDPOINT = "https://freeaixyz4all.vercel.app/api/v1/chat/completions";
+    const OPORD_LLM_MODEL = "tb/gemini-3.6-flash";
     const OPORD_ENDPOINT = "https://unvascular-malachi-isolatedly.ngrok-free.dev";
     const COMMUNITY_OPORDS_ENDPOINT = `${OPORD_ENDPOINT}/community-opords`;
-    const OPORD_LOADING_MESSAGE = "Decrypting Target Package...";
-    const OPORD_ERROR_MESSAGE = "The backend service appears to be temporarily unavailable. Please use the 'Craft OPORD' button while we resolve the issue.";
+    const OPORD_LOADING_MESSAGE = "Generating OPORD...";
+    const OPORD_ERROR_MESSAGE = "The AI service appears to be temporarily unavailable. Please use the 'Craft OPORD' button while we resolve the issue.";
     const OPORD_CIPHER_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#%&*+-/=?@[]{}";
     const INITIAL_VIEW_ZOOM = 3;
     const INITIAL_VIEW_X = 6754;
@@ -1698,6 +1744,7 @@
     const opordResultOutput = document.getElementById("opordResultOutput");
     const copyOpordResultBtn = document.getElementById("copyOpordResultBtn");
     const closeOpordResultBtn = document.getElementById("closeOpordResultBtn");
+    const closeOpordResultTopBtn = document.getElementById("closeOpordResultTopBtn");
     const communityOpordsModal = document.getElementById("communityOpordsModal");
     const communityOpordsCount = document.getElementById("communityOpordsCount");
     const communityOpordsList = document.getElementById("communityOpordsList");
@@ -1841,6 +1888,67 @@
     let communityOpords = [];
     let selectedCommunityOpordId = null;
     const SELECTION_POPUP_AUTO_CLOSE_MS = 2000;
+    const OPORD_COOLDOWN_SECONDS = 60;
+    let isGeneratingOpord = false;
+    let opordCooldownTimer = null;
+    let opordCooldownUntil = Number(localStorage.getItem("opord_cooldown_until")) || 0;
+
+    function updateOpordCooldownUI() {
+      if (isGeneratingOpord) {
+        generateOpordBtn.disabled = true;
+        generateOpordBtn.textContent = "GENERATING...";
+        return true;
+      }
+
+      const now = Date.now();
+      const remainingMs = opordCooldownUntil - now;
+      if (remainingMs > 0) {
+        const remainingSec = Math.ceil(remainingMs / 1000);
+        generateOpordBtn.disabled = true;
+        generateOpordBtn.textContent = `Generate OPORD (${remainingSec}s)`;
+        return true;
+      }
+
+      if (opordCooldownTimer) {
+        clearInterval(opordCooldownTimer);
+        opordCooldownTimer = null;
+      }
+      try {
+        localStorage.removeItem("opord_cooldown_until");
+      } catch (_) {}
+      generateOpordBtn.disabled = false;
+      generateOpordBtn.textContent = "Generate OPORD";
+      return false;
+    }
+
+    function startOpordCooldown() {
+      opordCooldownUntil = Date.now() + (OPORD_COOLDOWN_SECONDS * 1000);
+      try {
+        localStorage.setItem("opord_cooldown_until", opordCooldownUntil.toString());
+      } catch (_) {}
+
+      if (opordCooldownTimer) {
+        clearInterval(opordCooldownTimer);
+      }
+      updateOpordCooldownUI();
+      opordCooldownTimer = setInterval(() => {
+        const active = updateOpordCooldownUI();
+        if (!active) {
+          clearInterval(opordCooldownTimer);
+          opordCooldownTimer = null;
+        }
+      }, 1000);
+    }
+
+    if (opordCooldownUntil > Date.now()) {
+      opordCooldownTimer = setInterval(() => {
+        const active = updateOpordCooldownUI();
+        if (!active) {
+          clearInterval(opordCooldownTimer);
+          opordCooldownTimer = null;
+        }
+      }, 1000);
+    }
     const stackedPanelQuery = window.matchMedia("(max-width: 980px)");
 
     document.addEventListener("visibilitychange", () => {
@@ -2142,7 +2250,8 @@
       clearSelectedButton.hidden = chosenMarkers.length === 0;
       actionsSection.hidden = chosenMarkers.length === 0;
       copyPromptBtn.hidden = chosenMarkers.length === 0;
-      generateOpordBtn.hidden = !ENABLE_BACKEND_OPORD_FEATURES || chosenMarkers.length === 0;
+      generateOpordBtn.hidden = chosenMarkers.length === 0;
+      updateOpordCooldownUI();
       syncCollapsibleSection(selectedToggle, selectedBody, selectedCollapsed);
 
       if (!chosenMarkers.length) {
@@ -2692,7 +2801,7 @@ ${selectedLocationLines}
 
       try {
         await copyTextToClipboard(opordRawResultText);
-        copyOpordResultBtn.textContent = "COPIED";
+        copyOpordResultBtn.textContent = "COPIED!";
       } catch (error) {
         console.error(error);
         copyOpordResultBtn.textContent = "COPY FAILED";
@@ -2704,13 +2813,18 @@ ${selectedLocationLines}
     }
 
     async function generateOpord() {
-      if (!selectedIds.size) {
+      if (!selectedIds.size || isGeneratingOpord) {
+        return;
+      }
+
+      if (Date.now() < opordCooldownUntil) {
+        updateOpordCooldownUI();
         return;
       }
 
       const prompt = buildPromptText();
-      const originalLabel = generateOpordBtn.textContent;
 
+      isGeneratingOpord = true;
       generateOpordBtn.disabled = true;
       generateOpordBtn.textContent = "GENERATING...";
       copyOpordResultBtn.hidden = true;
@@ -2723,33 +2837,44 @@ ${selectedLocationLines}
       try {
         await requestOpordWakeLock();
 
-        const response = await fetch(OPORD_ENDPOINT, {
+        const response = await fetch(OPORD_LLM_ENDPOINT, {
           method: "POST",
           headers: {
-            "Content-Type": "application/json",
-            "ngrok-skip-browser-warning": "true"
+            "Content-Type": "application/json"
           },
           body: JSON.stringify({
-            prompt,
-            selected_locations: selectedMarkers().map((marker) => marker.name)
+            model: OPORD_LLM_MODEL,
+            messages: [
+              {
+                role: "user",
+                content: prompt
+              }
+            ]
           })
         });
 
-        const contentType = response.headers.get("Content-Type") || "";
-        const body = contentType.includes("application/json") ? await response.json() : null;
-
         if (!response.ok) {
+          let errorDetail = "";
+          try {
+            const errBody = await response.json();
+            if (errBody?.error?.message) {
+              errorDetail = ` (${errBody.error.message})`;
+            }
+          } catch (_) {}
           setOpordResultState(
             "error",
-            OPORD_ERROR_MESSAGE
+            `${OPORD_ERROR_MESSAGE}${errorDetail}`
           );
           return;
         }
 
-        if (body && body.answer) {
+        const data = await response.json();
+        const content = data?.choices?.[0]?.message?.content;
+
+        if (content) {
           setOpordResultState(
             "ready",
-            body.answer
+            content
           );
           copyOpordResultBtn.hidden = false;
           return;
@@ -2760,14 +2885,14 @@ ${selectedLocationLines}
           OPORD_ERROR_MESSAGE
         );
       } catch (error) {
-        console.error(error);
+        console.error("OPORD generation error:", error);
         setOpordResultState(
           "error",
           OPORD_ERROR_MESSAGE
         );
       } finally {
-        generateOpordBtn.disabled = false;
-        generateOpordBtn.textContent = originalLabel;
+        isGeneratingOpord = false;
+        startOpordCooldown();
       }
     }
 
@@ -2845,6 +2970,12 @@ ${selectedLocationLines}
     closeOpordResultBtn.addEventListener("click", () => {
       closeOpordResult();
     });
+
+    if (closeOpordResultTopBtn) {
+      closeOpordResultTopBtn.addEventListener("click", () => {
+        closeOpordResult();
+      });
+    }
 
     closeCommunityOpordsBtn.addEventListener("click", () => {
       closeCommunityOpords();
